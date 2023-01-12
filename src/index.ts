@@ -41,23 +41,37 @@ function listenForMessages() {
                 await BankVisualizer.showBalance(message.channel, bankUser);
                 break;
             case 'transfer':
+                let recipientID;
                 if (!args[1]) {
                     message.channel.send('Who you would like to send money to?')
-                    args[1] = (await getUserResponse(message.channel, message.author.id) || '');
-                    if (!args[1]) {
-                        message.channel.send('must specify user to send to');
-                        return;
+                    const newMsg = (await getUserResponse(message.channel, message.author.id));
+                    recipientID = newMsg?.mentions.users.first()?.id;
+                    if (!recipientID) {
+                        args[1] = newMsg?.content || '';
+                        if (!args[1]) {
+                            message.channel.send('must specify user to send to');
+                            return;
+                        }
                     }
+                } else {
+                    recipientID = message.mentions.users.first()?.id;
                 }
-                const transferUser = args.slice(1).join(' ');
-                const matchingUsers = bank.findUser(transferUser);
-                if (matchingUsers.length < 1) {
-                    return message.channel.send('could not find a user with that name');
+                let recipientBankUser;
+                if (recipientID) {
+                    recipientBankUser = bank.getUser(recipientID);
                 }
-                if (matchingUsers[0].userId === message.author.id && !ADMIN_IDS.includes(`${message.author.id} `)) {
+                else {
+                    const transferUser = args.slice(1).join(' ');
+                    const matchingUsers = bank.findUser(transferUser);
+                    recipientBankUser = matchingUsers[0];
+                }
+                if (!recipientBankUser) {
+                    return message.channel.send('could not find user');
+                }
+                if (recipientBankUser.userId === message.author.id && !ADMIN_IDS.includes(`${message.author.id} `)) {
                     return message.channel.send('you cannot send money to yourself');
                 }
-                (new TransferManager(bankUser)).processMonetaryTransfer(message.channel, matchingUsers[0]);
+                await (new TransferManager(bankUser)).processMonetaryTransfer(message.channel, recipientBankUser);
                 break;
             case 'help':
                 await (new EmbedBuilderLocal())

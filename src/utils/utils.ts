@@ -13,12 +13,12 @@ export function roundNumberTwoDecimals(num: number): number {
 const getFilterForUser = (userId: string) => {
     return (m: Message) => (userId === m.author.id);
 };
-export async function getUserResponse(channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>, userId: string): Promise<string | undefined> {
+export async function getUserResponse(channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>, userId: string): Promise<Message | undefined> {
     try {
         const messages = await channel.awaitMessages(
             { filter: getFilterForUser(userId), time: 60000, max: 1, errors: ['time'] }
         );
-        return messages.first()?.content;
+        return messages.first();
     } catch (e) {
         channel.send('*no response provided: cancelled transfer*');
         return;
