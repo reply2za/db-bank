@@ -1,19 +1,21 @@
-
+type SimpleUser = {
+    id: string;
+    name: string;
+};
 
 class IOUTicket {
-    senderID;
-    receiverID;
+    sender: SimpleUser;
+    receiver: SimpleUser;
+    // in format MM/DD/YY
     date;
     comment;
 
-    constructor(senderID: string, receiverID: string, date:string, comment:string) {
-        this.senderID = senderID;
-        this.receiverID = receiverID;
+    constructor(sender: SimpleUser, receiver: SimpleUser, date: string, comment: string) {
+        this.sender = sender;
+        this.receiver = receiver;
         this.date = date;
         this.comment = comment;
     }
-
 }
 
-export {IOUTicket}
-
+export { IOUTicket };

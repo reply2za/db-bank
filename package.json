@@ -14,7 +14,8 @@
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "fs": "^0.0.1-security",
-    "googleapis": "^110.0.0"
+    "googleapis": "^110.0.0",
+    "leven": "^3.1.0"
   },
   "devDependencies": {
     "prettier": "^2.8.3",

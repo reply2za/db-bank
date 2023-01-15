@@ -2,6 +2,7 @@ import { BankUser } from './BankUser';
 import { IOUTicket } from './IOUTicket';
 import { UserManager } from 'discord.js';
 import { roundNumberTwoDecimals } from '../utils/utils';
+import leven from 'leven';
 
 class Bank {
     users: Map<string, BankUser>;
@@ -11,6 +12,28 @@ class Bank {
         this.users = new Map();
         this.iOUList = [];
         this.#usernames = new Set();
+    }
+
+    transferIOU(
+        sender: BankUser,
+        receiver: BankUser,
+        amount: number,
+        comment: string
+    ): { success: boolean; failReason: string } {
+        const date = new Date();
+        for (let i = 0; i < amount; i++) {
+            const iou = new IOUTicket(
+                { id: sender.userId, name: sender.name },
+                { id: receiver.userId, name: receiver.name },
+                `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().substring(2)}`,
+                comment
+            );
+            this.iOUList.push(iou);
+        }
+        return {
+            success: true,
+            failReason: '',
+        };
     }
 
     transferAmount(sender: BankUser, receiver: BankUser, amount: number): { success: boolean; failReason: string } {
@@ -27,21 +50,16 @@ class Bank {
         return { success: true, failReason: '' };
     }
 
-    createIOU(sender: BankUser, receiver: BankUser, reason: string) {
-        const iou = new IOUTicket(sender.userId, receiver.userId, new Date().toDateString(), reason);
-        this.iOUList.push(iou);
-    }
-
-    getIOUs() {
-        return this.iOUList;
-    }
-
     getUser(id: string) {
         return this.users.get(id);
     }
 
     getAllUsers() {
         return Array.from(this.users.values());
+    }
+
+    getUserIOUs(id: string): IOUTicket[] {
+        return this.iOUList.filter((value: IOUTicket) => value.receiver.id === id);
     }
 
     getAllIOUs() {
@@ -80,14 +98,14 @@ class Bank {
             }
         }
         for (let iou of parsedData.bank.ious) {
-            this.iOUList.push(new IOUTicket(iou.senderID, iou.receiverID, iou.date, iou.comment));
+            this.iOUList.push(new IOUTicket(iou.sender, iou.receiver, iou.date, iou.comment));
         }
     }
 
     findUser(name: string): Array<BankUser> {
         const matches = [];
         for (const [, value] of this.users) {
-            if (value.name.toLowerCase().includes(name.toLowerCase())) {
+            if (leven(value.name.toLowerCase(), name.toLowerCase()) < 2) {
                 matches.push(value);
             }
         }
