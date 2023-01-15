@@ -1,13 +1,12 @@
 import {
     ColorResolvable,
-    EmbedAuthorOptions,
     EmbedBuilder,
     EmbedFooterData,
     GuildTextBasedChannel,
     If,
-    Message, TextBasedChannel,
-    TextChannel
-} from "discord.js";
+    Message,
+    TextBasedChannel,
+} from 'discord.js';
 
 /**
  * Local wrapper for EmbedBuilder.
@@ -40,15 +39,14 @@ export class EmbedBuilderLocal {
     }
 
     setAuthor(name: string, url?: string) {
-        this._embed.setAuthor({name: name, iconURL: url});
+        this._embed.setAuthor({ name: name, iconURL: url });
         return this;
     }
 
     setFooter(value: string | EmbedFooterData) {
         if (typeof value === 'string') {
             this._embed.setFooter({ text: value });
-        }
-        else {
+        } else {
             this._embed.setFooter(value);
         }
         return this;
@@ -73,7 +71,6 @@ export class EmbedBuilderLocal {
         this._embed.setThumbnail(value);
         return this;
     }
-
 
     get data() {
         return this._embed.data;
@@ -109,6 +106,5 @@ export class EmbedBuilderLocal {
         return message.edit({ embeds: [this.build()], content });
     }
 }
-
 
 module.exports = { EmbedBuilderLocal };

@@ -1,6 +1,5 @@
-import {User} from "discord.js";
-import {roundNumberTwoDecimals} from "../utils/utils";
-
+import { User } from 'discord.js';
+import { roundNumberTwoDecimals } from '../utils/utils';
 
 class BankUser {
     userId;
@@ -21,11 +20,10 @@ class BankUser {
     }
 
     addBalance(amount: number) {
-        this.balance += amount
+        this.balance += amount;
         this.balance = roundNumberTwoDecimals(this.balance);
         return this.balance;
     }
-
 
     subtractBalance(amount: number) {
         this.balance -= amount;
@@ -40,8 +38,6 @@ class BankUser {
     getDiscordUser() {
         return this.#discordUser;
     }
-
 }
 
-export {BankUser};
-
+export { BankUser };

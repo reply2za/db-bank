@@ -1,22 +1,23 @@
 'use strict';
 require('dotenv').config();
-import {bot, clientCommands} from './utils/constants';
-import {bank} from "./finance/Bank";
-import {localStorage} from "./Storage/LocalStorage";
-import fs from "fs";
+import { bot, clientCommands } from './utils/constants';
+import { bank } from './finance/Bank';
+import { localStorage } from './Storage/LocalStorage';
+import fs from 'fs';
+
 const token = process.env.CLIENT_TOKEN?.replace(/\\n/gm, '\n');
 
 function listenForMessages() {
-    const commands = fs.readdirSync("./dist/commands").filter(file => file.endsWith(".js"));
+    const commands = fs.readdirSync('./dist/commands').filter((file) => file.endsWith('.js'));
     for (const file of commands) {
-        const commandName = file.split(".")[0];
+        const commandName = file.split('.')[0];
         const command = require(`./commands/${file}`);
         clientCommands.set(commandName, command);
     }
     console.log('-loaded commands-');
-    const files = fs.readdirSync("./dist/events").filter(file => file.endsWith(".js"));
+    const files = fs.readdirSync('./dist/events').filter((file) => file.endsWith('.js'));
     for (const file of files) {
-        const eventName = file.split(".")[0];
+        const eventName = file.split('.')[0];
         const event = require(`./events/${file}`);
         bot.on(eventName, event);
     }
@@ -34,9 +35,9 @@ async function loadData() {
 
 (async () => {
     await bot.login(token);
-    console.log('-logged in-')
-    console.log('loading data...')
+    console.log('-logged in-');
+    console.log('loading data...');
     await loadData();
-    console.log('-data loaded-')
+    console.log('-data loaded-');
     listenForMessages();
 })();

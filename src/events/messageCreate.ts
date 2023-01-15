@@ -1,17 +1,14 @@
-import {ADMIN_IDS, clientCommands, PREFIX} from "../utils/constants";
-import {Message} from "discord.js";
-import {bank} from "../finance/Bank";
-import {BankUser} from "../finance/BankUser";
-import {localStorage} from "../Storage/LocalStorage";
-import {getUserResponse} from "../utils/utils";
-import {TransferManager} from "../finance/TransferManager";
-import {EmbedBuilderLocal} from "../utils/EmbedBuilderLocal";
+import { clientCommands, PREFIX } from '../utils/constants';
+import { Message } from 'discord.js';
+import { bank } from '../finance/Bank';
+import { BankUser } from '../finance/BankUser';
+import { localStorage } from '../Storage/LocalStorage';
 
 module.exports = async (message: Message) => {
-    const msgPrefix = message.content.substring(0,PREFIX.length);
+    const msgPrefix = message.content.substring(0, PREFIX.length);
     if (msgPrefix !== PREFIX) return;
     let bankUser;
-    bankUser = bank.getUser(message.author.id)
+    bankUser = bank.getUser(message.author.id);
     if (!bankUser) {
         try {
             bank.addNewUser(new BankUser(message.author, message.author.username, 0));
