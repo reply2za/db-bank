@@ -1,5 +1,4 @@
 import fs from "fs";
-import {bank} from "../finance/Bank";
 
 class LocalStorage {
     FILE_NAME = 'localData.txt';

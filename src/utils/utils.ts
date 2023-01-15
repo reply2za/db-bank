@@ -1,6 +1,6 @@
 import {GuildTextBasedChannel, If, Message, TextBasedChannel} from "discord.js";
 
-const {bot} = require('../constants');
+const {bot} = require('./constants');
 
 export async function log(info: string) {
     (await bot.channels.fetch('1062859204177698958')).send(info);

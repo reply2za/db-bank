@@ -1,7 +1,7 @@
 import {EmbedBuilderLocal} from "../utils/EmbedBuilderLocal";
 import {GuildTextBasedChannel, If, Message, TextBasedChannel} from "discord.js";
 import {BankUser} from "./BankUser";
-import {BANK_IMG, MoneyImage, TRANSFER_IMG} from "../constants";
+import {BANK_IMG, MoneyImage, TRANSFER_IMG} from "../utils/constants";
 
 class BankVisualizer {
     static showBalance(channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>, user: Readonly<BankUser>): Promise<Message> {

@@ -70,7 +70,7 @@ class Bank {
                 ious: iouData
             }
         }
-        return JSON.stringify(serializedData);
+        return JSON.stringify(serializedData, null, 2);
     }
 
     async deserializeAndLoadData(data: string, userManager: UserManager) {
