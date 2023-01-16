@@ -2,7 +2,7 @@
 .env
 dist
 node_modules
-local/localData.txt
+localData.txt
 .idea
 local
 
