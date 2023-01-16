@@ -1,0 +1,46 @@
+{
+  "bank": {
+    "users": [
+      {
+        "userId": "443150640823271436",
+        "name": "Zain",
+        "balance": 164.18
+      },
+      {
+        "userId": "799524729173442620",
+        "name": "zaintest",
+        "balance": 1.55
+      },
+      {
+        "userId": "1062574908451856574",
+        "name": "db-bank",
+        "balance": 0
+      },
+      {
+        "userId": "868982161854857296",
+        "name": "Chunks",
+        "balance": 279.81
+      },
+      {
+        "userId": "701477768981905579",
+        "name": "Karna",
+        "balance": 98.51
+      }
+    ],
+    "ious": [
+      {
+        "id": "012345638247823947",
+        "sender": {
+          "id": "868982161854857296",
+          "name": "Chunks"
+        },
+        "receiver": {
+          "id": "443150640823271436",
+          "name": "Zain"
+        },
+        "date": "1/15/23",
+        "comment": "He made me hot chocolate"
+      }
+    ]
+  }
+}
