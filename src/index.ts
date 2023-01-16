@@ -1,4 +1,6 @@
 'use strict';
+import { TextChannel } from 'discord.js';
+
 require('dotenv').config();
 import { bot, clientCommands } from './utils/constants';
 import { bank } from './finance/Bank';
@@ -32,6 +34,13 @@ async function loadData() {
         console.log('no local data');
     }
 }
+
+process.on('uncaughtException', (error) => {
+    console.log(error);
+    bot.channels.fetch('1064628593772220488').then((channel) => {
+        error.stack && (<TextChannel>channel)?.send(error.stack);
+    });
+});
 
 (async () => {
     await bot.login(token);

@@ -12,5 +12,7 @@ exports.run = async (statement: string, message: Message, args: string[], prefix
             **transferiou** - transfer an IOU
             **redeem** - redeem an IOU`
         )
+        .build()
+        // @ts-ignore
         .send(message.channel);
 };
