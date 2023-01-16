@@ -5,6 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "tsc && node dist/index.js",
+    "pm2": "bash scripts/pm2.bash",
+    "build": "pm2 start node dist/index.js --name db-bank",
     "dev": "tsc && node dist/index.js --dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
