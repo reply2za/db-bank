@@ -1,7 +1,15 @@
 import { EmbedBuilderLocal } from '../utils/EmbedBuilderLocal';
 import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js';
 import { BankUser } from './BankUser';
-import { BANK_IMG, bot, MoneyImage, TRANSFER_IMG, TRANSFER_IOU_IMG } from '../utils/constants';
+import {
+    BANK_IMG,
+    bot,
+    clientCommands,
+    MoneyImage,
+    REDEEM_IOU_IMG,
+    TRANSFER_IMG,
+    TRANSFER_IOU_IMG,
+} from '../utils/constants';
 import { IOUTicket } from './IOUTicket';
 
 class BankVisualizer {
@@ -23,12 +31,11 @@ class BankVisualizer {
             .setTitle(`${user.name}'s Bank`)
             .setColor('Green')
             .setDescription(
-                `balance: $${user.getBalance()}\n${
+                `\`$${user.getBalance()}\`\n${
                     iouDescription.length ? `\n- **Received IOUs** -\n${iouDescription}` : ''
                 }`
             )
             .setThumbnail(BANK_IMG)
-            .setFooter("use 'help' to view available commands")
             .send(channel);
     }
 
@@ -82,6 +89,31 @@ class BankVisualizer {
             .setDescription(`comment: ${comment || 'not provided'}`)
             .setColor('Gold')
             .setThumbnail(TRANSFER_IOU_IMG);
+    }
+
+    /**
+     * Should the reedeem IOU interface
+     * @param ious The IOU list
+     * @param highlight The index of the iou ticket to highlight/focus.
+     */
+    static getRedeemableIOUEmbed(ious: IOUTicket[], highlight?: number) {
+        let descriptionText = '';
+        let i = 0;
+        if (highlight !== undefined) highlight++;
+        for (const singleIOU of ious) {
+            i++;
+            if (i === highlight) {
+                descriptionText += `${i}. \`${singleIOU.sender.name}: ${singleIOU.comment.substring(0, 50)}\``;
+            } else {
+                descriptionText += `${i}. **${singleIOU.sender.name}**: ${singleIOU.comment.substring(0, 50)}`;
+            }
+            descriptionText += '\n';
+        }
+        return new EmbedBuilderLocal()
+            .setTitle(`Your redeemable IOU tickets`)
+            .setDescription(descriptionText)
+            .setColor('Fuchsia')
+            .setThumbnail(REDEEM_IOU_IMG);
     }
 
     static getTransferReceiptEmbed(receiverName: string, transferAmount: number): EmbedBuilderLocal {

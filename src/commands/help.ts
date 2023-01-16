@@ -6,7 +6,11 @@ exports.run = async (statement: string, message: Message, args: string[], prefix
     await new EmbedBuilderLocal()
         .setTitle('Help')
         .setDescription(
-            'commands:\n' + '**balance** - view balance\n' + '**transfer** [name] - initiate transfer process'
+            `commands:
+            **balance** - view balance
+            **transfer** [name] - initiate transfer process
+            **transferiou** - transfer an IOU
+            **redeem** - redeem an IOU`
         )
         .send(message.channel);
 };

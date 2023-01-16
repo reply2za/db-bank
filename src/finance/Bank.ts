@@ -3,6 +3,7 @@ import { IOUTicket } from './IOUTicket';
 import { UserManager } from 'discord.js';
 import { roundNumberTwoDecimals } from '../utils/utils';
 import leven from 'leven';
+import { localStorage } from '../Storage/LocalStorage';
 
 class Bank {
     users: Map<string, BankUser>;
@@ -23,6 +24,7 @@ class Bank {
         const date = new Date();
         for (let i = 0; i < amount; i++) {
             const iou = new IOUTicket(
+                null,
                 { id: sender.userId, name: sender.name },
                 { id: receiver.userId, name: receiver.name },
                 `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().substring(2)}`,
@@ -98,7 +100,7 @@ class Bank {
             }
         }
         for (let iou of parsedData.bank.ious) {
-            this.iOUList.push(new IOUTicket(iou.sender, iou.receiver, iou.date, iou.comment));
+            this.iOUList.push(new IOUTicket(iou.id, iou.sender, iou.receiver, iou.date, iou.comment));
         }
     }
 
@@ -111,6 +113,16 @@ class Bank {
         }
         matches.sort((a: BankUser, b: BankUser) => a.name.length - b.name.length);
         return matches;
+    }
+
+    async redeemIOU(id: string): Promise<boolean> {
+        const prevLength = this.iOUList.length;
+        this.iOUList = this.iOUList.filter((value) => {
+            return value.id !== id;
+        });
+        const newLength = this.iOUList.length;
+        await localStorage.saveData(bank.serializeData());
+        return prevLength !== newLength;
     }
 }
 

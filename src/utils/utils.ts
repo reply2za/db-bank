@@ -40,11 +40,11 @@ export async function getUserResponse(
  * @param name
  */
 export async function getUserToTransferTo(message: Message, name?: string): Promise<BankUser | undefined> {
-    let recipientID = message.mentions.users.first()?.id;
+    let recipientID = message.mentions?.users.first()?.id;
     if (!name && !recipientID) {
         message.channel.send('Who you would like to transfer to?');
         const newMsg = await getUserResponse(message.channel, message.author.id);
-        recipientID = newMsg?.mentions.users.first()?.id;
+        recipientID = newMsg?.mentions?.users.first()?.id;
         if (!recipientID) {
             if (!newMsg?.content) {
                 message.channel.send('must specify user to send to');

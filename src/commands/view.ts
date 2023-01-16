@@ -13,7 +13,7 @@ exports.run = async (statement: string, message: Message, args: string[], prefix
     });
     finalString += '------\n';
     bank.getAllIOUs().forEach((iou) => {
-        finalString += `${iou.sender.id}`;
+        finalString += `from ${iou.sender.name} to ${iou.receiver.name}\nreason: ${iou.comment}\n\n`;
     });
     message.channel.send(finalString);
 };
