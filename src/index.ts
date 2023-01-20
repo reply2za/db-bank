@@ -27,11 +27,11 @@ function listenForMessages() {
 }
 
 async function loadData() {
-    const data = localStorage.getData();
+    const data = await localStorage.retrieveData();
     if (data) {
         await bank.deserializeAndLoadData(data, bot.users);
     } else {
-        console.log('no local data');
+        console.log('[WARN] No local data!');
     }
 }
 

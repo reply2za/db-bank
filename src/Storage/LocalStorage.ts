@@ -1,14 +1,36 @@
 import fs from 'fs';
+import { bot } from '../utils/constants';
+import { Message, TextChannel } from 'discord.js';
 
 class LocalStorage {
     FILE_NAME = 'localData.txt';
 
-    getData() {
+    async #getDataMsg(): Promise<Message | undefined> {
+        const channel = await bot.channels.fetch('1065729072287715329');
+        return (<TextChannel>channel)?.messages.fetch('1065733201370288138');
+    }
+
+    async retrieveData() {
         return fs.readFileSync(this.FILE_NAME).toString();
     }
 
     async saveData(serializedData: string) {
-        fs.writeFileSync(this.FILE_NAME, serializedData);
+        try {
+            fs.writeFileSync(this.FILE_NAME, serializedData);
+        } catch (e) {}
+        const message = await this.#getDataMsg();
+        if (message) {
+            await message.edit({
+                content: `updated: ${new Date().toString()}`,
+                files: [
+                    {
+                        attachment: './localData.txt',
+                        name: 'localData.txt',
+                        description: 'db-bank data',
+                    },
+                ],
+            });
+        }
     }
 }
 
