@@ -11,7 +11,7 @@ import {
 /**
  * Local wrapper for EmbedBuilder.
  */
-export class EmbedBuilderLocal {
+export default class EmbedBuilderLocal {
     _embed;
 
     constructor() {
@@ -106,5 +106,3 @@ export class EmbedBuilderLocal {
         return message.edit({ embeds: [this.build()], content });
     }
 }
-
-module.exports = { EmbedBuilderLocal };

@@ -1,7 +1,7 @@
 import { BankUser } from './BankUser';
 import { GuildTextBasedChannel, If, TextBasedChannel } from 'discord.js';
 import { BankVisualizer } from './BankVisualizer';
-import { EmbedBuilderLocal } from '../utils/EmbedBuilderLocal';
+import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
 import { bank } from './Bank';
 import { localStorage } from '../Storage/LocalStorage';
 import { getUserResponse, log, roundNumberTwoDecimals } from '../utils/utils';

@@ -2,7 +2,7 @@ import { Message } from 'discord.js';
 import { BankUser } from '../finance/BankUser';
 import { bank } from '../finance/Bank';
 import { BankVisualizer } from '../finance/BankVisualizer';
-import { EmbedBuilderLocal } from '../utils/EmbedBuilderLocal';
+import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
 import { getUserResponse } from '../utils/utils';
 import { bot, REDEEMED_IOU_NOTIF_IMG } from '../utils/constants';
 

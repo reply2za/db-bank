@@ -1,4 +1,4 @@
-import { EmbedBuilderLocal } from '../utils/EmbedBuilderLocal';
+import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
 import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js';
 import { BankUser } from './BankUser';
 import {
