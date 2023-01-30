@@ -9,6 +9,7 @@ class Bank {
     users: Map<string, BankUser>;
     iOUList: Array<IOUTicket>;
     #usernames: Set<string>;
+
     constructor() {
         this.users = new Map();
         this.iOUList = [];

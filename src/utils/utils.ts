@@ -16,6 +16,7 @@ export function roundNumberTwoDecimals(num: number): number {
 const getFilterForUser = (userId: string) => {
     return (m: Message) => userId === m.author.id;
 };
+
 export async function getUserResponse(
     channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>,
     userId: string

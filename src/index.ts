@@ -1,11 +1,11 @@
 'use strict';
 import { TextChannel } from 'discord.js';
-
-require('dotenv').config();
 import { bot, clientCommands } from './utils/constants';
 import { bank } from './finance/Bank';
 import { localStorage } from './Storage/LocalStorage';
 import fs from 'fs';
+
+require('dotenv').config();
 
 const token = process.env.CLIENT_TOKEN?.replace(/\\n/gm, '\n');
 

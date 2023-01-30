@@ -108,6 +108,7 @@ export class TransferManager {
             channel.send('*cancelled transfer*');
         }
     }
+
     async processMonetaryTransfer(channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>, receiver: BankUser) {
         this.embed = BankVisualizer.getCashTransferEmbed(this.sender, receiver, 0);
         const embedMsg = await this.embed.send(channel);

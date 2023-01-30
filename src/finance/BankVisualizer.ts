@@ -1,15 +1,7 @@
 import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
 import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js';
 import { BankUser } from './BankUser';
-import {
-    BANK_IMG,
-    bot,
-    clientCommands,
-    MoneyImage,
-    REDEEM_IOU_IMG,
-    TRANSFER_IMG,
-    TRANSFER_IOU_IMG,
-} from '../utils/constants';
+import { BANK_IMG, bot, MoneyImage, REDEEM_IOU_IMG, TRANSFER_IMG, TRANSFER_IOU_IMG } from '../utils/constants';
 import { IOUTicket } from './IOUTicket';
 
 class BankVisualizer {
