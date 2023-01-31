@@ -27,8 +27,6 @@ class CommandHandler {
      */
     execute(event: MessageEventLocal) {
         if (event.statement[0] === '.' && isAdmin(event.message.author.id)) {
-            console.log(event.statement.replace('.', ''));
-            console.log(this.adminCommands.get(event.statement.replace('.', '')));
             this.adminCommands.get(event.statement.replace('.', ''))?.run(event);
         }
         this.clientCommands.get(event.statement)?.run(event);
