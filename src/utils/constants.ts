@@ -1,4 +1,4 @@
-import { Client, Collection, GatewayIntentBits, Partials } from 'discord.js';
+import { Client, GatewayIntentBits, Partials } from 'discord.js';
 // the db bot instance
 export const bot: Client = new Client({
     intents: [
@@ -17,7 +17,6 @@ export const bot: Client = new Client({
     partials: [Partials.Message, Partials.Channel, Partials.Reaction, Partials.User],
 });
 
-export const clientCommands = new Collection<string, any>();
 export const PREFIX = '$';
 
 // IDs followed by a space

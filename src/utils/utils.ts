@@ -72,3 +72,7 @@ export async function getUserToTransferTo(message: Message, name?: string): Prom
     }
     return recipientBankUser;
 }
+
+export function isAdmin(id: string): boolean {
+    return ADMIN_IDS.includes(`${id} `);
+}

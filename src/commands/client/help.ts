@@ -1,8 +1,7 @@
-import { Message } from 'discord.js';
-import { BankUser } from '../finance/BankUser';
-import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
+import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
+import { MessageEventLocal } from '../../utils/types';
 
-exports.run = async (statement: string, message: Message, args: string[], prefix: string, bankUser: BankUser) => {
+exports.run = async (event: MessageEventLocal) => {
     await new EmbedBuilderLocal()
         .setTitle('Help')
         .setDescription(
@@ -12,5 +11,5 @@ exports.run = async (statement: string, message: Message, args: string[], prefix
             **transferiou** - transfer an IOU
             **redeem** - redeem an IOU`
         )
-        .send(message.channel);
+        .send(event.message.channel);
 };

@@ -1,22 +1,17 @@
 'use strict';
 import { TextChannel } from 'discord.js';
-import { bot, clientCommands } from './utils/constants';
+import { bot } from './utils/constants';
 import { bank } from './finance/Bank';
 import { localStorage } from './Storage/LocalStorage';
 import fs from 'fs';
+import { commandHandler } from './handlers/CommandHandler';
 
 require('dotenv').config();
 
 const token = process.env.CLIENT_TOKEN?.replace(/\\n/gm, '\n');
 
 function listenForMessages() {
-    const commands = fs.readdirSync('./dist/commands').filter((file) => file.endsWith('.js'));
-    for (const file of commands) {
-        const commandName = file.split('.')[0];
-        const command = require(`./commands/${file}`);
-        clientCommands.set(commandName, command);
-    }
-    console.log('-loaded commands-');
+    commandHandler.loadAllCommands();
     const files = fs.readdirSync('./dist/events').filter((file) => file.endsWith('.js'));
     for (const file of files) {
         const eventName = file.split('.')[0];

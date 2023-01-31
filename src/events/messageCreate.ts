@@ -1,8 +1,10 @@
-import { clientCommands, PREFIX } from '../utils/constants';
+import { PREFIX } from '../utils/constants';
 import { Message } from 'discord.js';
 import { bank } from '../finance/Bank';
 import { BankUser } from '../finance/BankUser';
 import { localStorage } from '../Storage/LocalStorage';
+import { commandHandler } from '../handlers/CommandHandler';
+import { MessageEventLocal } from '../utils/types';
 
 module.exports = async (message: Message) => {
     const msgPrefix = message.content.substring(0, PREFIX.length);
@@ -20,6 +22,14 @@ module.exports = async (message: Message) => {
     }
     if (!bankUser) return;
     const args = message.content.replace(/\s+/g, ' ').split(' ');
+    // the command name, removes the prefix and any args
     const statement = args[0].substring(1).toLowerCase();
-    clientCommands.get(statement)?.run(statement, message, args, PREFIX, bankUser);
+    const event: MessageEventLocal = {
+        statement,
+        message,
+        args,
+        prefix: PREFIX,
+        bankUser,
+    };
+    commandHandler.execute(event);
 };
