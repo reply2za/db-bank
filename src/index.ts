@@ -1,6 +1,6 @@
 'use strict';
 import { TextChannel } from 'discord.js';
-import { bot } from './utils/constants';
+import { bot, isDevMode } from './utils/constants';
 import { bank } from './finance/Bank';
 import { localStorage } from './Storage/LocalStorage';
 import fs from 'fs';
@@ -38,6 +38,7 @@ process.on('uncaughtException', (error) => {
 });
 
 (async () => {
+    if (isDevMode) console.log('-devMode-');
     await bot.login(token);
     console.log('-logged in-');
     console.log('loading data...');

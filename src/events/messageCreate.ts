@@ -1,14 +1,16 @@
-import { PREFIX } from '../utils/constants';
+import { isDevMode, PREFIX } from '../utils/constants';
 import { Message } from 'discord.js';
 import { bank } from '../finance/Bank';
 import { BankUser } from '../finance/BankUser';
 import { localStorage } from '../Storage/LocalStorage';
 import { commandHandler } from '../handlers/CommandHandler';
 import { MessageEventLocal } from '../utils/types';
+import { isAdmin } from '../utils/utils';
 
 module.exports = async (message: Message) => {
     const msgPrefix = message.content.substring(0, PREFIX.length);
     if (msgPrefix !== PREFIX) return;
+    if (isDevMode && !isAdmin(message.author.id)) return;
     let bankUser;
     bankUser = bank.getUser(message.author.id);
     if (!bankUser) {

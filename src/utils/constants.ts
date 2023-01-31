@@ -17,7 +17,9 @@ export const bot: Client = new Client({
     partials: [Partials.Message, Partials.Channel, Partials.Reaction, Partials.User],
 });
 
-export const PREFIX = '$';
+export const isDevMode = process.argv.includes('--dev');
+
+export const PREFIX = isDevMode ? ',' : '$';
 
 // IDs followed by a space
 export const ADMIN_IDS = Object.freeze(['443150640823271436 ']);
