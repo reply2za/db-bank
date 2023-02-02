@@ -6,11 +6,13 @@ import leven from 'leven';
 import { localStorage } from '../Storage/LocalStorage';
 
 class Bank {
-    users: Map<string, BankUser>;
-    iOUList: Array<IOUTicket>;
-    #usernames: Set<string>;
+    users: Map<string, BankUser> = new Map();
+    iOUList: Array<IOUTicket> = [];
+    #usernames: Set<string> = new Set();
 
-    constructor() {
+    constructor() {}
+
+    #resetAllData() {
         this.users = new Map();
         this.iOUList = [];
         this.#usernames = new Set();
@@ -91,6 +93,7 @@ class Bank {
     }
 
     async deserializeAndLoadData(data: string, userManager: UserManager) {
+        this.#resetAllData();
         const parsedData = JSON.parse(data);
         for (let userObj of parsedData.bank.users) {
             try {

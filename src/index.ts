@@ -1,6 +1,6 @@
 'use strict';
 import { TextChannel } from 'discord.js';
-import { bot, isDevMode } from './utils/constants';
+import { bot, isDevMode, PREFIX } from './utils/constants';
 import { bank } from './finance/Bank';
 import { localStorage } from './Storage/LocalStorage';
 import { commandHandler } from './handlers/CommandHandler';
@@ -18,7 +18,10 @@ process.on('uncaughtException', (error) => {
 });
 
 (async () => {
-    if (isDevMode) console.log('-devMode-');
+    if (isDevMode) {
+        console.log('-devMode-');
+        console.log(`prefix is: ${PREFIX}`);
+    }
     await bot.login(token);
     console.log('-logged in-');
     console.log('loading data...');

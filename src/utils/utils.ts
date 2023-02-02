@@ -2,6 +2,8 @@ import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js
 import { bank } from '../finance/Bank';
 import { ADMIN_IDS } from './constants';
 import { BankUser } from '../finance/BankUser';
+import fs from 'fs';
+import request from 'request';
 
 const { bot } = require('./constants');
 
@@ -71,6 +73,29 @@ export async function getUserToTransferTo(message: Message, name?: string): Prom
         return;
     }
     return recipientBankUser;
+}
+
+/**
+ * Processes the discord message containing the data file.
+ * @param message The message containing the file.
+ */
+export async function processDataFile(message: Message): Promise<boolean> {
+    // sets the .env file
+    return new Promise((res) => {
+        if (!message.attachments?.first() || !message.attachments.first()!.name?.includes('.txt')) {
+            res(false);
+            return false;
+        } else {
+            request
+                .get(message.attachments.first()!.url)
+                .on('error', console.error)
+                .once('complete', () => {
+                    res(true);
+                })
+                .pipe(fs.createWriteStream('localData.txt'));
+            return true;
+        }
+    });
 }
 
 export function isAdmin(id: string): boolean {

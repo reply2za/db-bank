@@ -6,6 +6,7 @@ import { localStorage } from '../Storage/LocalStorage';
 import { commandHandler } from '../handlers/CommandHandler';
 import { MessageEventLocal } from '../utils/types';
 import { isAdmin } from '../utils/utils';
+import { processManager } from '../utils/ProcessManager';
 
 module.exports = async (message: Message) => {
     const msgPrefix = message.content.substring(0, PREFIX.length);
@@ -33,5 +34,6 @@ module.exports = async (message: Message) => {
         prefix: PREFIX,
         bankUser,
     };
+    if (!processManager.getState() && event.statement !== '.boot') return;
     commandHandler.execute(event);
 };
