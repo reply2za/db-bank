@@ -1,4 +1,4 @@
-import { bot } from './constants';
+import { bot, isDevMode } from './constants';
 import { TextChannel } from 'discord.js';
 
 export default class Logger {
@@ -15,5 +15,9 @@ export default class Logger {
 
     static async transactionLog(info: string) {
         (<TextChannel>await bot.channels.fetch('1062859204177698958'))?.send(info);
+    }
+
+    static debugLog(error: Error) {
+        if (isDevMode) console.log(error);
     }
 }
