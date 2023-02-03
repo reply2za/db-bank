@@ -3,6 +3,9 @@ import fs from 'fs';
 import { Collection } from 'discord.js';
 import { MessageEventLocal } from '../utils/types';
 
+// secondary prefix after the first to tell the app that it is a dev command
+const ADMIN_CMD_PREFIX = '$';
+
 class CommandHandler {
     clientCommands = new Collection<string, any>();
     adminCommands = new Collection<string, any>();
@@ -25,8 +28,8 @@ class CommandHandler {
      * @param event
      */
     execute(event: MessageEventLocal) {
-        if (event.statement[0] === '.' && isAdmin(event.message.author.id)) {
-            this.adminCommands.get(event.statement.replace('.', ''))?.run(event);
+        if (event.statement[0] === ADMIN_CMD_PREFIX && isAdmin(event.message.author.id)) {
+            this.adminCommands.get(event.statement.replace(ADMIN_CMD_PREFIX, ''))?.run(event);
         }
         this.clientCommands.get(event.statement)?.run(event);
     }
