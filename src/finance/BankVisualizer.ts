@@ -3,6 +3,7 @@ import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js
 import { BankUser } from './BankUser';
 import { BANK_IMG, bot, MoneyImage, REDEEM_IOU_IMG, TRANSFER_IMG, TRANSFER_IOU_IMG } from '../utils/constants';
 import { IOUTicket } from './IOUTicket';
+import { roundNumberTwoDecimals } from '../utils/utils';
 
 class BankVisualizer {
     static async showBalance(
@@ -51,7 +52,11 @@ class BankVisualizer {
         return e
             .setTitle(`Transfer to ${receiver.name}`)
             .setDescription(amount ? `sending $${amount}` : '*no amount selected*')
-            .setFooter(`your balance: $${sender.balance}${amount ? ` => ${sender.balance - amount}` : ''}`);
+            .setFooter(
+                `your balance: $${sender.balance}${
+                    amount ? ` => ${roundNumberTwoDecimals(sender.balance - amount)}` : ''
+                }`
+            );
     }
 
     static getPreTransferConfirmationEmbed(): EmbedBuilderLocal {
