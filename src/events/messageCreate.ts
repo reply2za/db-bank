@@ -34,6 +34,5 @@ module.exports = async (message: Message) => {
         prefix: PREFIX,
         bankUser,
     };
-    if (!processManager.getState() && event.statement !== '.boot') return;
     commandHandler.execute(event);
 };

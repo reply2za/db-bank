@@ -2,9 +2,12 @@ import { isAdmin } from '../utils/utils';
 import fs from 'fs';
 import { Collection } from 'discord.js';
 import { MessageEventLocal } from '../utils/types';
+import { processManager } from '../utils/ProcessManager';
 
 // secondary prefix after the first to tell the app that it is a dev command
 const ADMIN_CMD_PREFIX = '$';
+// list of commands that should not be process-specific
+const MULTI_PROCESS_CMDS = ['boot'].map((cmd) => `${ADMIN_CMD_PREFIX}${cmd}`);
 
 class CommandHandler {
     clientCommands = new Collection<string, any>();
@@ -28,6 +31,7 @@ class CommandHandler {
      * @param event
      */
     execute(event: MessageEventLocal) {
+        if (!processManager.getState() && MULTI_PROCESS_CMDS.includes(event.statement)) return;
         if (event.statement[0] === ADMIN_CMD_PREFIX && isAdmin(event.message.author.id)) {
             this.adminCommands.get(event.statement.replace(ADMIN_CMD_PREFIX, ''))?.run(event);
         }
