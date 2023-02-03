@@ -2,14 +2,13 @@ import { MessageEventLocal } from '../../utils/types';
 import { processManager } from '../../utils/ProcessManager';
 import { isDevMode } from '../../utils/constants';
 const hardwareTag = process.env.HARDWARE_TAG?.replace(/\\n/gm, '\n');
-const version = require('../../../package.json').version;
 
 exports.run = async (event: MessageEventLocal) => {
     if (!event.args[1]) {
         event.message.channel.send(
-            `${processManager.getState() ? 'active' : 'inactive'}: ${
-                process.pid
-            } [${hardwareTag}] (version: ${version}) ${isDevMode ? '(devMode)' : ''}`
+            `${processManager.getState() ? 'active' : 'inactive'}: ${process.pid} [${hardwareTag}] (v${
+                processManager.version
+            }) ${isDevMode ? '(devMode)' : ''}`
         );
     } else if (event.args[2] && matchesHardwareTagOrPID(event.args[2])) {
         if (event.args[1] === 'on') {

@@ -1,28 +1,26 @@
 'use strict';
-import { TextChannel } from 'discord.js';
+require('dotenv').config();
+const token = process.env.CLIENT_TOKEN?.replace(/\\n/gm, '\n');
+const hardwareTag = process.env.HARDWARE_TAG?.replace(/\\n/gm, '\n');
 import { bot, isDevMode, PREFIX } from './utils/constants';
 import { bank } from './finance/Bank';
 import { localStorage } from './Storage/LocalStorage';
 import { commandHandler } from './handlers/CommandHandler';
 import { eventHandler } from './handlers/EventHandler';
-
-require('dotenv').config();
-
-const token = process.env.CLIENT_TOKEN?.replace(/\\n/gm, '\n');
-
-process.on('uncaughtException', (error) => {
-    console.log(error);
-    bot.channels.fetch('1064628593772220488').then((channel) => {
-        error.stack && (<TextChannel>channel)?.send(error.stack);
-    });
-});
+import Logger from './utils/Logger';
+import { processManager } from './utils/ProcessManager';
 
 (async () => {
+    await bot.login(token);
+    process.on('uncaughtException', (error) => {
+        Logger.errorLog(error);
+    });
     if (isDevMode) {
         console.log('-devMode-');
         console.log(`prefix is: ${PREFIX}`);
+    } else {
+        await Logger.infoLog(`starting ${process.pid} [${hardwareTag || 'unnamed'}]: v${processManager.version}`);
     }
-    await bot.login(token);
     console.log('-logged in-');
     console.log('loading data...');
     const data = await localStorage.retrieveData();

@@ -3,5 +3,5 @@ import { execSync } from 'child_process';
 
 exports.run = async (event: MessageEventLocal) => {
     event.message.channel.send('updating...');
-    execSync('git stash && git pull && npm i && pm2 delete db-bank && npm run pm2');
+    execSync('git stash && git pull && npm i && pm2 restart db-bank');
 };

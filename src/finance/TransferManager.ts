@@ -4,7 +4,8 @@ import { BankVisualizer } from './BankVisualizer';
 import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
 import { bank } from './Bank';
 import { localStorage } from '../Storage/LocalStorage';
-import { getUserResponse, log, roundNumberTwoDecimals } from '../utils/utils';
+import { getUserResponse, roundNumberTwoDecimals } from '../utils/utils';
+import Logger from '../utils/Logger';
 
 export class TransferManager {
     sender: BankUser;
@@ -94,7 +95,7 @@ export class TransferManager {
                         ).build(),
                     ],
                 });
-                await log(
+                await Logger.transactionLog(
                     `[IOU transfer] $${transferAmount} from ${this.sender.name} to ${receiver.name}\n` +
                         `comment: ${comment || 'N/A'}`
                 );
@@ -137,7 +138,7 @@ export class TransferManager {
                         BankVisualizer.getTransferNotificationEmbed(this.sender.name, receiver, transferAmount).build(),
                     ],
                 });
-                await log(
+                await Logger.transactionLog(
                     `[transfer] $${transferAmount} from ${this.sender.name} to ${receiver.name}\n` +
                         `new balances:\n` +
                         `${this.sender.name}: ${this.sender.balance}\n` +

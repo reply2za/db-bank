@@ -5,12 +5,6 @@ import { BankUser } from '../finance/BankUser';
 import fs from 'fs';
 import request from 'request';
 
-const { bot } = require('./constants');
-
-export async function log(info: string) {
-    (await bot.channels.fetch('1062859204177698958')).send(info);
-}
-
 export function roundNumberTwoDecimals(num: number): number {
     return Math.round((num + Number.EPSILON) * 100) / 100;
 }

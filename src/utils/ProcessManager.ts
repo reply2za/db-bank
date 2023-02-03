@@ -1,11 +1,14 @@
 import { isDevMode } from './constants';
+const version = require('../../package.json').version;
 
 class ProcessManager {
     #isActive;
+    version;
 
     constructor() {
         // if in devMode then we want process to be on by default
         this.#isActive = isDevMode;
+        this.version = version;
     }
 
     /**
