@@ -32,15 +32,20 @@ class BankVisualizer {
             .send(channel);
     }
 
-    static getCoreTransferEmbed() {
+    static getCoreTransferEmbed(): EmbedBuilderLocal {
         return new EmbedBuilderLocal().setColor('Purple').setThumbnail(TRANSFER_IMG);
     }
 
-    static getIOUTransferEmbed(sender: Readonly<BankUser>, receiver: Readonly<BankUser>, amount = 0) {
-        const e = this.getCoreTransferEmbed();
-        return e
+    static getIOUTransferEmbed(
+        sender: Readonly<BankUser>,
+        receiver: Readonly<BankUser>,
+        amount = 0,
+        comment = ''
+    ): EmbedBuilderLocal {
+        return this.getCoreTransferEmbed()
             .setTitle(`Transfer IOU to ${receiver.name}`)
-            .setDescription(amount ? `sending ${amount} IOU` : '*no amount selected*');
+            .setDescription(amount ? `sending ${amount} IOU${amount > 1 ? 's' : ''}` : '*no amount selected*')
+            .setFooter(`${comment ? `comment: ${comment}` : ' '}`);
     }
 
     static getCashTransferEmbed(

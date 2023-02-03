@@ -79,6 +79,8 @@ export class TransferManager {
         await this.embed.edit(embedMsg);
         channel.send('type a short reason/comment for the IOU: ');
         const comment = (await getUserResponse(channel, this.sender.userId))?.content || '';
+        this.embed = BankVisualizer.getIOUTransferEmbed(this.sender, receiver, transferAmount, comment);
+        await this.embed.edit(embedMsg);
         await BankVisualizer.getPreTransferConfirmationEmbed().send(channel);
         const responseConfirmation = (await getUserResponse(channel, this.sender.userId))?.content;
         if (responseConfirmation && responseConfirmation.toLowerCase() === 'yes') {
