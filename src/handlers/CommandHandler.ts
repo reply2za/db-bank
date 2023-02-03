@@ -31,7 +31,7 @@ class CommandHandler {
      * @param event
      */
     execute(event: MessageEventLocal) {
-        if (!processManager.getState() && MULTI_PROCESS_CMDS.includes(event.statement)) return;
+        if (!processManager.getState() && !MULTI_PROCESS_CMDS.includes(event.statement)) return;
         if (event.statement[0] === ADMIN_CMD_PREFIX && isAdmin(event.message.author.id)) {
             this.adminCommands.get(event.statement.replace(ADMIN_CMD_PREFIX, ''))?.run(event);
         }
