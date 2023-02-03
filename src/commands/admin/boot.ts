@@ -1,7 +1,7 @@
+const hardwareTag = process.env.HARDWARE_TAG?.replace(/\\n/gm, '\n');
 import { MessageEventLocal } from '../../utils/types';
 import { processManager } from '../../utils/ProcessManager';
 import { isDevMode } from '../../utils/constants';
-const hardwareTag = process.env.HARDWARE_TAG?.replace(/\\n/gm, '\n');
 
 exports.run = async (event: MessageEventLocal) => {
     if (!event.args[1]) {
