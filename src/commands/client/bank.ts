@@ -1,2 +1,2 @@
-const x = require('./balance');
-exports.run = (...args: any) => x.run(...args);
+const balance = require('./balance');
+exports.run = (...args: any) => balance.run(...args);
