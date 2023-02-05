@@ -4,6 +4,7 @@ import { processManager } from '../../utils/ProcessManager';
 import { isDevMode } from '../../utils/constants';
 import reactions from '../../utils/reactions';
 import { MessageReaction, TextBasedChannel, User } from 'discord.js';
+import { attachReactionToMessage } from '../../utils/utils';
 
 const hardwareTag = process.env.HARDWARE_TAG?.replace(/\\n/gm, '\n');
 
@@ -19,28 +20,31 @@ exports.run = async (event: MessageEventLocal) => {
     }
 };
 
+function getBootStatus() {
+    return `${processManager.getState() ? '**active**' : 'inactive'}: ${process.pid} [*${hardwareTag}*] (v${
+        processManager.version
+    }) ${isDevMode ? '(devMode)' : ''}`;
+}
+
 async function displayStatus(event: MessageEventLocal) {
-    const sentMsg = await event.message.channel.send(
-        `${processManager.getState() ? '**active**' : 'inactive'}: ${process.pid} [*${hardwareTag}*] (v${
-            processManager.version
-        }) ${isDevMode ? '(devMode)' : ''}`
-    );
-    await sentMsg.react(reactions.GEAR);
-    const filter = (reaction: MessageReaction, user: User) => {
-        return event.message.author.id === user.id && [reactions.GEAR].includes(reaction.emoji.name!);
-    };
-    const collector = sentMsg!.createReactionCollector({ filter, time: 30000, dispose: true });
-    collector.on('collect', (reaction, reactionUser) => {
-        if (processManager.getState()) {
-            setStateInactive(event.message.channel);
-        } else {
-            setStateActive(event.message.channel);
+    const sentMsg = await event.message.channel.send(getBootStatus());
+    await attachReactionToMessage(
+        sentMsg,
+        [event.message.author],
+        [reactions.GEAR],
+        (reaction: MessageReaction, reactionUser: User) => {
+            if (processManager.getState()) {
+                setStateInactive(event.message.channel);
+            } else {
+                setStateActive(event.message.channel);
+            }
+            reaction.users.remove(reactionUser.id);
+            sentMsg.edit({ content: getBootStatus() });
+        },
+        () => {
+            sentMsg.reactions.removeAll();
         }
-        reaction.users.remove(reactionUser.id);
-    });
-    collector.once('end', () => {
-        sentMsg.reactions.removeAll();
-    });
+    );
 }
 
 function setStateActive(channel: TextBasedChannel) {

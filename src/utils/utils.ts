@@ -1,9 +1,19 @@
-import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js';
+import {
+    Collection,
+    EmojiIdentifierResolvable,
+    GuildTextBasedChannel,
+    If,
+    Message,
+    MessageReaction,
+    TextBasedChannel,
+    User,
+} from 'discord.js';
 import { bank } from '../finance/Bank';
 import { ADMIN_IDS } from './constants';
 import { BankUser } from '../finance/BankUser';
 import fs from 'fs';
 import request from 'request';
+import reactions from './reactions';
 
 export function roundNumberTwoDecimals(num: number): number {
     return Math.round((num + Number.EPSILON) * 100) / 100;
@@ -90,6 +100,41 @@ export async function processDataFile(message: Message): Promise<boolean> {
             return true;
         }
     });
+}
+
+/**
+ * Attaches a reaction with a reaction collector to a specific message.
+ * @param reactMsg The message to attach the reaction to.
+ * @param reactionUsers The list of users that can activate the effect of the reaction.
+ * @param reactionsList The reactions to attach the message.
+ * @param executeCallback A callback function for when any reaction is clicked.
+ * @param endCallback A callback for when the reaction collector expires.
+ * @param filter Optional - A filter for the reactionCollector.
+ * @param filterTime Optional - The duration in which the reactionCollector is in effect.
+ */
+export async function attachReactionToMessage(
+    reactMsg: Message,
+    reactionUsers: User[],
+    reactionsList: EmojiIdentifierResolvable[],
+    executeCallback: (reaction: MessageReaction, user: User) => void,
+    endCallback: (collected: Collection<string, MessageReaction>, reason: string) => void,
+    filter?: (reaction: MessageReaction, user: User) => boolean,
+    filterTime = 30000
+) {
+    for (const r of reactionsList) {
+        await reactMsg.react(r);
+    }
+    if (!filter) {
+        filter = (reaction: MessageReaction, user: User) => {
+            return !!(
+                reactionUsers.filter((rUser) => rUser.id === user.id).length &&
+                reactionsList.includes(reaction.emoji.name!)
+            );
+        };
+    }
+    const collector = reactMsg.createReactionCollector({ filter, time: filterTime, dispose: true });
+    collector.on('collect', executeCallback);
+    collector.once('end', endCallback);
 }
 
 export function isAdmin(id: string): boolean {
