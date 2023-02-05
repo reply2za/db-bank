@@ -6,6 +6,8 @@ import { bank } from './Bank';
 import { localStorage } from '../Storage/LocalStorage';
 import { getUserResponse, roundNumberTwoDecimals } from '../utils/utils';
 import Logger from '../utils/Logger';
+import { TransferType } from './types';
+import { getAmount, validateAmount, validateMonetaryAmount } from '../utils/numberUtils';
 
 export class TransferManager {
     sender: BankUser;
@@ -16,61 +18,17 @@ export class TransferManager {
         this.embed = null;
     }
 
-    async getAmount(channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>) {
-        const enterAmountMsg = await new EmbedBuilderLocal()
-            .setDescription('enter the amount you would like to send')
-            .setFooter('or `q` to quit')
-            .send(channel);
-        const response = await getUserResponse(channel, this.sender.userId);
-        enterAmountMsg.deletable && enterAmountMsg.delete();
-        return response?.content;
-    }
-
-    /**
-     * Returns whether the amount provided is acceptable.
-     * @param transferAmount
-     * @param channel
-     */
-    validateAmount(transferAmount: any, channel?: If<boolean, GuildTextBasedChannel, TextBasedChannel>): boolean {
-        if (!Number.isFinite(transferAmount)) {
-            channel?.send('*cancelled transfer: `invalid input`*');
-            return false;
-        }
-        if (transferAmount <= 0) {
-            channel?.send('*cancelled transfer: `amount must be greater than 0`*');
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Returns whether the amount provided is acceptable.
-     * @param transferAmount
-     * @param channel
-     */
-    validateMonetaryAmount(
-        transferAmount: any,
-        channel?: If<boolean, GuildTextBasedChannel, TextBasedChannel>
-    ): boolean {
-        if (!this.validateAmount(transferAmount, channel)) return false;
-        if (transferAmount > this.sender.balance) {
-            channel?.send('*cancelled transfer: `your balance is too low`*');
-            return false;
-        }
-        return true;
-    }
-
     async processIOUTransfer(channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>, receiver: BankUser) {
         this.embed = BankVisualizer.getIOUTransferEmbed(this.sender, receiver, 0);
         const embedMsg = await this.embed.send(channel);
-        const responseAmt = await this.getAmount(channel);
+        const responseAmt = await getAmount(channel, this.sender.userId);
         if (responseAmt === 'q') {
             channel.send('*cancelled transfer*');
             embedMsg.deletable && embedMsg.delete();
             return;
         }
         const transferAmount = roundNumberTwoDecimals(Number(responseAmt));
-        const isValid = this.validateAmount(transferAmount, channel);
+        const isValid = validateAmount(transferAmount, channel);
         if (!isValid) {
             embedMsg.deletable && embedMsg.delete();
             return;
@@ -112,17 +70,17 @@ export class TransferManager {
         }
     }
 
-    async processMonetaryTransfer(channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>, receiver: BankUser) {
+    async processMonetaryTransfer(channel: TextBasedChannel, receiver: BankUser) {
         this.embed = BankVisualizer.getCashTransferEmbed(this.sender, receiver, 0);
         const embedMsg = await this.embed.send(channel);
-        const responseAmt = await this.getAmount(channel);
+        const responseAmt = await getAmount(channel, this.sender.userId);
         if (responseAmt === 'q') {
             channel.send('*cancelled transfer*');
             embedMsg.deletable && embedMsg.delete();
             return;
         }
         const transferAmount = roundNumberTwoDecimals(Number(responseAmt));
-        const isValid = this.validateMonetaryAmount(transferAmount, channel);
+        const isValid = validateMonetaryAmount(transferAmount, this.sender, channel);
         if (!isValid) {
             embedMsg.deletable && embedMsg.delete();
             return;
@@ -132,28 +90,9 @@ export class TransferManager {
         await BankVisualizer.getPreTransferConfirmationEmbed().send(channel);
         const responseConfirmation = (await getUserResponse(channel, this.sender.userId))?.content;
         if (responseConfirmation && responseConfirmation.toLowerCase() === 'yes') {
-            const transferResponse = bank.transferAmount(this.sender, receiver, transferAmount);
-            if (transferResponse.success) {
-                await localStorage.saveData(bank.serializeData());
-                await receiver.getDiscordUser().send({
-                    embeds: [
-                        BankVisualizer.getTransferNotificationEmbed(this.sender.name, receiver, transferAmount).build(),
-                    ],
-                });
-                await Logger.transactionLog(
-                    `[transfer] $${transferAmount} from ${this.sender.name} to ${receiver.name}\n` +
-                        `new balances:\n` +
-                        `${this.sender.name}: ${this.sender.balance}\n` +
-                        `${receiver.name}: ${receiver.balance}\n`
-                );
-                await BankVisualizer.getTransferReceiptEmbed(receiver.name, transferAmount).send(channel);
-            } else {
-                await BankVisualizer.getErrorEmbed(
-                    `transfer failed: ${transferResponse.failReason || 'unknown reason'}`
-                ).send(channel);
-            }
+            await bank.transferAmount(this.sender, receiver, transferAmount, channel, TransferType.TRANSFER);
         } else {
-            channel.send('*cancelled transfer*');
+            await channel.send('*cancelled transfer*');
         }
     }
 }

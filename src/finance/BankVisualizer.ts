@@ -1,7 +1,15 @@
 import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
 import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js';
 import { BankUser } from './BankUser';
-import { BANK_IMG, bot, MoneyImage, REDEEM_IOU_IMG, TRANSFER_IMG, TRANSFER_IOU_IMG } from '../utils/constants';
+import {
+    BANK_IMG,
+    bot,
+    ChargeImage,
+    MoneyImage,
+    REDEEM_IOU_IMG,
+    TRANSFER_IMG,
+    TRANSFER_IOU_IMG,
+} from '../utils/constants';
 import { IOUTicket } from './IOUTicket';
 import { roundNumberTwoDecimals } from '../utils/utils';
 
@@ -80,6 +88,18 @@ class BankVisualizer {
             .setThumbnail(this.getTransferImage(transferAmount));
     }
 
+    static getChargeNotificationEmbed(
+        sender: Readonly<BankUser>,
+        receiverName: string,
+        transferAmount: number
+    ): EmbedBuilderLocal {
+        return new EmbedBuilderLocal()
+            .setTitle(`Charged by ${receiverName}`)
+            .setDescription(`amount: $${transferAmount}\nyour balance: $${sender.balance}`)
+            .setColor('LuminousVividPink')
+            .setThumbnail(this.getChargeImage(transferAmount));
+    }
+
     static getIOUTransferNotificationEmbed(
         senderName: string,
         receiver: Readonly<BankUser>,
@@ -141,6 +161,16 @@ class BankVisualizer {
             return MoneyImage.MEDIUM;
         } else {
             return MoneyImage.LARGE;
+        }
+    }
+
+    private static getChargeImage(transferAmount: number): string {
+        if (transferAmount < 7) {
+            return ChargeImage.SB_CREDIT_CARD;
+        } else if (transferAmount < 25) {
+            return ChargeImage.SW_BILL_LIST;
+        } else {
+            return ChargeImage.MK_BILL_LIST;
         }
     }
 }

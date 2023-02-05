@@ -1,9 +1,12 @@
 import { BankUser } from './BankUser';
 import { IOUTicket } from './IOUTicket';
-import { UserManager } from 'discord.js';
+import { TextBasedChannel, UserManager } from 'discord.js';
 import { roundNumberTwoDecimals } from '../utils/utils';
 import leven from 'leven';
 import { localStorage } from '../Storage/LocalStorage';
+import { BankVisualizer } from './BankVisualizer';
+import Logger from '../utils/Logger';
+import { TransferType } from './types';
 
 class Bank {
     users: Map<string, BankUser> = new Map();
@@ -41,7 +44,47 @@ class Bank {
         };
     }
 
-    transferAmount(sender: BankUser, receiver: BankUser, amount: number): { success: boolean; failReason: string } {
+    async #recordTransfer(
+        transferResponse: { success: boolean; failReason: string },
+        transferAmount: number,
+        sender: BankUser,
+        receiver: BankUser,
+        channel: TextBasedChannel,
+        transferType: TransferType
+    ) {
+        if (transferResponse.success) {
+            await localStorage.saveData(bank.serializeData());
+            if (transferType === TransferType.CHARGE) {
+                await sender.getDiscordUser().send({
+                    embeds: [BankVisualizer.getChargeNotificationEmbed(sender, receiver.name, transferAmount).build()],
+                });
+                await channel.send(`charged ${receiver.name} $${transferAmount}`);
+            } else {
+                await receiver.getDiscordUser().send({
+                    embeds: [
+                        BankVisualizer.getTransferNotificationEmbed(sender.name, receiver, transferAmount).build(),
+                    ],
+                });
+                await BankVisualizer.getTransferReceiptEmbed(receiver.name, transferAmount).send(channel);
+            }
+            await Logger.transactionLog(
+                `[${transferType}] $${transferAmount} from ${sender.name} to ${receiver.name}\n` +
+                    `new balances:\n` +
+                    `${sender.name}: ${sender.balance}\n` +
+                    `${receiver.name}: ${receiver.balance}\n`
+            );
+        } else {
+            await BankVisualizer.getErrorEmbed(
+                `${transferType} failed: ${transferResponse.failReason || 'unknown reason'}`
+            ).send(channel);
+        }
+    }
+
+    #transferAmountCore(
+        sender: BankUser,
+        receiver: BankUser,
+        amount: number
+    ): { success: boolean; failReason: string } {
         if (!amount) return { success: false, failReason: 'input error' };
         amount = roundNumberTwoDecimals(amount);
         if (sender.getBalance() < amount) {
@@ -52,7 +95,20 @@ class Bank {
         }
         sender.subtractBalance(amount);
         receiver.addBalance(amount);
+
         return { success: true, failReason: '' };
+    }
+
+    async transferAmount(
+        sender: BankUser,
+        receiver: BankUser,
+        amount: number,
+        channel: TextBasedChannel,
+        type = TransferType.TRANSFER
+    ): Promise<{ success: boolean; failReason: string }> {
+        const transferResponse = this.#transferAmountCore(sender, receiver, amount);
+        await this.#recordTransfer(transferResponse, amount, sender, receiver, channel, type);
+        return transferResponse;
     }
 
     getUser(id: string) {

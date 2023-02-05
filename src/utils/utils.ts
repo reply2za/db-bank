@@ -45,16 +45,21 @@ export async function getUserResponse(
  * Searches the message for a mention. If there is none then searches the name. If there is no name then prompts the user.
  * @param message
  * @param name
+ * @param actionName
  */
-export async function getUserToTransferTo(message: Message, name?: string): Promise<BankUser | undefined> {
+export async function getUserToTransferTo(
+    message: Message,
+    name?: string,
+    actionName = 'transfer'
+): Promise<BankUser | undefined> {
     let recipientID = message.mentions?.users.first()?.id;
     if (!name && !recipientID) {
-        message.channel.send('Who you would like to transfer to?');
+        message.channel.send(`Who you would like to ${actionName} to?`);
         const newMsg = await getUserResponse(message.channel, message.author.id);
         recipientID = newMsg?.mentions?.users.first()?.id;
         if (!recipientID) {
             if (!newMsg?.content) {
-                message.channel.send('must specify user to send to');
+                message.channel.send(`must specify user to ${actionName} to`);
                 return;
             } else {
                 name = newMsg.content.split(' ')[0];
@@ -73,7 +78,7 @@ export async function getUserToTransferTo(message: Message, name?: string): Prom
         return;
     }
     if (recipientBankUser.userId === message.author.id && !ADMIN_IDS.includes(`${message.author.id} `)) {
-        message.channel.send('you cannot make a transfer to yourself');
+        message.channel.send(`you cannot make a ${actionName} to yourself`);
         return;
     }
     return recipientBankUser;
