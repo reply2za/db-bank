@@ -56,7 +56,7 @@ export class TransferManager {
                     ],
                 });
                 await Logger.transactionLog(
-                    `[IOU transfer] $${transferAmount} from ${this.sender.name} to ${receiver.name}\n` +
+                    `[IOU transfer] ${transferAmount} from ${this.sender.name} to ${receiver.name}\n` +
                         `comment: ${comment || 'N/A'}`
                 );
                 await BankVisualizer.getIOUTransferReceiptEmbed(receiver.name, transferAmount).send(channel);
