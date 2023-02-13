@@ -36,7 +36,7 @@ export async function getUserResponse(
         });
         return messages.first();
     } catch (e) {
-        channel.send('*no response provided: cancelled transfer*');
+        channel.send('*no response provided*');
         return;
     }
 }

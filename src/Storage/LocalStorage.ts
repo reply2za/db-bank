@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { bot } from '../utils/constants';
+import { bot, isDevMode } from '../utils/constants';
 import { Message, TextChannel } from 'discord.js';
 
 class LocalStorage {
@@ -18,18 +18,20 @@ class LocalStorage {
         try {
             fs.writeFileSync(this.FILE_NAME, serializedData);
         } catch (e) {}
-        const message = await this.#getDataMsg();
-        if (message) {
-            await message.edit({
-                content: `updated: ${new Date().toString()}`,
-                files: [
-                    {
-                        attachment: './localData.txt',
-                        name: 'localData.txt',
-                        description: 'db-bank data',
-                    },
-                ],
-            });
+        if (!isDevMode) {
+            const message = await this.#getDataMsg();
+            if (message) {
+                await message.edit({
+                    content: `updated: ${new Date().toString()}`,
+                    files: [
+                        {
+                            attachment: './localData.txt',
+                            name: 'localData.txt',
+                            description: 'db-bank data',
+                        },
+                    ],
+                });
+            }
         }
     }
 }
