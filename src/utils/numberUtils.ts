@@ -26,7 +26,7 @@ export function validateMonetaryAmount(
 ): boolean {
     if (!validateAmount(transferAmount, channel)) return false;
     if (transferAmount > sender.balance) {
-        channel?.send('*cancelled transfer: `your balance is too low`*');
+        channel?.send('*cancelled transfer: `balance is too low`*');
         return false;
     }
     return true;
