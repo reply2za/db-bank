@@ -1,5 +1,6 @@
 import { bank } from '../../finance/Bank';
 import { MessageEventLocal } from '../../utils/types';
+import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 
 exports.run = async (event: MessageEventLocal) => {
     let finalString = '';
@@ -8,9 +9,9 @@ exports.run = async (event: MessageEventLocal) => {
             finalString += `**${user.name}**: $${user.getBalance()}\n`;
         }
     });
-    finalString += '------\n';
+    finalString += '\n---IOUs---\n';
     bank.getAllIOUs().forEach((iou) => {
-        finalString += `from ${iou.sender.name} to ${iou.receiver.name}\nreason: ${iou.comment}\n\n`;
+        finalString += `**from ${iou.sender.name} to ${iou.receiver.name}**\nreason: ${iou.comment}\n`;
     });
-    event.message.channel.send(finalString);
+    await new EmbedBuilderLocal().setTitle('Accounts').setDescription(finalString).send(event.message.channel);
 };
