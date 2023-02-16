@@ -79,11 +79,15 @@ class BankVisualizer {
     static getTransferNotificationEmbed(
         senderName: string,
         receiver: Readonly<BankUser>,
-        transferAmount: number
+        transferAmount: number,
+        comment = ''
     ): EmbedBuilderLocal {
+        const description = (comment ? `*${comment}*\n` : '').concat(
+            `amount: $${transferAmount}\nyour balance: $${receiver.balance}`
+        );
         return new EmbedBuilderLocal()
             .setTitle(`${senderName} sent you money`)
-            .setDescription(`amount: $${transferAmount}\nyour balance: $${receiver.balance}`)
+            .setDescription(description)
             .setColor('Green')
             .setThumbnail(this.getTransferImage(transferAmount));
     }
@@ -91,11 +95,15 @@ class BankVisualizer {
     static getChargeNotificationEmbed(
         sender: Readonly<BankUser>,
         receiverName: string,
-        transferAmount: number
+        transferAmount: number,
+        comment = ''
     ): EmbedBuilderLocal {
+        const description = (comment ? `*${comment}*\n` : '').concat(
+            `amount: $${transferAmount}\nyour balance: $${sender.balance}`
+        );
         return new EmbedBuilderLocal()
             .setTitle(`Charged by ${receiverName}`)
-            .setDescription(`amount: $${transferAmount}\nyour balance: $${sender.balance}`)
+            .setDescription(description)
             .setColor('LuminousVividPink')
             .setThumbnail(this.getChargeImage(transferAmount));
     }

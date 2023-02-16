@@ -50,19 +50,32 @@ class Bank {
         sender: BankUser,
         receiver: BankUser,
         channel: TextBasedChannel,
-        transferType: TransferType
+        transferType: TransferType,
+        comment = ''
     ) {
         if (transferResponse.success) {
             await localStorage.saveData(bank.serializeData());
             if (transferType === TransferType.CHARGE) {
                 await sender.getDiscordUser().send({
-                    embeds: [BankVisualizer.getChargeNotificationEmbed(sender, receiver.name, transferAmount).build()],
+                    embeds: [
+                        BankVisualizer.getChargeNotificationEmbed(
+                            sender,
+                            receiver.name,
+                            transferAmount,
+                            comment
+                        ).build(),
+                    ],
                 });
                 await channel.send(`charged ${receiver.name} $${transferAmount}`);
             } else {
                 await receiver.getDiscordUser().send({
                     embeds: [
-                        BankVisualizer.getTransferNotificationEmbed(sender.name, receiver, transferAmount).build(),
+                        BankVisualizer.getTransferNotificationEmbed(
+                            sender.name,
+                            receiver,
+                            transferAmount,
+                            comment
+                        ).build(),
                     ],
                 });
                 await BankVisualizer.getTransferReceiptEmbed(receiver.name, transferAmount).send(channel);
@@ -104,10 +117,11 @@ class Bank {
         receiver: BankUser,
         amount: number,
         channel: TextBasedChannel,
-        type = TransferType.TRANSFER
+        type = TransferType.TRANSFER,
+        comment = ''
     ): Promise<{ success: boolean; failReason: string }> {
         const transferResponse = this.#transferAmountCore(sender, receiver, amount);
-        await this.#recordTransfer(transferResponse, amount, sender, receiver, channel, type);
+        await this.#recordTransfer(transferResponse, amount, sender, receiver, channel, type, comment);
         return transferResponse;
     }
 

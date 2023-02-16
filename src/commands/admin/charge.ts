@@ -4,6 +4,8 @@ import { getUserResponse, getUserToTransferTo, roundNumberTwoDecimals } from '..
 import { validateMonetaryAmount } from '../../utils/numberUtils';
 import { TransferType } from '../../finance/types';
 import { BankVisualizer } from '../../finance/BankVisualizer';
+import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
+import { Colors } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
     if (!event.args[1]) {
@@ -23,11 +25,31 @@ exports.run = async (event: MessageEventLocal) => {
     const isValid = validateMonetaryAmount(transferAmount, sender, event.message.channel);
     if (!isValid) return;
     event.message.channel.send(`you are charging ${sender.name} $${transferAmount}`);
+    await new EmbedBuilderLocal()
+        .setDescription("type a short comment/description ['b' = blank, 'q' = cancel]")
+        .setColor(Colors.Orange)
+        .send(event.message.channel);
+    const commentResponse = (await getUserResponse(event.message.channel, event.message.author.id))?.content;
+    let comment = '';
+    if (!commentResponse || commentResponse.toLowerCase() === 'q') {
+        event.message.channel.send('**cancelled**');
+        return;
+    }
+    if (commentResponse !== 'b') {
+        comment = commentResponse;
+    }
     await BankVisualizer.getPreTransferConfirmationEmbed().send(event.message.channel);
-    const response = await getUserResponse(event.message.channel, event.message.author.id);
-    if (!response || response.content.toLowerCase() !== 'yes') {
+    const confirmationResponse = await getUserResponse(event.message.channel, event.message.author.id);
+    if (!confirmationResponse || confirmationResponse.content.toLowerCase() !== 'yes') {
         event.message.channel.send('*cancelled*');
         return;
     }
-    await bank.transferAmount(sender, event.bankUser, transferAmount, event.message.channel, TransferType.CHARGE);
+    await bank.transferAmount(
+        sender,
+        event.bankUser,
+        transferAmount,
+        event.message.channel,
+        TransferType.CHARGE,
+        comment
+    );
 };
