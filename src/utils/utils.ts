@@ -11,9 +11,6 @@ import {
 import { bank } from '../finance/Bank';
 import { ADMIN_IDS } from './constants';
 import { BankUser } from '../finance/BankUser';
-import fs from 'fs';
-import request from 'request';
-import reactions from './reactions';
 
 export function roundNumberTwoDecimals(num: number): number {
     return Math.round((num + Number.EPSILON) * 100) / 100;
@@ -85,36 +82,14 @@ export async function getUserToTransferTo(
 }
 
 /**
- * Processes the discord message containing the data file.
- * @param message The message containing the file.
- */
-export async function processDataFile(message: Message): Promise<boolean> {
-    // sets the .env file
-    return new Promise((res) => {
-        if (!message.attachments?.first() || !message.attachments.first()!.name?.includes('.txt')) {
-            res(false);
-            return false;
-        } else {
-            request
-                .get(message.attachments.first()!.url)
-                .on('error', console.error)
-                .once('complete', () => {
-                    res(true);
-                })
-                .pipe(fs.createWriteStream('localData.txt'));
-            return true;
-        }
-    });
-}
-
-/**
  * Attaches a reaction with a reaction collector to a specific message.
  * @param reactMsg The message to attach the reaction to.
  * @param reactionUsers The list of users that can activate the effect of the reaction.
+ * An empty list allows any user to activate the reaction. Will not be used if a custom filter is provided.
  * @param reactionsList The reactions to attach the message.
  * @param executeCallback A callback function for when any reaction is clicked.
  * @param endCallback A callback for when the reaction collector expires.
- * @param filter Optional - A filter for the reactionCollector.
+ * @param filter Optional - A filter for the reactionCollector. If none is provided then follows the policy/description of reactionUsers.
  * @param filterTime Optional - The duration in which the reactionCollector is in effect.
  */
 export async function attachReactionToMessage(
@@ -131,6 +106,7 @@ export async function attachReactionToMessage(
     }
     if (!filter) {
         filter = (reaction: MessageReaction, user: User) => {
+            if (!reactionUsers.length) return true;
             return !!(
                 reactionUsers.filter((rUser) => rUser.id === user.id).length &&
                 reactionsList.includes(reaction.emoji.name!)

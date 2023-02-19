@@ -1,8 +1,10 @@
 import { MessageEventLocal } from '../../utils/types';
-import { processDataFile } from '../../utils/utils';
 import { bank } from '../../finance/Bank';
 import { bot } from '../../utils/constants';
 import { localStorage } from '../../Storage/LocalStorage';
+import { Message } from 'discord.js';
+import request from 'request';
+import fs from 'fs';
 
 exports.run = async (event: MessageEventLocal) => {
     const success = await processDataFile(event.message);
@@ -15,3 +17,26 @@ exports.run = async (event: MessageEventLocal) => {
         event.message.channel.send('*there was an issue processing the data*');
     }
 };
+
+/**
+ * Processes the discord message containing the data file.
+ * @param message The message containing the file.
+ */
+async function processDataFile(message: Message): Promise<boolean> {
+    // sets the .env file
+    return new Promise((res) => {
+        if (!message.attachments?.first() || !message.attachments.first()!.name?.includes('.txt')) {
+            res(false);
+            return false;
+        } else {
+            request
+                .get(message.attachments.first()!.url)
+                .on('error', console.error)
+                .once('complete', () => {
+                    res(true);
+                })
+                .pipe(fs.createWriteStream('localData.txt'));
+            return true;
+        }
+    });
+}
