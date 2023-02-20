@@ -71,7 +71,7 @@ export async function getUserToTransferTo(
         recipientBankUser = matchingUsers[0];
     }
     if (!recipientBankUser) {
-        message.channel.send('could not find user');
+        message.channel.send('*could not find user*');
         return;
     }
     if (recipientBankUser.userId === message.author.id && !ADMIN_IDS.includes(`${message.author.id} `)) {

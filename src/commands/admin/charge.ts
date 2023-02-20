@@ -12,13 +12,10 @@ exports.run = async (event: MessageEventLocal) => {
         event.message.channel.send('charge [user] [amt]');
         return;
     }
+    const sender = await getUserToTransferTo(event.message, event.args[1], 'charge');
+    if (!sender) return;
     if (!event.args[2]) {
         event.message.channel.send('*error: must add amount*  `i.e. charge [user] [amt]`');
-        return;
-    }
-    const sender = await getUserToTransferTo(event.message, event.args[1], 'charge');
-    if (!sender) {
-        event.message.channel.send('*could not find user*');
         return;
     }
     const transferAmount = roundNumberTwoDecimals(Number(event.args[2]));
