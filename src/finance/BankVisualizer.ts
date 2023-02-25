@@ -7,6 +7,7 @@ import {
     ChargeImage,
     MoneyImage,
     REDEEM_IOU_IMG,
+    SENT_IOU_IMG,
     TRANSFER_IMG,
     TRANSFER_IOU_IMG,
 } from '../utils/constants';
@@ -128,22 +129,37 @@ class BankVisualizer {
      */
     static getRedeemableIOUEmbed(ious: IOUTicket[], highlight?: number) {
         let descriptionText = '';
-        let i = 0;
+        let i = 1;
         if (highlight !== undefined) highlight++;
         for (const singleIOU of ious) {
-            i++;
             if (i === highlight) {
                 descriptionText += `${i}. \`${singleIOU.sender.name}: ${singleIOU.comment.substring(0, 50)}\``;
             } else {
                 descriptionText += `${i}. **${singleIOU.sender.name}**: ${singleIOU.comment.substring(0, 50)}`;
             }
             descriptionText += '\n';
+            i++;
         }
         return new EmbedBuilderLocal()
             .setTitle(`Your redeemable IOU tickets`)
             .setDescription(descriptionText)
-            .setColor('Fuchsia')
+            .setColor('Blue')
             .setThumbnail(REDEEM_IOU_IMG);
+    }
+
+    static getSentIOUEmbed(ious: IOUTicket[]) {
+        let descriptionText = '';
+        let i = 1;
+        for (const singleIOU of ious) {
+            descriptionText += `${i}. **${singleIOU.sender.name}**: ${singleIOU.comment.substring(0, 50)}`;
+            descriptionText += '\n';
+            i++;
+        }
+        return new EmbedBuilderLocal()
+            .setTitle(`Sent IOUs`)
+            .setDescription(descriptionText)
+            .setColor('Fuchsia')
+            .setThumbnail(SENT_IOU_IMG);
     }
 
     static getTransferReceiptEmbed(receiverName: string, transferAmount: number): EmbedBuilderLocal {

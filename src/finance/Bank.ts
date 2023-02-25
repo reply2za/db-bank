@@ -133,8 +133,20 @@ class Bank {
         return Array.from(this.users.values());
     }
 
+    /**
+     * Gets all the active IOU tickets given to a user.
+     * @param id The user id
+     */
     getUserIOUs(id: string): IOUTicket[] {
         return this.iOUList.filter((value: IOUTicket) => value.receiver.id === id);
+    }
+
+    /**
+     * Gets all the active sent IOU tickets by a user.
+     * @param id The user id
+     */
+    getUserSentIOUs(id: string) {
+        return this.iOUList.filter((value: IOUTicket) => value.sender.id === id);
     }
 
     getAllIOUs() {

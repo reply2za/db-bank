@@ -30,7 +30,9 @@ export const TRANSFER_IMG =
     'https://vignette.wikia.nocookie.net/spongebob/images/2/25/Mermaid_Man_and_Barnacle_Boy_III_092.png/revision/latest?cb=20191208224116';
 export const TRANSFER_IOU_IMG = 'https://i.makeagif.com/media/2-27-2016/cuk9a4.gif';
 
-export const REDEEM_IOU_IMG = 'https://thumbs.gfycat.com/UnlinedSoreDowitcher-size_restricted.gif';
+export const REDEEM_IOU_IMG = 'https://i.pinimg.com/originals/a1/b0/59/a1b0599a8c4e26bb279c3b7a2f23dabc.gif';
+
+export const SENT_IOU_IMG = 'https://thumbs.gfycat.com/UnlinedSoreDowitcher-size_restricted.gif';
 
 export const REDEEMED_IOU_NOTIF_IMG =
     'https://static.wikia.nocookie.net/spongebob/images/8/89/Drifter.png/revision/latest?cb=20150728004136';
