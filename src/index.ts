@@ -4,7 +4,7 @@ const token = process.env.CLIENT_TOKEN?.replace(/\\n/gm, '\n');
 const hardwareTag = process.env.HARDWARE_TAG?.replace(/\\n/gm, '\n');
 import { bot, isDevMode, PREFIX } from './utils/constants';
 import { bank } from './finance/Bank';
-import { localStorage } from './Storage/LocalStorage';
+import { localStorage } from './storage/LocalStorage';
 import { commandHandler } from './handlers/CommandHandler';
 import { eventHandler } from './handlers/EventHandler';
 import Logger from './utils/Logger';

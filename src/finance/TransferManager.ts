@@ -3,7 +3,7 @@ import { GuildTextBasedChannel, If, TextBasedChannel } from 'discord.js';
 import { BankVisualizer } from './BankVisualizer';
 import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
 import { bank } from './Bank';
-import { localStorage } from '../Storage/LocalStorage';
+import { localStorage } from '../storage/LocalStorage';
 import { getUserResponse, roundNumberTwoDecimals } from '../utils/utils';
 import Logger from '../utils/Logger';
 import { TransferType } from './types';

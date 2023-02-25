@@ -3,7 +3,7 @@ import { IOUTicket } from './IOUTicket';
 import { TextBasedChannel, UserManager } from 'discord.js';
 import { roundNumberTwoDecimals } from '../utils/utils';
 import leven from 'leven';
-import { localStorage } from '../Storage/LocalStorage';
+import { localStorage } from '../storage/LocalStorage';
 import { BankVisualizer } from './BankVisualizer';
 import Logger from '../utils/Logger';
 import { TransferType } from './types';

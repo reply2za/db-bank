@@ -2,11 +2,10 @@ import { isDevMode, PREFIX } from '../utils/constants';
 import { Message } from 'discord.js';
 import { bank } from '../finance/Bank';
 import { BankUser } from '../finance/BankUser';
-import { localStorage } from '../Storage/LocalStorage';
+import { localStorage } from '../storage/LocalStorage';
 import { commandHandler } from '../handlers/CommandHandler';
 import { MessageEventLocal } from '../utils/types';
 import { isAdmin } from '../utils/utils';
-import { processManager } from '../utils/ProcessManager';
 
 module.exports = async (message: Message) => {
     const msgPrefix = message.content.substring(0, PREFIX.length);

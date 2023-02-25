@@ -11,10 +11,10 @@ class CommandHandler {
     clientCommands = new Collection<string, any>();
     adminCommands = new Collection<string, any>();
     #loadSpecificCommands(innerPath: string, commandsMap: Map<string, any>) {
-        const commands = fs.readdirSync(`./dist/${innerPath}`).filter((fileName) => fileName.endsWith('.js'));
-        for (const file of commands) {
-            const commandName = file.split('.')[0];
-            const command = require(`../${innerPath}/${file}`);
+        const fileNames = fs.readdirSync(`./dist/${innerPath}`).filter((name) => name.endsWith('.js'));
+        for (const fileName of fileNames) {
+            const commandName = fileName.split('.')[0];
+            const command = require(`../${innerPath}/${fileName}`);
             commandsMap.set(commandName, command);
         }
     }
