@@ -3,7 +3,7 @@ import { MessageEventLocal } from '../../utils/types';
 import { processManager } from '../../utils/ProcessManager';
 import { isDevMode } from '../../utils/constants';
 import reactions from '../../utils/reactions';
-import { MessageReaction, TextBasedChannel, User } from 'discord.js';
+import { MessageReaction, User } from 'discord.js';
 import { attachReactionToMessage } from '../../utils/utils';
 
 const hardwareTag = process.env.HARDWARE_TAG?.replace(/\\n/gm, '\n');
@@ -13,9 +13,9 @@ exports.run = async (event: MessageEventLocal) => {
         displayStatus(event).catch((err) => Logger.debugLog(err));
     } else if (event.args[2] && matchesHardwareTagOrPID(event.args[2])) {
         if (event.args[1] === 'on') {
-            setStateActive(event.message.channel);
+            setStateActive();
         } else if (event.args[1] === 'off') {
-            setStateInactive(event.message.channel);
+            setStateInactive();
         }
     }
 };
@@ -34,9 +34,9 @@ async function displayStatus(event: MessageEventLocal) {
         [reactions.GEAR],
         (reaction: MessageReaction, reactionUser: User) => {
             if (processManager.getState()) {
-                setStateInactive(event.message.channel);
+                setStateInactive();
             } else {
-                setStateActive(event.message.channel);
+                setStateActive();
             }
             reaction.users.remove(reactionUser.id);
             sentMsg.edit({ content: getBootStatus() });
@@ -47,14 +47,12 @@ async function displayStatus(event: MessageEventLocal) {
     );
 }
 
-function setStateActive(channel: TextBasedChannel) {
+function setStateActive() {
     processManager.setState(true);
-    channel.send(`${process.pid} is now on`);
 }
 
-function setStateInactive(channel: TextBasedChannel) {
+function setStateInactive() {
     processManager.setState(false);
-    channel.send(`${process.pid} is now off`);
 }
 
 /**
