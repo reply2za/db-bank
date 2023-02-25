@@ -5,11 +5,16 @@ exports.run = async (event: MessageEventLocal) => {
     await new EmbedBuilderLocal()
         .setTitle('Help List')
         .setDescription(
-            `**bank** - view balance
+            `
+            **bank** - view balance
             **transfer** [name] - initiate transfer process
-            **transferiou** - transfer an IOU
-            **ious** - view your IOUs
+            
+            -- IOU commands -- 
+            **transferIOU** - transfer an IOU
+            **ious** - view your received IOUs
+            **sentIOUs** - view your sent IOUs
             **redeem** - redeem an IOU`
         )
+        .setFooter('commands are not case sensitive')
         .send(event.message.channel);
 };
