@@ -3,6 +3,7 @@ import fs from 'fs';
 import { Collection } from 'discord.js';
 import { MessageEventLocal } from '../utils/types';
 import { processManager } from '../utils/ProcessManager';
+import * as path from 'path';
 
 // list of commands that should not be process-specific
 const MULTI_PROCESS_CMDS = ['boot'];
@@ -10,13 +11,50 @@ const MULTI_PROCESS_CMDS = ['boot'];
 class CommandHandler {
     clientCommands = new Collection<string, any>();
     adminCommands = new Collection<string, any>();
+
+    /**
+     * Parses the provided directory and returns an object containing two lists.
+     * One being all the immediate js files in the directory and the other being names of subdirectories.
+     * @param dirPath From the project's root, the path to the directory to parse.
+     * @private
+     */
+    #parseRootDirectory(dirPath: string) {
+        const subDirs: string[] = [];
+        const jsFiles = fs.readdirSync(dirPath).filter((fName) => {
+            const extName = path.extname(fName);
+            if (extName) {
+                return extName === '.js';
+            } else {
+                subDirs.push(fName);
+            }
+            return false;
+        });
+        return {
+            // the root js files in the directory
+            jsFiles,
+            // list of subdirectories
+            subDirs,
+        };
+    }
     #loadSpecificCommands(innerPath: string, commandsMap: Map<string, any>) {
-        const fileNames = fs.readdirSync(`./dist/${innerPath}`).filter((name) => name.endsWith('.js'));
-        for (const fileName of fileNames) {
-            const commandName = fileName.split('.')[0];
-            const command = require(`../${innerPath}/${fileName}`);
-            commandsMap.set(commandName, command);
+        const dirPath = `./dist/${innerPath}`;
+        // maps a filename to the correct relative path
+        const cmdFileReference = new Map();
+        let rootFiles = this.#parseRootDirectory(dirPath);
+        rootFiles.jsFiles.forEach((fileName) => cmdFileReference.set(fileName, `../${innerPath}/${fileName}`));
+        for (const subDirName of rootFiles.subDirs) {
+            const subDirPath = `${dirPath}/${subDirName}`;
+            const subRootFiles = this.#parseRootDirectory(subDirPath);
+            if (subRootFiles.subDirs.length > 0) throw new Error('unsupported file structure');
+            subRootFiles.jsFiles.forEach((fileName) =>
+                cmdFileReference.set(fileName, `../${innerPath}/${subDirName}/${subDirName}.js`)
+            );
         }
+        cmdFileReference.forEach((path, fileName) => {
+            const commandName = fileName.split('.')[0];
+            const command = require(path);
+            commandsMap.set(commandName, command);
+        });
     }
     loadAllCommands() {
         this.#loadSpecificCommands('commands/client', this.clientCommands);

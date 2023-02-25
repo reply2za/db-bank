@@ -1,7 +1,7 @@
-import { getUserToTransferTo } from '../../utils/utils';
-import { TransferManager } from '../../finance/TransferManager';
-import { commandHandler } from '../../handlers/CommandHandler';
-import { MessageEventLocal } from '../../utils/types';
+import { getUserToTransferTo } from '../../../utils/utils';
+import { TransferManager } from '../../../finance/TransferManager';
+import { commandHandler } from '../../../handlers/CommandHandler';
+import { MessageEventLocal } from '../../../utils/types';
 
 exports.run = async (event: MessageEventLocal) => {
     if (event.args[1]?.toLowerCase() === 'iou') {

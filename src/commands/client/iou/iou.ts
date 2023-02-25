@@ -1,7 +1,7 @@
-import { MessageEventLocal } from '../../utils/types';
-import { bank } from '../../finance/Bank';
-import { BankVisualizer } from '../../finance/BankVisualizer';
-import { PREFIX } from '../../utils/constants';
+import { MessageEventLocal } from '../../../utils/types';
+import { bank } from '../../../finance/Bank';
+import { BankVisualizer } from '../../../finance/BankVisualizer';
+import { PREFIX } from '../../../utils/constants';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.userId);

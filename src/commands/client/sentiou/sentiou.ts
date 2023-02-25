@@ -1,6 +1,6 @@
-import { MessageEventLocal } from '../../utils/types';
-import { bank } from '../../finance/Bank';
-import { BankVisualizer } from '../../finance/BankVisualizer';
+import { MessageEventLocal } from '../../../utils/types';
+import { bank } from '../../../finance/Bank';
+import { BankVisualizer } from '../../../finance/BankVisualizer';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserSentIOUs(event.bankUser.userId);
