@@ -44,7 +44,8 @@ exports.run = async (event: MessageEventLocal) => {
                     .setTitle(`${event.bankUser.name} redeemed your IOU`)
                     .setColor('Aqua')
                     .setThumbnail(REDEEMED_IOU_NOTIF_IMG)
-                    .setDescription(`The IOU you gave to ${event.bankUser.name} has been redeemed\nCongratulations!`);
+                    .setDescription(`The IOU you gave to ${event.bankUser.name} has been redeemed\nCongratulations!`)
+                    .setFooter(`IOU reason: ${iou.comment || 'none'}`);
                 await iouSender.send({
                     embeds: [iouRedeemedNotifEmbed.build()],
                 });
