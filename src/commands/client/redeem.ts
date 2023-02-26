@@ -18,8 +18,7 @@ exports.run = async (event: MessageEventLocal) => {
         .setDescription("which IOU would you like to redeem [or 'q' to quit]")
         .send(event.message.channel);
     const iouIndexResponse = (await getUserResponse(event.message.channel, event.bankUser.userId))?.content;
-    if (!iouIndexResponse) return;
-    if (iouIndexResponse.toLowerCase() === 'q') {
+    if (!iouIndexResponse || iouIndexResponse.toLowerCase() === 'q') {
         event.message.channel.send('**cancelled**');
         return;
     }
