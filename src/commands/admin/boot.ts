@@ -40,9 +40,6 @@ async function displayStatus(event: MessageEventLocal) {
             }
             reaction.users.remove(reactionUser.id);
             sentMsg.edit({ content: getBootStatus() });
-        },
-        () => {
-            sentMsg.reactions.removeAll();
         }
     );
 }

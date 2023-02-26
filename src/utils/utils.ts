@@ -97,7 +97,9 @@ export async function attachReactionToMessage(
     reactionUsers: User[],
     reactionsList: EmojiIdentifierResolvable[],
     executeCallback: (reaction: MessageReaction, user: User) => void,
-    endCallback: (collected: Collection<string, MessageReaction>, reason: string) => void,
+    endCallback = async (collected: Collection<string, MessageReaction>, reason: string) => {
+        reactMsg.reactions.removeAll().catch();
+    },
     filter?: (reaction: MessageReaction, user: User) => boolean,
     filterTime = 30000
 ) {
