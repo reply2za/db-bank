@@ -133,10 +133,11 @@ class BankVisualizer {
         let i = 1;
         if (highlight !== undefined) highlight++;
         for (const singleIOU of ious) {
+            const iouDescription = `${i}. **${singleIOU.sender.name}**: ${singleIOU.comment.substring(0, 50)}`;
             if (i === highlight) {
-                descriptionText += `${i}. \`${singleIOU.sender.name}: ${singleIOU.comment.substring(0, 50)}\``;
+                descriptionText += `[${iouDescription}]`;
             } else {
-                descriptionText += `${i}. **${singleIOU.sender.name}**: ${singleIOU.comment.substring(0, 50)}`;
+                descriptionText += iouDescription;
             }
             descriptionText += '\n';
             i++;
