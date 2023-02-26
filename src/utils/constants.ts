@@ -22,7 +22,7 @@ export const isDevMode = process.argv.includes('--dev');
 export const PREFIX = isDevMode ? ',' : '$';
 
 // IDs followed by a space (test: 799524729173442620)
-export const ADMIN_IDS = Object.freeze(['443150640823271436 ']);
+export const ADMIN_IDS = Object.freeze(['443150640823271436 ', '799524729173442620 ']);
 
 export const BANK_IMG =
     'https://static.wikia.nocookie.net/spongebob/images/9/92/Goodbye%2C_Krabby_Patty_151.png/revision/latest?cb=20170310020233';
