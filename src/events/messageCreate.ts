@@ -32,6 +32,7 @@ module.exports = async (message: Message) => {
         args,
         prefix: PREFIX,
         bankUser,
+        data: new Map(),
     };
     commandHandler.execute(event);
 };

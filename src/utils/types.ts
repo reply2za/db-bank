@@ -12,4 +12,5 @@ export type MessageEventLocal = {
     prefix: string;
     // the bank user initiating the event
     bankUser: BankUser;
+    data: Map<string, any>;
 };
