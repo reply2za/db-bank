@@ -1,4 +1,4 @@
-import { getUserResponse, getUserToTransferTo, roundNumberTwoDecimals } from '../../../utils/utils';
+import { getUserToTransferTo } from '../../../utils/utils';
 import { commandHandler } from '../../../handlers/CommandHandler';
 import { MessageEventLocal } from '../../../utils/types';
 import { TextChannel } from 'discord.js';
