@@ -12,9 +12,9 @@ import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
 exports.run = async (event: MessageEventLocal) => {
     if (event.args[1]?.toLowerCase() === 'iou') {
         event.args = [event.args[0]];
-        commandHandler.execute({ ...event, statement: 'transferiou', args: [] });
+        await commandHandler.execute({ ...event, statement: 'transferiou', args: [] });
     } else {
-        const recipientBankUser = await getUserToTransferTo(event.message, event.args[1]);
+        const recipientBankUser = await getUserToTransferTo(event.message, event.args[1], 'transfer money');
         if (!recipientBankUser) return;
         await new MonetaryTransfer(
             <TextChannel>event.message.channel,

@@ -37,6 +37,7 @@ class BankVisualizer {
                     iouDescription.length ? `\n- **Received IOUs** -\n${iouDescription}` : ''
                 }`
             )
+            .setFooter('transfer | transferIOU')
             .setThumbnail(BANK_IMG)
             .send(channel);
     }

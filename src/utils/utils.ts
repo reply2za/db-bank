@@ -118,6 +118,7 @@ export async function attachReactionToMessage(
     const collector = reactMsg.createReactionCollector({ filter, time: filterTime, dispose: true });
     collector.on('collect', executeCallback);
     collector.once('end', endCallback);
+    return collector;
 }
 
 export function isAdmin(id: string): boolean {

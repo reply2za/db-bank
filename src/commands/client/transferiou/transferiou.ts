@@ -10,7 +10,7 @@ import { Transfer } from '../../../finance/Transfer';
 import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
 
 exports.run = async (event: MessageEventLocal) => {
-    const recipientBankUser = await getUserToTransferTo(event.message, event.args[1]);
+    const recipientBankUser = await getUserToTransferTo(event.message, event.args[1], 'transfer IOUs');
     if (!recipientBankUser) return;
     await new TransferIOU(<TextChannel>event.message.channel, event.bankUser, recipientBankUser).processTransfer();
 };

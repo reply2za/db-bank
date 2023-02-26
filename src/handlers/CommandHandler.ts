@@ -66,13 +66,13 @@ class CommandHandler {
      * Executes an event. Admin commands must have a '.' prepending the event's statement name.
      * @param event
      */
-    execute(event: MessageEventLocal) {
+    async execute(event: MessageEventLocal) {
         if (!processManager.getState() && !MULTI_PROCESS_CMDS.includes(event.statement)) return;
         if (isAdmin(event.message.author.id)) {
             const cmdToRun = this.adminCommands.get(event.statement) || this.clientCommands.get(event.statement);
-            cmdToRun?.run(event);
+            await cmdToRun?.run(event);
         } else {
-            this.clientCommands.get(event.statement)?.run(event);
+            await this.clientCommands.get(event.statement)?.run(event);
         }
     }
 }

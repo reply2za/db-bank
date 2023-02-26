@@ -38,4 +38,8 @@ export default {
     O_DIAMOND: '🔸',
     // orange book
     BOOK_O: '📙',
+    // ticket, IOU
+    TICKET: '🎫',
+    // cash
+    MONEY: '💵',
 };
