@@ -28,27 +28,35 @@ export async function getUserResponse(
             errors: ['time'],
         });
         return messages.first();
-    } catch (e) {
-        channel.send('*no response provided*');
-        return;
-    }
+    } catch (e) {}
 }
 
 /**
  * Searches the message for a mention. If there is none then searches the name. If there is no name then prompts the user.
- * @param message
- * @param name
- * @param actionName
+ * @param message The user's message.
+ * @param name Optional - A name of a user to search for.
+ * @param actionName Optional - The name of the action that is being attempted
+ * @param eventData Optional - Event data
  */
 export async function getUserToTransferTo(
     message: Message,
-    name?: string,
-    actionName = 'transfer'
+    name = '',
+    actionName = 'transfer',
+    eventData = new Map<string, any>()
 ): Promise<BankUser | undefined> {
     let recipientID = message.mentions?.users.first()?.id;
     if (!name && !recipientID) {
-        message.channel.send(`Who you would like to ${actionName} to?`);
+        let initialTransferMsg = eventData.get('INITIAL_TRANSFER_MSG');
+        if (initialTransferMsg) await initialTransferMsg.delete();
+        initialTransferMsg = await message.channel.send(`Who you would like to ${actionName} to?`);
+        eventData.set('INITIAL_TRANSFER_MSG', initialTransferMsg);
         const newMsg = await getUserResponse(message.channel, message.author.id);
+        // determines if abandoned, meaning that the same transfer is no longer active
+        if (initialTransferMsg.id !== eventData.get('INITIAL_TRANSFER_MSG')?.id) return;
+        if (!newMsg) {
+            message.channel.send('*no response provided*');
+            return;
+        }
         recipientID = newMsg?.mentions?.users.first()?.id;
         if (!recipientID) {
             if (!newMsg?.content) {

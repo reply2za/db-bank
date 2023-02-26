@@ -22,6 +22,7 @@ export abstract class Transfer {
             .setFooter('or `q` to quit')
             .send(this.channel);
         const response = await getUserResponse(this.channel, senderId);
+        if (!response) this.channel.send('*no response provided*');
         enterAmountMsg.deletable && enterAmountMsg.delete();
         return response?.content;
     }

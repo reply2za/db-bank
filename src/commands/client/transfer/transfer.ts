@@ -14,7 +14,7 @@ exports.run = async (event: MessageEventLocal) => {
         event.args = [event.args[0]];
         await commandHandler.execute({ ...event, statement: 'transferiou', args: [] });
     } else {
-        const recipientBankUser = await getUserToTransferTo(event.message, event.args[1], 'transfer money');
+        const recipientBankUser = await getUserToTransferTo(event.message, event.args[1], 'transfer money', event.data);
         if (!recipientBankUser) return;
         await new MonetaryTransfer(
             <TextChannel>event.message.channel,

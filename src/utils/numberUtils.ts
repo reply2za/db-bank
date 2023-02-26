@@ -1,6 +1,4 @@
 import { TextBasedChannel } from 'discord.js';
-import EmbedBuilderLocal from './EmbedBuilderLocal';
-import { getUserResponse } from './utils';
 import { BankUser } from '../finance/BankUser';
 
 /**

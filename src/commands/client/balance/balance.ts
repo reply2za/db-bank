@@ -17,8 +17,7 @@ exports.run = async (event: MessageEventLocal) => {
     const userIOUs = bank.getUserIOUs(event.message.author.id);
     if (userIOUs.length) reactionsList.push(reactions.PAGE_C);
     const balanceReactionCallback = async (reaction: MessageReaction) => {
-        if (processingReaction) return;
-        processingReaction = true;
+        reaction.users.remove(event.message.author).catch();
         switch (reaction.emoji.name) {
             case reactions.MONEY:
                 await commandHandler.execute({ ...event, statement: 'transfer', args: [] });
@@ -30,7 +29,6 @@ exports.run = async (event: MessageEventLocal) => {
                 await commandHandler.execute({ ...event, statement: 'iou', args: [] });
                 break;
         }
-        processingReaction = false;
     };
     await attachReactionToMessage(
         balanceMsg,
