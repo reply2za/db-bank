@@ -38,3 +38,7 @@ export function validateAmount(transferAmount: any, channel?: TextBasedChannel):
     }
     return true;
 }
+
+export function roundNumberTwoDecimals(num: number): number {
+    return Math.round((num + Number.EPSILON) * 100) / 100;
+}

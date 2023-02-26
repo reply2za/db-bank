@@ -1,9 +1,9 @@
 import { TextChannel } from 'discord.js';
 import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
-import { getUserResponse, roundNumberTwoDecimals } from '../utils/utils';
+import { getUserResponse } from '../utils/utils';
 import { BankUser } from './BankUser';
 import { BankVisualizer } from './BankVisualizer';
-import { validateAmount } from '../utils/numberUtils';
+import { roundNumberTwoDecimals, validateAmount } from '../utils/numberUtils';
 
 export abstract class Transfer {
     channel;

@@ -1,7 +1,7 @@
 import { MessageEventLocal } from '../../utils/types';
 import { bank } from '../../finance/Bank';
-import { getUserResponse, getUserToTransferTo, roundNumberTwoDecimals } from '../../utils/utils';
-import { validateMonetaryAmount } from '../../utils/numberUtils';
+import { getUserResponse, getUserToTransferTo } from '../../utils/utils';
+import { roundNumberTwoDecimals, validateMonetaryAmount } from '../../utils/numberUtils';
 import { TransferType } from '../../finance/types';
 import { BankVisualizer } from '../../finance/BankVisualizer';
 import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';

@@ -12,7 +12,7 @@ import {
     TRANSFER_IOU_IMG,
 } from '../utils/constants';
 import { IOUTicket } from './IOUTicket';
-import { roundNumberTwoDecimals } from '../utils/utils';
+import { roundNumberTwoDecimals } from '../utils/numberUtils';
 
 class BankVisualizer {
     static async showBalance(

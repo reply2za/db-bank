@@ -6,6 +6,7 @@ import { localStorage } from '../storage/LocalStorage';
 import { commandHandler } from '../handlers/CommandHandler';
 import { MessageEventLocal } from '../utils/types';
 import { isAdmin } from '../utils/utils';
+import Logger from '../utils/Logger';
 
 module.exports = async (message: Message) => {
     const msgPrefix = message.content.substring(0, PREFIX.length);
@@ -34,5 +35,5 @@ module.exports = async (message: Message) => {
         bankUser,
         data: new Map(),
     };
-    commandHandler.execute(event);
+    commandHandler.execute(event).catch((error) => Logger.errorLog(error));
 };

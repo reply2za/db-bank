@@ -1,7 +1,7 @@
 import { BankUser } from './BankUser';
 import { IOUTicket } from './IOUTicket';
 import { TextBasedChannel, UserManager } from 'discord.js';
-import { roundNumberTwoDecimals } from '../utils/utils';
+import { roundNumberTwoDecimals } from '../utils/numberUtils';
 import leven from 'leven';
 import { localStorage } from '../storage/LocalStorage';
 import { BankVisualizer } from './BankVisualizer';

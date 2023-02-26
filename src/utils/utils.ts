@@ -12,10 +12,6 @@ import { bank } from '../finance/Bank';
 import { ADMIN_IDS } from './constants';
 import { BankUser } from '../finance/BankUser';
 
-export function roundNumberTwoDecimals(num: number): number {
-    return Math.round((num + Number.EPSILON) * 100) / 100;
-}
-
 const getFilterForUser = (userId: string) => {
     return (m: Message) => userId === m.author.id;
 };

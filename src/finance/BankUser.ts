@@ -1,5 +1,5 @@
 import { User } from 'discord.js';
-import { roundNumberTwoDecimals } from '../utils/utils';
+import { roundNumberTwoDecimals } from '../utils/numberUtils';
 
 class BankUser {
     readonly userId;
