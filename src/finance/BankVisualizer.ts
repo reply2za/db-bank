@@ -156,7 +156,7 @@ class BankVisualizer {
             i++;
         }
         return new EmbedBuilderLocal()
-            .setTitle(`You sent IOUs to`)
+            .setTitle(`Your sent IOUs to`)
             .setDescription(descriptionText)
             .setColor('Fuchsia')
             .setThumbnail(SENT_IOU_IMG);
