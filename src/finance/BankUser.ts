@@ -2,10 +2,10 @@ import { User } from 'discord.js';
 import { roundNumberTwoDecimals } from '../utils/utils';
 
 class BankUser {
-    userId;
-    name;
+    readonly userId;
+    readonly name;
     balance;
-    #discordUser;
+    readonly #discordUser;
 
     constructor(discordUser: User, name: string, balance: number) {
         this.userId = discordUser.id;
