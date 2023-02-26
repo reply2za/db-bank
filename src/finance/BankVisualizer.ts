@@ -151,12 +151,12 @@ class BankVisualizer {
         let descriptionText = '';
         let i = 1;
         for (const singleIOU of ious) {
-            descriptionText += `${i}. **${singleIOU.sender.name}**: ${singleIOU.comment.substring(0, 50)}`;
+            descriptionText += `${i}. **${singleIOU.receiver.name}**: *${singleIOU.comment.substring(0, 50)}*`;
             descriptionText += '\n';
             i++;
         }
         return new EmbedBuilderLocal()
-            .setTitle(`Sent IOUs`)
+            .setTitle(`You sent IOUs to`)
             .setDescription(descriptionText)
             .setColor('Fuchsia')
             .setThumbnail(SENT_IOU_IMG);
