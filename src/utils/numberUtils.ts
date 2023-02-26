@@ -3,16 +3,6 @@ import EmbedBuilderLocal from './EmbedBuilderLocal';
 import { getUserResponse } from './utils';
 import { BankUser } from '../finance/BankUser';
 
-export async function getAmount(channel: TextBasedChannel, senderId: string) {
-    const enterAmountMsg = await new EmbedBuilderLocal()
-        .setDescription('enter the amount you would like to send')
-        .setFooter('or `q` to quit')
-        .send(channel);
-    const response = await getUserResponse(channel, senderId);
-    enterAmountMsg.deletable && enterAmountMsg.delete();
-    return response?.content;
-}
-
 /**
  * Returns whether the amount provided is acceptable.
  * @param transferAmount
