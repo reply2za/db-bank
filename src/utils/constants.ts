@@ -21,7 +21,7 @@ export const isDevMode = process.argv.includes('--dev');
 
 export const PREFIX = isDevMode ? ',' : '$';
 
-// IDs followed by a space
+// IDs followed by a space (test: 799524729173442620)
 export const ADMIN_IDS = Object.freeze(['443150640823271436 ']);
 
 export const BANK_IMG =
