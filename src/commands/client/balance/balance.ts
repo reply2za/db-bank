@@ -4,6 +4,7 @@ import { MessageEventLocal } from '../../../utils/types';
 import { attachReactionToMessage } from '../../../utils/utils';
 import reactions from '../../../utils/reactions';
 import { commandHandler } from '../../../handlers/CommandHandler';
+import { MessageReaction } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
     const balanceMsg = await BankVisualizer.showBalance(
@@ -15,7 +16,7 @@ exports.run = async (event: MessageEventLocal) => {
     const reactionsList = [reactions.MONEY, reactions.TICKET];
     const userIOUs = bank.getUserIOUs(event.message.author.id);
     if (userIOUs.length) reactionsList.push(reactions.PAGE_C);
-    await attachReactionToMessage(balanceMsg, [event.message.author], reactionsList, async (reaction) => {
+    const balanceReactionCallback = async (reaction: MessageReaction) => {
         if (processingReaction) return;
         processingReaction = true;
         switch (reaction.emoji.name) {
@@ -30,5 +31,14 @@ exports.run = async (event: MessageEventLocal) => {
                 break;
         }
         processingReaction = false;
-    });
+    };
+    await attachReactionToMessage(
+        balanceMsg,
+        [event.message.author],
+        reactionsList,
+        balanceReactionCallback,
+        undefined,
+        undefined,
+        45000
+    );
 };
