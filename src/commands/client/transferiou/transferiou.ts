@@ -1,12 +1,12 @@
-import { getUserResponse, getUserToTransferTo, roundNumberTwoDecimals } from '../../utils/utils';
-import { MessageEventLocal } from '../../utils/types';
+import { getUserResponse, getUserToTransferTo, roundNumberTwoDecimals } from '../../../utils/utils';
+import { MessageEventLocal } from '../../../utils/types';
 import { GuildTextBasedChannel, If, TextBasedChannel } from 'discord.js';
-import { BankUser } from '../../finance/BankUser';
-import { BankVisualizer } from '../../finance/BankVisualizer';
-import { getAmount, validateAmount } from '../../utils/numberUtils';
-import { bank } from '../../finance/Bank';
-import { localStorage } from '../../storage/LocalStorage';
-import Logger from '../../utils/Logger';
+import { BankUser } from '../../../finance/BankUser';
+import { BankVisualizer } from '../../../finance/BankVisualizer';
+import { getAmount, validateAmount } from '../../../utils/numberUtils';
+import { bank } from '../../../finance/Bank';
+import { localStorage } from '../../../storage/LocalStorage';
+import Logger from '../../../utils/Logger';
 
 exports.run = async (event: MessageEventLocal) => {
     const recipientBankUser = await getUserToTransferTo(event.message, event.args[1]);
