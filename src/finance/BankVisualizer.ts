@@ -73,8 +73,9 @@ class BankVisualizer {
             );
     }
 
-    static getPreTransferConfirmationEmbed(): EmbedBuilderLocal {
-        return new EmbedBuilderLocal().setDescription("confirm transfer? Type 'yes' or 'no'").setColor('Yellow');
+    static getConfirmationEmbed(actionName = ''): EmbedBuilderLocal {
+        if (actionName) actionName = ` ${actionName}`;
+        return new EmbedBuilderLocal().setDescription(`confirm${actionName}? Type 'yes' or 'no'`).setColor('Yellow');
     }
 
     static getTransferNotificationEmbed(

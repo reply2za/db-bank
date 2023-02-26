@@ -42,7 +42,7 @@ async function processMonetaryTransfer(channel: TextBasedChannel, sender: BankUs
     }
     transferEmbed = BankVisualizer.getCashTransferEmbed(sender, receiver, transferAmount);
     await transferEmbed.edit(embedMsg);
-    await BankVisualizer.getPreTransferConfirmationEmbed().send(channel);
+    await BankVisualizer.getConfirmationEmbed('transfer').send(channel);
     const responseConfirmation = (await getUserResponse(channel, sender.userId))?.content;
     if (responseConfirmation && responseConfirmation.toLowerCase() === 'yes') {
         await bank.transferAmount(sender, receiver, transferAmount, channel, TransferType.TRANSFER);

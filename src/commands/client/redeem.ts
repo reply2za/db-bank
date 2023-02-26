@@ -11,7 +11,9 @@ exports.run = async (event: MessageEventLocal) => {
         event.message.channel.send('*no redeemable IOUs found*');
         return;
     }
-    const sentIOUEmbed = await BankVisualizer.getRedeemableIOUEmbed(ious).send(event.message.channel);
+    const sentIOUEmbed =
+        event.data.get('REDEEM_IOU_EMBED_MSG') ||
+        (await BankVisualizer.getRedeemableIOUEmbed(ious).send(event.message.channel));
     await new EmbedBuilderLocal()
         .setDescription("which IOU would you like to redeem [or 'q' to quit]")
         .send(event.message.channel);
@@ -28,7 +30,7 @@ exports.run = async (event: MessageEventLocal) => {
     }
     await BankVisualizer.getRedeemableIOUEmbed(ious, iouIndex).edit(sentIOUEmbed);
     const iou = ious[iouIndex];
-    await BankVisualizer.getPreTransferConfirmationEmbed().send(event.message.channel);
+    await BankVisualizer.getConfirmationEmbed('redemption').send(event.message.channel);
     const response = (await getUserResponse(event.message.channel, event.bankUser.userId))?.content;
     if (response?.toLowerCase() === 'yes') {
         const isSuccessful = await bank.redeemIOU(iou.id);

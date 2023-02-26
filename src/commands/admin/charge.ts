@@ -35,7 +35,7 @@ exports.run = async (event: MessageEventLocal) => {
     if (commentResponse !== 'b') {
         comment = commentResponse;
     }
-    await BankVisualizer.getPreTransferConfirmationEmbed().send(event.message.channel);
+    await BankVisualizer.getConfirmationEmbed('charge').send(event.message.channel);
     const confirmationResponse = await getUserResponse(event.message.channel, event.message.author.id);
     if (!confirmationResponse || confirmationResponse.content.toLowerCase() !== 'yes') {
         event.message.channel.send('*cancelled*');

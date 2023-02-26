@@ -45,7 +45,7 @@ async function processIOUTransfer(
     const comment = (await getUserResponse(channel, sender.userId))?.content || '';
     transferEmbed = BankVisualizer.getIOUTransferEmbed(sender, receiver, transferAmount, comment);
     await transferEmbed.edit(embedMsg);
-    await BankVisualizer.getPreTransferConfirmationEmbed().send(channel);
+    await BankVisualizer.getConfirmationEmbed('transfer').send(channel);
     const responseConfirmation = (await getUserResponse(channel, sender.userId))?.content;
     if (responseConfirmation && responseConfirmation.toLowerCase() === 'yes') {
         const transferResponse = bank.transferIOU(sender, receiver, transferAmount, comment);
