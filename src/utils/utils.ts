@@ -99,9 +99,6 @@ export async function attachReactionToMessage(
     filter?: (reaction: MessageReaction, user: User) => boolean,
     filterTime = 30000
 ) {
-    for (const r of reactionsList) {
-        await reactMsg.react(r);
-    }
     if (!filter) {
         filter = (reaction: MessageReaction, user: User) => {
             if (!reactionUsers.length) return true;
@@ -114,6 +111,9 @@ export async function attachReactionToMessage(
     const collector = reactMsg.createReactionCollector({ filter, time: filterTime, dispose: true });
     collector.on('collect', executeCallback);
     collector.once('end', endCallback);
+    for (const r of reactionsList) {
+        await reactMsg.react(r);
+    }
     return collector;
 }
 
