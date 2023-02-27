@@ -15,3 +15,10 @@ export type MessageEventLocal = {
     // additional data that can be added to the event
     data: Map<string, any>;
 };
+
+/*
+Data fields
+[name, type] - explanation
+INITIAL_TRANSFER_MSG, Message - the initial message object from the bot when starting a transfer
+REACTION_TSFR_REQ, string - contains an id for a reaction transfer request only when it is in progress
+ */
