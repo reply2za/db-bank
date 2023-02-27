@@ -4,6 +4,7 @@ import { BankVisualizer } from '../../../finance/BankVisualizer';
 import { attachReactionToMessage } from '../../../utils/utils';
 import reactions from '../../../utils/reactions';
 import { commandHandler } from '../../../handlers/CommandHandler';
+import { MessageReaction } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.userId);
@@ -20,7 +21,7 @@ exports.run = async (event: MessageEventLocal) => {
         .setFooter(`redeem IOUs ${sentIOUs.length ? '| view sent IOUs' : ''}`)
         .send(event.message.channel);
     let processingRedeemCmd = false;
-    await attachReactionToMessage(redeemableIOUMsg, [event.message.author], reactionsList, async (reaction) => {
+    const reactionCallback = async (reaction: MessageReaction) => {
         switch (reaction.emoji.name) {
             case reactions.OUTBOX:
                 await commandHandler.execute({ ...event, statement: 'sentiou', args: [] });
@@ -33,5 +34,6 @@ exports.run = async (event: MessageEventLocal) => {
                 processingRedeemCmd = false;
                 break;
         }
-    });
+    };
+    await attachReactionToMessage(redeemableIOUMsg, [event.message.author], reactionsList, reactionCallback);
 };

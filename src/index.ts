@@ -2,7 +2,7 @@
 require('dotenv').config();
 const token = process.env.CLIENT_TOKEN?.replace(/\\n/gm, '\n');
 const hardwareTag = process.env.HARDWARE_TAG?.replace(/\\n/gm, '\n');
-import { bot, isDevMode, PREFIX } from './utils/constants';
+import { bot, isDevMode, PREFIX } from './utils/constants/constants';
 import { bank } from './finance/Bank';
 import { localStorage } from './storage/LocalStorage';
 import { commandHandler } from './handlers/CommandHandler';

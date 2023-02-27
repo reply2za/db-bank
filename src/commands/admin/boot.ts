@@ -1,7 +1,7 @@
 import Logger from '../../utils/Logger';
 import { MessageEventLocal } from '../../utils/types';
 import { processManager } from '../../utils/ProcessManager';
-import { isDevMode } from '../../utils/constants';
+import { isDevMode } from '../../utils/constants/constants';
 import reactions from '../../utils/reactions';
 import { MessageReaction, User } from 'discord.js';
 import { attachReactionToMessage } from '../../utils/utils';

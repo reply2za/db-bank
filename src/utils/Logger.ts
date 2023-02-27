@@ -1,4 +1,4 @@
-import { bot, isDevMode } from './constants';
+import { bot, isDevMode } from './constants/constants';
 import { TextChannel } from 'discord.js';
 
 export default class Logger {

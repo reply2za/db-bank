@@ -12,12 +12,16 @@ exports.run = async (event: MessageEventLocal) => {
         event.bankUser,
         bank.getUserIOUs(event.bankUser.userId)
     );
-    let processingReaction = false;
     const reactionsList = [reactions.MONEY, reactions.TICKET];
     const userIOUs = bank.getUserIOUs(event.message.author.id);
     if (userIOUs.length) reactionsList.push(reactions.PAGE_C);
     const balanceReactionCallback = async (reaction: MessageReaction) => {
         reaction.users.remove(event.message.author).catch();
+        let transferMsg = event.data.get('INITIAL_TRANSFER_MSG');
+        if (transferMsg) {
+            transferMsg.delete();
+            event.data.delete('INITIAL_TRANSFER_MSG');
+        }
         switch (reaction.emoji.name) {
             case reactions.MONEY:
                 await commandHandler.execute({ ...event, statement: 'transfer', args: [] });

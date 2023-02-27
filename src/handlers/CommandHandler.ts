@@ -3,10 +3,12 @@ import fs from 'fs';
 import { Collection } from 'discord.js';
 import { MessageEventLocal } from '../utils/types';
 import { processManager } from '../utils/ProcessManager';
-import * as path from 'path';
+import path from 'path';
 
 // list of commands that should not be process-specific
 const MULTI_PROCESS_CMDS = ['boot'];
+// the output directory name where source files are generated
+const SOURCE_DIR_NAME = 'dist';
 
 class CommandHandler {
     clientCommands = new Collection<string, any>();
@@ -36,8 +38,9 @@ class CommandHandler {
             subDirs,
         };
     }
+
     #loadSpecificCommands(innerPath: string, commandsMap: Map<string, any>) {
-        const dirPath = `./dist/${innerPath}`;
+        const dirPath = `./${SOURCE_DIR_NAME}/${innerPath}`;
         // maps a filename to the correct relative path
         const cmdFileReference = new Map();
         let rootFiles = this.#parseRootDirectory(dirPath);
@@ -56,6 +59,7 @@ class CommandHandler {
             commandsMap.set(commandName, command);
         });
     }
+
     loadAllCommands() {
         this.#loadSpecificCommands('commands/client', this.clientCommands);
         this.#loadSpecificCommands('commands/admin', this.adminCommands);

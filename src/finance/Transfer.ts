@@ -57,6 +57,7 @@ export abstract class Transfer {
             await this.channel.send('*cancelled transfer*');
         }
     }
+
     protected abstract getTransferEmbed(number: number, comment: string): EmbedBuilderLocal;
 
     protected abstract getComment(): Promise<string>;

@@ -1,29 +1,3 @@
-import { Client, GatewayIntentBits, Partials } from 'discord.js';
-// the db bot instance
-export const bot: Client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildInvites,
-        GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.GuildPresences,
-        GatewayIntentBits.GuildIntegrations,
-        GatewayIntentBits.DirectMessages,
-        GatewayIntentBits.GuildMessageReactions,
-        GatewayIntentBits.DirectMessageReactions,
-        GatewayIntentBits.MessageContent,
-    ],
-    partials: [Partials.Message, Partials.Channel, Partials.Reaction, Partials.User],
-});
-
-export const isDevMode = process.argv.includes('--dev');
-
-export const PREFIX = isDevMode ? ',' : '$';
-
-// IDs followed by a space (test: 799524729173442620)
-export const ADMIN_IDS = Object.freeze(['443150640823271436 ', '799524729173442620 ']);
-
 export const BANK_IMG =
     'https://static.wikia.nocookie.net/spongebob/images/9/92/Goodbye%2C_Krabby_Patty_151.png/revision/latest?cb=20170310020233';
 export const TRANSFER_IMG =
@@ -36,9 +10,6 @@ export const SENT_IOU_IMG = 'https://thumbs.gfycat.com/UnlinedSoreDowitcher-size
 
 export const REDEEMED_IOU_NOTIF_IMG =
     'https://static.wikia.nocookie.net/spongebob/images/8/89/Drifter.png/revision/latest?cb=20150728004136';
-
-export const CHARGE_IMG =
-    'https://m.media-amazon.com/images/M/MV5BMTk2MDA4MzQ4MV5BMl5BanBnXkFtZTgwNzQzNTEzMjE@._V1_.jpg';
 
 export enum ChargeImage {
     SB_CREDIT_CARD = 'https://m.media-amazon.com/images/M/MV5BMTk2MDA4MzQ4MV5BMl5BanBnXkFtZTgwNzQzNTEzMjE@._V1_.jpg',

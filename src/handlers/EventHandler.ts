@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { bot } from '../utils/constants';
+import { bot } from '../utils/constants/constants';
 
 class EventHandler {
     loadAllEvents() {

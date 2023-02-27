@@ -1,5 +1,5 @@
 const version = require('../../package.json').version;
-import { isDevMode } from './constants';
+import { isDevMode } from './constants/constants';
 
 class ProcessManager {
     #isActive;

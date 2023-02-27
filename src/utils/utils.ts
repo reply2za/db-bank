@@ -9,7 +9,7 @@ import {
     User,
 } from 'discord.js';
 import { bank } from '../finance/Bank';
-import { ADMIN_IDS } from './constants';
+import { ADMIN_IDS } from './constants/constants';
 import { BankUser } from '../finance/BankUser';
 
 const getFilterForUser = (userId: string) => {
@@ -46,13 +46,12 @@ export async function getUserToTransferTo(
 ): Promise<BankUser | undefined> {
     let recipientID = message.mentions?.users.first()?.id;
     if (!name && !recipientID) {
-        let initialTransferMsg = eventData.get('INITIAL_TRANSFER_MSG');
-        if (initialTransferMsg) await initialTransferMsg.delete();
-        initialTransferMsg = await message.channel.send(`Who you would like to ${actionName} to?`);
+        const initialTransferMsg = await message.channel.send(`Who you would like to ${actionName} to?`);
         eventData.set('INITIAL_TRANSFER_MSG', initialTransferMsg);
         const newMsg = await getUserResponse(message.channel, message.author.id);
         // determines if abandoned, meaning that the same transfer is no longer active
         if (initialTransferMsg.id !== eventData.get('INITIAL_TRANSFER_MSG')?.id) return;
+        eventData.delete('INITIAL_TRANSFER_MSG');
         if (!newMsg) {
             message.channel.send('*no response provided*');
             return;

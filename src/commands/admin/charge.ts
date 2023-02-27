@@ -29,7 +29,7 @@ exports.run = async (event: MessageEventLocal) => {
     const commentResponse = (await getUserResponse(event.message.channel, event.message.author.id))?.content;
     let comment = '';
     if (!commentResponse || commentResponse.toLowerCase() === 'q') {
-        event.message.channel.send('**cancelled**');
+        event.message.channel.send('*cancelled*');
         return;
     }
     if (commentResponse !== 'b') {

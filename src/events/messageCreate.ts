@@ -1,4 +1,4 @@
-import { isDevMode, PREFIX } from '../utils/constants';
+import { isDevMode, PREFIX } from '../utils/constants/constants';
 import { Message } from 'discord.js';
 import { bank } from '../finance/Bank';
 import { BankUser } from '../finance/BankUser';
@@ -19,11 +19,15 @@ module.exports = async (message: Message) => {
             bank.addNewUser(new BankUser(message.author, message.author.username, 0));
             await localStorage.saveData(bank.serializeData());
         } catch (e) {
-            console.log(e);
-            message.channel.send('could not add user, please contact administrator');
+            if (e instanceof Error) Logger.errorLog(e);
+            message.channel.send('*error: could not add user*');
+            return;
+        }
+        if (!bankUser) {
+            message.channel.send('*there was an error*');
+            return;
         }
     }
-    if (!bankUser) return;
     const args = message.content.replace(/\s+/g, ' ').split(' ');
     // the command name, removes the prefix and any args
     const statement = args[0].substring(1).toLowerCase();

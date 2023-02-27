@@ -28,6 +28,7 @@ class MonetaryTransfer extends Transfer {
     constructor(channel: TextChannel, sender: BankUser, receiver: BankUser) {
         super(channel, sender, receiver);
     }
+
     protected async approvedTransactionAction(transferAmount: number, comment: string): Promise<void> {
         await bank.transferAmount(this.sender, this.receiver, transferAmount, this.channel, TransferType.TRANSFER);
     }

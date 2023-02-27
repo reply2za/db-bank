@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { bot, isDevMode } from '../utils/constants';
+import { bot, isDevMode } from '../utils/constants/constants';
 import { Message, TextChannel } from 'discord.js';
 
 class LocalStorage {

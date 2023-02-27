@@ -1,6 +1,6 @@
 import { MessageEventLocal } from '../../utils/types';
 import { bank } from '../../finance/Bank';
-import { bot } from '../../utils/constants';
+import { bot } from '../../utils/constants/constants';
 import { localStorage } from '../../storage/LocalStorage';
 import { Message } from 'discord.js';
 import request from 'request';

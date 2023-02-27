@@ -3,16 +3,16 @@ import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js
 import { BankUser } from './BankUser';
 import {
     BANK_IMG,
-    bot,
     ChargeImage,
     MoneyImage,
     REDEEM_IOU_IMG,
     SENT_IOU_IMG,
     TRANSFER_IMG,
     TRANSFER_IOU_IMG,
-} from '../utils/constants';
+} from '../utils/constants/images';
 import { IOUTicket } from './IOUTicket';
 import { roundNumberTwoDecimals } from '../utils/numberUtils';
+import { bot } from '../utils/constants/constants';
 
 class BankVisualizer {
     static async showBalance(

@@ -2,8 +2,9 @@ import { bank } from '../../finance/Bank';
 import { BankVisualizer } from '../../finance/BankVisualizer';
 import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import { getUserResponse } from '../../utils/utils';
-import { bot, REDEEMED_IOU_NOTIF_IMG } from '../../utils/constants';
+import { bot } from '../../utils/constants/constants';
 import { MessageEventLocal } from '../../utils/types';
+import { REDEEMED_IOU_NOTIF_IMG } from '../../utils/constants/images';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.userId);
@@ -19,7 +20,7 @@ exports.run = async (event: MessageEventLocal) => {
         .send(event.message.channel);
     const iouIndexResponse = (await getUserResponse(event.message.channel, event.bankUser.userId))?.content;
     if (!iouIndexResponse || iouIndexResponse.toLowerCase() === 'q') {
-        event.message.channel.send('**cancelled**');
+        event.message.channel.send('*cancelled*');
         return;
     }
     const iouIndex = Math.floor(Number(iouIndexResponse)) - 1;
