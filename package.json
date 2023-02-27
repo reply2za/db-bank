@@ -18,9 +18,9 @@
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "fs": "^0.0.1-security",
-    "googleapis": "^110.0.0",
     "leven": "^3.1.0",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/request": "^2.48.8",
