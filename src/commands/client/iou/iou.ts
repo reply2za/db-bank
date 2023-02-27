@@ -19,14 +19,18 @@ exports.run = async (event: MessageEventLocal) => {
     const redeemableIOUMsg = await BankVisualizer.getRedeemableIOUEmbed(ious)
         .setFooter(`redeem IOUs ${sentIOUs.length ? '| view sent IOUs' : ''}`)
         .send(event.message.channel);
-    await attachReactionToMessage(redeemableIOUMsg, [event.message.author], reactionsList, (reaction) => {
+    let processingRedeemCmd = false;
+    await attachReactionToMessage(redeemableIOUMsg, [event.message.author], reactionsList, async (reaction) => {
         switch (reaction.emoji.name) {
             case reactions.OUTBOX:
-                commandHandler.execute({ ...event, statement: 'sentiou', args: [] });
+                await commandHandler.execute({ ...event, statement: 'sentiou', args: [] });
                 break;
             case reactions.KEY:
+                if (processingRedeemCmd) return;
+                processingRedeemCmd = true;
                 event.data.set('REDEEM_IOU_EMBED_MSG', redeemableIOUMsg);
-                commandHandler.execute({ ...event, statement: 'redeem', args: [] });
+                await commandHandler.execute({ ...event, statement: 'redeem', args: [] });
+                processingRedeemCmd = false;
                 break;
         }
     });
