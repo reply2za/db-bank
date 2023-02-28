@@ -1,56 +1,47 @@
 import { MessageEventLocal } from '../../utils/types';
 import { bank } from '../../finance/Bank';
 import { getUserResponse, getUserToTransferTo } from '../../utils/utils';
-import { roundNumberTwoDecimals, validateMonetaryAmount } from '../../utils/numberUtils';
 import { TransferType } from '../../finance/types';
 import { BankVisualizer } from '../../finance/BankVisualizer';
 import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
-import { Colors } from 'discord.js';
+import { Colors, TextChannel } from 'discord.js';
+import { Transfer } from '../../finance/Transfer';
+import { BankUser } from '../../finance/BankUser';
 
 exports.run = async (event: MessageEventLocal) => {
-    if (!event.args[1]) {
-        event.message.channel.send('charge [user] [amt]');
-        return;
-    }
     const sender = await getUserToTransferTo(event.message, event.args[1], 'charge');
     if (!sender) return;
-    let chargeAmtTxt = event.args[2];
-    if (!chargeAmtTxt) {
-        await new EmbedBuilderLocal()
-            .setDescription("input the charge amount ['q' = cancel]")
-            .setColor(Colors.Orange)
-            .send(event.message.channel);
-        chargeAmtTxt = (await getUserResponse(event.message.channel, event.message.author.id))?.content || '';
-    }
-    const transferAmount = roundNumberTwoDecimals(Number(chargeAmtTxt));
-    const isValid = validateMonetaryAmount(transferAmount, sender, event.message.channel);
-    if (!isValid) return;
-    event.message.channel.send(`you are charging ${sender.name} $${transferAmount}`);
-    await new EmbedBuilderLocal()
-        .setDescription("type a short comment/description ['b' = blank, 'q' = cancel]")
-        .setColor(Colors.Orange)
-        .send(event.message.channel);
-    const commentResponse = (await getUserResponse(event.message.channel, event.message.author.id))?.content;
-    let comment = '';
-    if (!commentResponse || commentResponse.toLowerCase() === 'q') {
-        event.message.channel.send('*cancelled*');
-        return;
-    }
-    if (commentResponse !== 'b') {
-        comment = commentResponse;
-    }
-    await BankVisualizer.getConfirmationEmbed('charge').send(event.message.channel);
-    const confirmationResponse = await getUserResponse(event.message.channel, event.message.author.id);
-    if (!confirmationResponse || confirmationResponse.content.toLowerCase() !== 'yes') {
-        event.message.channel.send('*cancelled*');
-        return;
-    }
-    await bank.transferAmount(
-        sender,
-        event.bankUser,
-        transferAmount,
-        event.message.channel,
-        TransferType.CHARGE,
-        comment
-    );
+    await new Charge(<TextChannel>event.message.channel, sender, event.bankUser, 'charge').processTransfer();
 };
+
+class Charge extends Transfer {
+    constructor(channel: TextChannel, sender: BankUser, receiver: BankUser, actionName: string) {
+        super(channel, sender, receiver, actionName, receiver);
+    }
+
+    protected async approvedTransactionAction(transferAmount: number, comment: string): Promise<void> {
+        await bank.transferAmount(
+            this.sender,
+            this.receiver,
+            transferAmount,
+            this.channel,
+            TransferType.CHARGE,
+            comment
+        );
+    }
+
+    protected async getComment(): Promise<string> {
+        await new EmbedBuilderLocal()
+            .setDescription("type a short comment/description ['b' = blank, 'q' = cancel]")
+            .setColor(Colors.Orange)
+            .send(this.channel);
+
+        const commentResponse = (await getUserResponse(this.channel, this.receiver.userId))?.content || '';
+        if (commentResponse === 'b') return '';
+        return commentResponse;
+    }
+
+    getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {
+        return BankVisualizer.getChargeTransferEmbed(this.sender, this.receiver, amount);
+    }
+}

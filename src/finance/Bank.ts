@@ -66,7 +66,7 @@ class Bank {
                         ).build(),
                     ],
                 });
-                await channel.send(`charged ${receiver.name} $${transferAmount}`);
+                await BankVisualizer.getChargeReceiptEmbed(sender.name, transferAmount).send(channel);
             } else {
                 await receiver.getDiscordUser().send({
                     embeds: [

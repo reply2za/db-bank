@@ -3,6 +3,7 @@ import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js
 import { BankUser } from './BankUser';
 import {
     BANK_IMG,
+    CHARGE_TRANSFER_IMG,
     ChargeImage,
     MoneyImage,
     REDEEM_IOU_IMG,
@@ -69,6 +70,23 @@ class BankVisualizer {
             .setDescription(amount ? `sending $${amount}` : '*no amount selected*')
             .setFooter(
                 `your balance: $${sender.balance}${
+                    amount ? ` => ${roundNumberTwoDecimals(sender.balance - amount)}` : ''
+                }`
+            );
+    }
+
+    static getChargeTransferEmbed(
+        sender: Readonly<BankUser>,
+        receiver: Readonly<BankUser>,
+        amount = 0
+    ): EmbedBuilderLocal {
+        return new EmbedBuilderLocal()
+            .setColor('DarkVividPink')
+            .setThumbnail(CHARGE_TRANSFER_IMG)
+            .setTitle(`Charge ${sender.name}`)
+            .setDescription(amount ? `charging $${amount}` : '*no amount selected*')
+            .setFooter(
+                `sender's balance: $${sender.balance}${
                     amount ? ` => ${roundNumberTwoDecimals(sender.balance - amount)}` : ''
                 }`
             );
@@ -173,6 +191,10 @@ class BankVisualizer {
         return new EmbedBuilderLocal()
             .setDescription(`sent ${transferAmount < 2 ? 'an IOU' : `${transferAmount} IOUs`} to ${receiverName}`)
             .setColor('Blurple');
+    }
+
+    static getChargeReceiptEmbed(senderName: string, transferAmount: number): EmbedBuilderLocal {
+        return new EmbedBuilderLocal().setDescription(`charged ${senderName} $${transferAmount}`).setColor('Blurple');
     }
 
     static getErrorEmbed(description: string): EmbedBuilderLocal {

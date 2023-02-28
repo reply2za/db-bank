@@ -11,6 +11,8 @@ export const SENT_IOU_IMG = 'https://thumbs.gfycat.com/UnlinedSoreDowitcher-size
 export const REDEEMED_IOU_NOTIF_IMG =
     'https://static.wikia.nocookie.net/spongebob/images/8/89/Drifter.png/revision/latest?cb=20150728004136';
 
+export const CHARGE_TRANSFER_IMG =
+    'https://assets.teenvogue.com/photos/5dcdb6c29e7c33000970e45b/16:9/w_1280,c_limit/fb.jpg';
 export enum ChargeImage {
     SB_CREDIT_CARD = 'https://m.media-amazon.com/images/M/MV5BMTk2MDA4MzQ4MV5BMl5BanBnXkFtZTgwNzQzNTEzMjE@._V1_.jpg',
     SW_BILL_LIST = 'https://i.ytimg.com/vi/8G9sFnTgaqY/maxresdefault.jpg',
