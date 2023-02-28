@@ -14,11 +14,15 @@ exports.run = async (event: MessageEventLocal) => {
     }
     const sender = await getUserToTransferTo(event.message, event.args[1], 'charge');
     if (!sender) return;
-    if (!event.args[2]) {
-        event.message.channel.send('*error: must add amount*  `i.e. charge [user] [amt]`');
-        return;
+    let chargeAmtTxt = event.args[2];
+    if (!chargeAmtTxt) {
+        await new EmbedBuilderLocal()
+            .setDescription("input the charge amount ['q' = cancel]")
+            .setColor(Colors.Orange)
+            .send(event.message.channel);
+        chargeAmtTxt = (await getUserResponse(event.message.channel, event.message.author.id))?.content || '';
     }
-    const transferAmount = roundNumberTwoDecimals(Number(event.args[2]));
+    const transferAmount = roundNumberTwoDecimals(Number(chargeAmtTxt));
     const isValid = validateMonetaryAmount(transferAmount, sender, event.message.channel);
     if (!isValid) return;
     event.message.channel.send(`you are charging ${sender.name} $${transferAmount}`);
