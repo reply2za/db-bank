@@ -4,6 +4,7 @@ import { getUserResponse } from '../utils/utils';
 import { BankUser } from './BankUser';
 import { BankVisualizer } from './BankVisualizer';
 import { roundNumberTwoDecimals, validateAmount } from '../utils/numberUtils';
+import reactions from '../utils/reactions';
 
 export abstract class Transfer {
     channel;
@@ -53,8 +54,10 @@ export abstract class Transfer {
         const responseConfirmation = (await getUserResponse(this.channel, this.sender.userId))?.content;
         if (responseConfirmation && responseConfirmation.toLowerCase() === 'yes') {
             await this.approvedTransactionAction(transferAmount, comment);
+            embedMsg.react(reactions.CHECK);
         } else {
             await this.channel.send('*cancelled transfer*');
+            embedMsg.react(reactions.X);
         }
     }
 
