@@ -1,4 +1,4 @@
-import { TextChannel } from 'discord.js';
+import { Colors, TextChannel } from 'discord.js';
 import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
 import { getUserResponse } from '../utils/utils';
 import { BankUser } from './BankUser';
@@ -43,7 +43,7 @@ export abstract class Transfer {
         const embedMsg = await transferEmbed.send(this.channel);
         const responseAmt = await this.getAmount();
         if (!responseAmt || responseAmt.toLowerCase() === 'q') {
-            this.channel.send(`*cancelled ${this.actionName}*`);
+            await this.cancelResponse();
             embedMsg.deletable && embedMsg.delete();
             return;
         }
@@ -57,6 +57,10 @@ export abstract class Transfer {
         await transferEmbed.edit(embedMsg);
         const comment = await this.getComment();
         if (comment) {
+            if (comment.toLowerCase() === 'q') {
+                await this.cancelResponse();
+                return;
+            }
             transferEmbed = this.getTransferEmbed(transferAmount, comment);
             await transferEmbed.edit(embedMsg);
         }
@@ -66,14 +70,28 @@ export abstract class Transfer {
             await this.approvedTransactionAction(transferAmount, comment);
             embedMsg.react(reactions.CHECK);
         } else {
-            await this.channel.send(`*cancelled ${this.actionName}*`);
+            await this.cancelResponse();
             embedMsg.react(reactions.X);
         }
     }
 
     protected abstract getTransferEmbed(number: number, comment: string): EmbedBuilderLocal;
 
-    protected abstract getComment(): Promise<string>;
+    /**
+     * Returning a 'q' (case-insensitive) will cancel the transfer flow.
+     * @protected
+     */
+    protected async getComment(): Promise<string> {
+        await new EmbedBuilderLocal()
+            .setDescription("type a short comment/description ['q' = cancel]")
+            .setColor(Colors.Orange)
+            .send(this.channel);
+        return (await getUserResponse(this.channel, this.sender.userId))?.content || '';
+    }
 
     protected abstract approvedTransactionAction(transferAmount: number, comment: string): Promise<void>;
+
+    protected async cancelResponse(): Promise<void> {
+        await this.channel.send(`*cancelled ${this.actionName}*`);
+    }
 }

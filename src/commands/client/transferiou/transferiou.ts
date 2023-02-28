@@ -1,6 +1,6 @@
 import { getUserResponse, getUserToTransferTo } from '../../../utils/utils';
 import { MessageEventLocal } from '../../../utils/types';
-import { TextChannel } from 'discord.js';
+import { Colors, TextChannel } from 'discord.js';
 import { BankUser } from '../../../finance/BankUser';
 import { BankVisualizer } from '../../../finance/BankVisualizer';
 import { bank } from '../../../finance/Bank';
@@ -18,11 +18,6 @@ exports.run = async (event: MessageEventLocal) => {
 class TransferIOU extends Transfer {
     constructor(channel: TextChannel, sender: BankUser, receiver: BankUser) {
         super(channel, sender, receiver);
-    }
-
-    protected async getComment(): Promise<string> {
-        this.channel.send('type a short reason/comment for the IOU: ');
-        return (await getUserResponse(this.channel, this.sender.userId))?.content || '';
     }
 
     getTransferEmbed(amount: number, comment: string): EmbedBuilderLocal {

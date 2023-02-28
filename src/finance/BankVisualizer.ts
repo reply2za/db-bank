@@ -78,13 +78,18 @@ class BankVisualizer {
     static getChargeTransferEmbed(
         sender: Readonly<BankUser>,
         receiver: Readonly<BankUser>,
-        amount = 0
+        amount = 0,
+        comment = ''
     ): EmbedBuilderLocal {
         return new EmbedBuilderLocal()
             .setColor('DarkVividPink')
             .setThumbnail(CHARGE_TRANSFER_IMG)
             .setTitle(`Charge ${sender.name}`)
-            .setDescription(amount ? `charging $${amount}` : '*no amount selected*')
+            .setDescription(
+                (amount ? `charging $${amount}` : '*no amount selected*').concat(
+                    `${comment ? `\ncomment: ${comment}` : ''}`
+                )
+            )
             .setFooter(
                 `sender's balance: $${sender.balance}${
                     amount ? ` => ${roundNumberTwoDecimals(sender.balance - amount)}` : ''

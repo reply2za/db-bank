@@ -42,6 +42,6 @@ class Charge extends Transfer {
     }
 
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {
-        return BankVisualizer.getChargeTransferEmbed(this.sender, this.receiver, amount);
+        return BankVisualizer.getChargeTransferEmbed(this.sender, this.receiver, amount, comment);
     }
 }
