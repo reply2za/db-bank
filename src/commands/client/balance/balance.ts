@@ -18,13 +18,6 @@ exports.run = async (event: MessageEventLocal) => {
     if (userIOUs.length) reactionsList.push(reactions.PAGE_C);
     const balanceReactionCallback = async (reaction: MessageReaction) => {
         reaction.users.remove(event.message.author).catch();
-        let transferMsg = event.data.get('INITIAL_TRANSFER_MSG');
-        if (transferMsg) {
-            transferMsg.delete();
-            event.data.delete('REACTION_TSFR_REQ');
-            event.data.delete('INITIAL_TRANSFER_MSG');
-        }
-        let transferReq;
         let cmdName;
         switch (reaction.emoji.name) {
             case reactions.MONEY:
@@ -39,16 +32,28 @@ exports.run = async (event: MessageEventLocal) => {
             default:
                 return;
         }
+        let transferMsg = event.data.get('INITIAL_TRANSFER_MSG');
+        if (transferMsg) {
+            const activeTransferReq = event.data.get('REACTION_TSFR_REQ');
+            if (activeTransferReq?.cmdName !== cmdName) {
+                transferMsg.delete();
+                event.data.delete('INITIAL_TRANSFER_MSG');
+                event.data.delete('REACTION_TSFR_REQ');
+            }
+        }
+        // a unique id for the transfer request
+        let transferRequestId;
         // allow the 'view iou' command to be called while a transfer is being initiated
         if (cmdName.includes('transfer')) {
-            if (event.data.get('REACTION_TSFR_REQ')) return;
-            else {
-                transferReq = uuidv4();
-                event.data.set('REACTION_TSFR_REQ', transferReq);
+            if (event.data.get('REACTION_TSFR_REQ')) {
+                return;
+            } else {
+                transferRequestId = uuidv4();
+                event.data.set('REACTION_TSFR_REQ', { id: transferRequestId, cmdName });
             }
         }
         await commandHandler.execute({ ...event, statement: cmdName, args: [] });
-        if (event.data.get('REACTION_TSFR_REQ') === transferReq) {
+        if (event.data.get('REACTION_TSFR_REQ')?.id === transferRequestId) {
             event.data.delete('REACTION_TSFR_REQ');
         }
     };

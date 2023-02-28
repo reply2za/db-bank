@@ -46,7 +46,9 @@ export async function getUserToTransferTo(
 ): Promise<BankUser | undefined> {
     let recipientID = message.mentions?.users.first()?.id;
     if (!name && !recipientID) {
-        const initialTransferMsg = await message.channel.send(`Who you would like to ${actionName} to?`);
+        const initialTransferMsg =
+            eventData.get('INITIAL_TRANSFER_MSG') ||
+            (await message.channel.send(`Who you would like to ${actionName} to?`));
         eventData.set('INITIAL_TRANSFER_MSG', initialTransferMsg);
         const newMsg = await getUserResponse(message.channel, message.author.id);
         // determines if abandoned, meaning that the same transfer is no longer active
