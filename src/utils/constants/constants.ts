@@ -19,7 +19,14 @@ export const bot: Client = new Client({
 
 export const isDevMode = process.argv.includes('--dev');
 
-export const PREFIX = isDevMode ? ',' : '$';
+let prefix = '$';
+let adminIDs = ['443150640823271436 '];
+if (isDevMode) {
+    prefix = ',';
+    adminIDs.push('799524729173442620 ');
+}
+
+export const PREFIX = prefix;
 
 // IDs followed by a space (test: 799524729173442620)
-export const ADMIN_IDS = Object.freeze(['443150640823271436 ', '799524729173442620 ']);
+export const ADMIN_IDS = Object.freeze(adminIDs);

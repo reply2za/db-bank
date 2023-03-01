@@ -6,7 +6,7 @@ import leven from 'leven';
 import { localStorage } from '../storage/LocalStorage';
 import { BankVisualizer } from './BankVisualizer';
 import Logger from '../utils/Logger';
-import { TransferType } from './types';
+import { FinalTransferStatus, TransferType } from './types';
 
 class Bank {
     users: Map<string, BankUser> = new Map();
@@ -21,12 +21,7 @@ class Bank {
         this.#usernames = new Set();
     }
 
-    transferIOU(
-        sender: BankUser,
-        receiver: BankUser,
-        amount: number,
-        comment: string
-    ): { success: boolean; failReason: string } {
+    transferIOU(sender: BankUser, receiver: BankUser, amount: number, comment: string): FinalTransferStatus {
         const date = new Date();
         for (let i = 0; i < amount; i++) {
             const iou = new IOUTicket(
@@ -45,7 +40,7 @@ class Bank {
     }
 
     async #recordTransfer(
-        transferResponse: { success: boolean; failReason: string },
+        transferResponse: FinalTransferStatus,
         transferAmount: number,
         sender: BankUser,
         receiver: BankUser,
@@ -93,11 +88,7 @@ class Bank {
         }
     }
 
-    #transferAmountCore(
-        sender: BankUser,
-        receiver: BankUser,
-        amount: number
-    ): { success: boolean; failReason: string } {
+    #transferAmountCore(sender: BankUser, receiver: BankUser, amount: number): FinalTransferStatus {
         if (!amount) return { success: false, failReason: 'input error' };
         amount = roundNumberTwoDecimals(amount);
         if (sender.getBalance() < amount) {
@@ -119,7 +110,7 @@ class Bank {
         channel: TextBasedChannel,
         type = TransferType.TRANSFER,
         comment = ''
-    ): Promise<{ success: boolean; failReason: string }> {
+    ): Promise<FinalTransferStatus> {
         const transferResponse = this.#transferAmountCore(sender, receiver, amount);
         await this.#recordTransfer(transferResponse, amount, sender, receiver, channel, type, comment);
         return transferResponse;

@@ -43,10 +43,12 @@ class TransferIOU extends Transfer {
                     `comment: ${comment || 'N/A'}`
             );
             await BankVisualizer.getIOUTransferReceiptEmbed(this.receiver.name, transferAmount).send(this.channel);
+            return true;
         } else {
             await BankVisualizer.getErrorEmbed(
                 `transfer failed: ${transferResponse.failReason || 'unknown reason'}`
             ).send(this.channel);
         }
+        return false;
     }
 }

@@ -67,8 +67,8 @@ export abstract class Transfer {
         await BankVisualizer.getConfirmationEmbed(this.actionName).send(this.channel);
         const responseConfirmation = (await getUserResponse(this.channel, this.responder.userId))?.content;
         if (responseConfirmation && responseConfirmation.toLowerCase() === 'yes') {
-            await this.approvedTransactionAction(transferAmount, comment);
-            embedMsg.react(reactions.CHECK);
+            const txnResponse = await this.approvedTransactionAction(transferAmount, comment);
+            embedMsg.react(txnResponse ? reactions.CHECK : reactions.X);
         } else {
             await this.cancelResponse();
             embedMsg.react(reactions.X);
@@ -89,7 +89,14 @@ export abstract class Transfer {
         return (await getUserResponse(this.channel, this.sender.userId))?.content || '';
     }
 
-    protected abstract approvedTransactionAction(transferAmount: number, comment: string): Promise<void>;
+    /**
+     * The action to perform if the user wishes to continue with the transaction after the confirmation page.
+     * @param transferAmount The amount to transfer
+     * @param comment A user comment associated with this transaction.
+     * @protected
+     * @returns Whether the transaction succeeded.
+     */
+    protected abstract approvedTransactionAction(transferAmount: number, comment: string): Promise<boolean>;
 
     protected async cancelResponse(): Promise<void> {
         await this.channel.send(`*cancelled ${this.actionName}*`);

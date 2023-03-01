@@ -29,13 +29,20 @@ class MonetaryTransfer extends Transfer {
         super(channel, sender, receiver);
     }
 
-    protected async approvedTransactionAction(transferAmount: number, comment: string): Promise<void> {
-        await bank.transferAmount(this.sender, this.receiver, transferAmount, this.channel, TransferType.TRANSFER);
+    protected async approvedTransactionAction(transferAmount: number, comment: string) {
+        const status = await bank.transferAmount(
+            this.sender,
+            this.receiver,
+            transferAmount,
+            this.channel,
+            TransferType.TRANSFER
+        );
+        return status.success;
     }
 
-    protected getComment(): Promise<string> {
+    protected async getComment(): Promise<string> {
         // comments are not currently supported with monetary transfer
-        return new Promise((resolve) => resolve(''));
+        return '';
     }
 
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {

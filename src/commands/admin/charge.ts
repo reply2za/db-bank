@@ -19,8 +19,8 @@ class Charge extends Transfer {
         super(channel, sender, receiver, actionName, receiver);
     }
 
-    protected async approvedTransactionAction(transferAmount: number, comment: string): Promise<void> {
-        await bank.transferAmount(
+    protected async approvedTransactionAction(transferAmount: number, comment: string) {
+        const status = await bank.transferAmount(
             this.sender,
             this.receiver,
             transferAmount,
@@ -28,6 +28,7 @@ class Charge extends Transfer {
             TransferType.CHARGE,
             comment
         );
+        return status.success;
     }
 
     protected async getComment(): Promise<string> {
