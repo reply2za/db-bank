@@ -14,11 +14,6 @@ class BankUser {
         this.#discordUser = discordUser;
     }
 
-    setBalance(amount: number) {
-        this.balance = amount;
-        return this.balance;
-    }
-
     addBalance(amount: number) {
         this.balance += amount;
         this.balance = roundNumberTwoDecimals(this.balance);
