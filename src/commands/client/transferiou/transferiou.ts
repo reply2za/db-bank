@@ -21,10 +21,11 @@ class TransferIOU extends Transfer {
     }
 
     getTransferEmbed(amount: number, comment: string): EmbedBuilderLocal {
-        return BankVisualizer.getIOUTransferEmbed(this.sender, this.receiver, amount, comment);
+        return BankVisualizer.getIOUTransferEmbed(this.sender, this.receiver, Math.floor(amount), comment);
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {
+        transferAmount = Math.floor(transferAmount);
         const transferResponse = bank.transferIOU(this.sender, this.receiver, transferAmount, comment);
         if (transferResponse.success) {
             await localStorage.saveData(bank.serializeData());
