@@ -5,6 +5,7 @@ import { getUserResponse } from '../../utils/utils';
 import { bot } from '../../utils/constants/constants';
 import { MessageEventLocal } from '../../utils/types';
 import { REDEEMED_IOU_NOTIF_IMG } from '../../utils/constants/images';
+import Logger from '../../utils/Logger';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.userId);
@@ -50,6 +51,12 @@ exports.run = async (event: MessageEventLocal) => {
                 await iouSender.send({
                     embeds: [iouRedeemedNotifEmbed.build()],
                 });
+                await Logger.transactionLog(
+                    `[iou redemption] ${iou.receiver.name} redeemed an IOU from ${iou.sender.name} \n` +
+                        `comment: ${iou.comment || 'N/A'}`
+                );
+            } else {
+                Logger.errorLog(new Error(`could not find iou sender with the id ${iou.sender.id}`));
             }
         }
     } else {
