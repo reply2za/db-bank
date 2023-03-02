@@ -2,7 +2,7 @@ import { BankVisualizer } from '../../../finance/BankVisualizer';
 import { bank } from '../../../finance/Bank';
 import { MessageEventLocal } from '../../../utils/types';
 import { attachReactionToMessage } from '../../../utils/utils';
-import reactions from '../../../utils/reactions';
+import reactions from '../../../utils/constants/reactions';
 import { commandHandler } from '../../../handlers/CommandHandler';
 import { MessageReaction } from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';

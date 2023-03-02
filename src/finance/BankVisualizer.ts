@@ -1,16 +1,7 @@
 import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
 import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js';
 import { BankUser } from './BankUser';
-import {
-    BANK_IMG,
-    CHARGE_TRANSFER_IMG,
-    ChargeImage,
-    MoneyImage,
-    REDEEM_IOU_IMG,
-    SENT_IOU_IMG,
-    TRANSFER_IMG,
-    TRANSFER_IOU_IMG,
-} from '../utils/constants/images';
+import images from '../utils/constants/images';
 import { IOUTicket } from './IOUTicket';
 import { roundNumberTwoDecimals } from '../utils/numberUtils';
 import { bot } from '../utils/constants/constants';
@@ -39,12 +30,12 @@ class BankVisualizer {
                 }`
             )
             .setFooter(`transfer cash | transfer IOUs${iouDescription.length ? ' | view IOUs' : ''}`)
-            .setThumbnail(BANK_IMG)
+            .setThumbnail(images.BANK_IMG)
             .send(channel);
     }
 
     static getCoreTransferEmbed(): EmbedBuilderLocal {
-        return new EmbedBuilderLocal().setColor('Purple').setThumbnail(TRANSFER_IMG);
+        return new EmbedBuilderLocal().setColor('Purple').setThumbnail(images.TRANSFER_IMG);
     }
 
     static getIOUTransferEmbed(
@@ -83,7 +74,7 @@ class BankVisualizer {
     ): EmbedBuilderLocal {
         return new EmbedBuilderLocal()
             .setColor('DarkVividPink')
-            .setThumbnail(CHARGE_TRANSFER_IMG)
+            .setThumbnail(images.CHARGE_TRANSFER_IMG)
             .setTitle(`Charge ${sender.name}`)
             .setDescription(
                 (amount ? `charging $${amount}` : '*no amount selected*').concat(
@@ -144,7 +135,7 @@ class BankVisualizer {
             .setTitle(`${senderName} sent you ${transferAmount < 2 ? 'an IOU' : `${transferAmount} IOUs`}`)
             .setDescription(`comment: ${comment || 'not provided'}`)
             .setColor('Gold')
-            .setThumbnail(TRANSFER_IOU_IMG);
+            .setThumbnail(images.TRANSFER_IOU_IMG);
     }
 
     /**
@@ -170,7 +161,7 @@ class BankVisualizer {
             .setTitle(`Your redeemable IOU tickets`)
             .setDescription(descriptionText)
             .setColor('Blue')
-            .setThumbnail(REDEEM_IOU_IMG);
+            .setThumbnail(images.REDEEM_IOU_IMG);
     }
 
     static getSentIOUEmbed(ious: IOUTicket[]) {
@@ -185,7 +176,7 @@ class BankVisualizer {
             .setTitle(`Your sent IOUs to`)
             .setDescription(descriptionText)
             .setColor('Fuchsia')
-            .setThumbnail(SENT_IOU_IMG);
+            .setThumbnail(images.SENT_IOU_IMG);
     }
 
     static getTransferReceiptEmbed(receiverName: string, transferAmount: number): EmbedBuilderLocal {
@@ -208,23 +199,23 @@ class BankVisualizer {
 
     private static getTransferImage(transferAmount: number): string {
         if (transferAmount < 1) {
-            return MoneyImage.TINY;
+            return images.MoneyImages.TINY;
         } else if (transferAmount < 5) {
-            return MoneyImage.SMALL;
+            return images.MoneyImages.SMALL;
         } else if (transferAmount < 20) {
-            return MoneyImage.MEDIUM;
+            return images.MoneyImages.MEDIUM;
         } else {
-            return MoneyImage.LARGE;
+            return images.MoneyImages.LARGE;
         }
     }
 
     private static getChargeImage(transferAmount: number): string {
         if (transferAmount < 7) {
-            return ChargeImage.SB_CREDIT_CARD;
+            return images.ChargeImages.SB_CREDIT_CARD;
         } else if (transferAmount < 25) {
-            return ChargeImage.SW_BILL_LIST;
+            return images.ChargeImages.SW_BILL_LIST;
         } else {
-            return ChargeImage.MK_BILL_LIST;
+            return images.ChargeImages.MK_BILL_LIST;
         }
     }
 }

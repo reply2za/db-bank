@@ -4,7 +4,7 @@ import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import { getUserResponse } from '../../utils/utils';
 import { bot } from '../../utils/constants/constants';
 import { MessageEventLocal } from '../../utils/types';
-import { REDEEMED_IOU_NOTIF_IMG } from '../../utils/constants/images';
+import images from '../../utils/constants/images';
 import Logger from '../../utils/Logger';
 
 exports.run = async (event: MessageEventLocal) => {
@@ -45,7 +45,7 @@ exports.run = async (event: MessageEventLocal) => {
                 const iouRedeemedNotifEmbed = new EmbedBuilderLocal()
                     .setTitle(`${event.bankUser.name} redeemed your IOU`)
                     .setColor('Aqua')
-                    .setThumbnail(REDEEMED_IOU_NOTIF_IMG)
+                    .setThumbnail(images.REDEEMED_IOU_NOTIF_IMG)
                     .setDescription(`The IOU you gave to ${event.bankUser.name} has been redeemed\nCongratulations!`)
                     .setFooter(`IOU reason: ${iou.comment || 'none'}`);
                 await iouSender.send({

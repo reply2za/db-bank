@@ -4,7 +4,7 @@ import { getUserResponse } from '../utils/utils';
 import { BankUser } from './BankUser';
 import { BankVisualizer } from './BankVisualizer';
 import { roundNumberTwoDecimals, validateAmount } from '../utils/numberUtils';
-import reactions from '../utils/reactions';
+import reactions from '../utils/constants/reactions';
 
 export abstract class Transfer {
     channel;

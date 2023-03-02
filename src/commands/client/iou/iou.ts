@@ -2,7 +2,7 @@ import { MessageEventLocal } from '../../../utils/types';
 import { bank } from '../../../finance/Bank';
 import { BankVisualizer } from '../../../finance/BankVisualizer';
 import { attachReactionToMessage } from '../../../utils/utils';
-import reactions from '../../../utils/reactions';
+import reactions from '../../../utils/constants/reactions';
 import { commandHandler } from '../../../handlers/CommandHandler';
 import { MessageReaction } from 'discord.js';
 
