@@ -12,16 +12,16 @@ import { processManager } from './utils/ProcessManager';
 
 (async () => {
     await bot.login(token);
+    console.log('-logged in-');
     process.on('uncaughtException', (error) => {
         Logger.errorLog(error);
     });
     if (isDevMode) {
         console.log('-devMode-');
-        console.log(`prefix is: ${PREFIX}`);
     } else {
+        console.log('-PROD-');
         await Logger.infoLog(`starting ${process.pid} [${hardwareTag || 'unnamed'}]: v${processManager.version}`);
     }
-    console.log('-logged in-');
     console.log('loading data...');
     const data = await localStorage.retrieveData();
     if (data) {
@@ -32,4 +32,5 @@ import { processManager } from './utils/ProcessManager';
     }
     commandHandler.loadAllCommands();
     eventHandler.loadAllEvents();
+    console.log(`prefix is: ${PREFIX}`);
 })();
