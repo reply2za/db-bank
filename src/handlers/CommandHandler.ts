@@ -53,9 +53,9 @@ class CommandHandler {
                 cmdFileReference.set(fileName, `../${innerPath}/${subDirName}/${subDirName}.js`)
             );
         }
-        cmdFileReference.forEach((path, fileName) => {
+        cmdFileReference.forEach((relativePath, fileName) => {
             const commandName = fileName.split('.')[0];
-            const command = require(path);
+            const command = require(relativePath);
             commandsMap.set(commandName, command);
         });
     }
@@ -67,7 +67,7 @@ class CommandHandler {
     }
 
     /**
-     * Executes an event. Admin commands must have a '.' prepending the event's statement name.
+     * Executes an event.
      * @param event
      */
     async execute(event: MessageEventLocal) {
