@@ -25,7 +25,7 @@ class BankVisualizer {
             .setTitle(`${user.name}'s Bank`)
             .setColor('Green')
             .setDescription(
-                `\`$${user.getBalance()}\`\n${
+                `\`$${user.getBalance().toFixed(2)}\`\n${
                     iouDescription.length ? `\n- **Received IOUs** -\n${iouDescription}` : ''
                 }`
             )
@@ -58,10 +58,10 @@ class BankVisualizer {
         const e = this.getCoreTransferEmbed();
         return e
             .setTitle(`Transfer to ${receiver.name}`)
-            .setDescription(amount ? `sending $${amount}` : '*no amount selected*')
+            .setDescription(amount ? `sending $${amount.toFixed(2)}` : '*no amount selected*')
             .setFooter(
-                `your balance: $${sender.balance}${
-                    amount ? ` => ${roundNumberTwoDecimals(sender.balance - amount)}` : ''
+                `your balance: $${sender.balance.toFixed(2)}${
+                    amount ? ` => ${roundNumberTwoDecimals(sender.balance - amount).toFixed(2)}` : ''
                 }`
             );
     }
@@ -77,13 +77,13 @@ class BankVisualizer {
             .setThumbnail(images.CHARGE_TRANSFER_IMG)
             .setTitle(`Charge ${sender.name}`)
             .setDescription(
-                (amount ? `charging $${amount}` : '*no amount selected*').concat(
+                (amount ? `charging $${amount.toFixed(2)}` : '*no amount selected*').concat(
                     `${comment ? `\ncomment: ${comment}` : ''}`
                 )
             )
             .setFooter(
-                `sender's balance: $${sender.balance}${
-                    amount ? ` => ${roundNumberTwoDecimals(sender.balance - amount)}` : ''
+                `sender's balance: $${sender.balance.toFixed(2)}${
+                    amount ? ` => ${roundNumberTwoDecimals(sender.balance - amount).toFixed()}` : ''
                 }`
             );
     }
@@ -100,7 +100,7 @@ class BankVisualizer {
         comment = ''
     ): EmbedBuilderLocal {
         const description = (comment ? `*${comment}*\n` : '').concat(
-            `amount: $${transferAmount}\nyour balance: $${receiver.balance}`
+            `amount: $${transferAmount.toFixed(2)}\nyour balance: $${receiver.balance.toFixed(2)}`
         );
         return new EmbedBuilderLocal()
             .setTitle(`${senderName} sent you money`)
@@ -116,7 +116,7 @@ class BankVisualizer {
         comment = ''
     ): EmbedBuilderLocal {
         const description = (comment ? `*${comment}*\n` : '').concat(
-            `amount: $${transferAmount}\nyour balance: $${sender.balance}`
+            `amount: $${transferAmount.toFixed(2)}\nyour balance: $${sender.balance.toFixed(2)}`
         );
         return new EmbedBuilderLocal()
             .setTitle(`Charged by ${receiverName}`)
@@ -139,7 +139,7 @@ class BankVisualizer {
     }
 
     /**
-     * Should the reedeem IOU interface
+     * Should the redeem IOU interface
      * @param ious The IOU list
      * @param highlight The index of the iou ticket to highlight/focus.
      */
@@ -180,7 +180,9 @@ class BankVisualizer {
     }
 
     static getTransferReceiptEmbed(receiverName: string, transferAmount: number): EmbedBuilderLocal {
-        return new EmbedBuilderLocal().setDescription(`sent $${transferAmount} to ${receiverName}`).setColor('Blurple');
+        return new EmbedBuilderLocal()
+            .setDescription(`sent $${transferAmount.toFixed(2)} to ${receiverName}`)
+            .setColor('Blurple');
     }
 
     static getIOUTransferReceiptEmbed(receiverName: string, transferAmount: number): EmbedBuilderLocal {
@@ -190,7 +192,9 @@ class BankVisualizer {
     }
 
     static getChargeReceiptEmbed(senderName: string, transferAmount: number): EmbedBuilderLocal {
-        return new EmbedBuilderLocal().setDescription(`charged ${senderName} $${transferAmount}`).setColor('Blurple');
+        return new EmbedBuilderLocal()
+            .setDescription(`charged ${senderName} $${transferAmount.toFixed(2)}`)
+            .setColor('Blurple');
     }
 
     static getErrorEmbed(description: string): EmbedBuilderLocal {
