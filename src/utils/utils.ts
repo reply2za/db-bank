@@ -9,7 +9,7 @@ import {
     User,
 } from 'discord.js';
 import { bank } from '../finance/Bank';
-import { ADMIN_IDS } from './constants/constants';
+import { ADMIN_IDS, isDevMode } from './constants/constants';
 import { BankUser } from '../finance/BankUser';
 
 const getFilterForUser = (userId: string) => {
@@ -91,7 +91,7 @@ export async function getUserToTransferTo(
  * An empty list allows any user to activate the reaction. Will not be used if a custom filter is provided.
  * @param reactionsList The reactions to attach the message.
  * @param executeCallback A callback function for when any reaction is clicked.
- * @param endCallback A callback for when the reaction collector expires.
+ * @param endCallback Optional - A callback for when the reaction collector expires. If none then it will remove all reactions on the reactMsg.
  * @param filter Optional - A filter for the reactionCollector. If none is provided then follows the policy/description of reactionUsers.
  * @param filterTime Optional - The duration in which the reactionCollector is in effect.
  */
@@ -100,12 +100,15 @@ export async function attachReactionToMessage(
     reactionUsers: User[],
     reactionsList: EmojiIdentifierResolvable[],
     executeCallback: (reaction: MessageReaction, user: User) => void,
-    endCallback = async (collected: Collection<string, MessageReaction>, reason: string) => {
-        reactMsg.reactions.removeAll().catch();
-    },
+    endCallback?: (collected: Collection<string, MessageReaction>, reason: string) => void,
     filter?: (reaction: MessageReaction, user: User) => boolean,
     filterTime = 30000
 ) {
+    if (!endCallback) {
+        endCallback = () => {
+            reactMsg.reactions.removeAll().catch((error) => isDevMode && console.log(error));
+        };
+    }
     if (!filter) {
         filter = (reaction: MessageReaction, user: User) => {
             if (!reactionUsers.length) return true;
@@ -117,7 +120,7 @@ export async function attachReactionToMessage(
     }
     const collector = reactMsg.createReactionCollector({ filter, time: filterTime, dispose: true });
     collector.on('collect', executeCallback);
-    collector.once('end', endCallback);
+    collector.on('end', endCallback);
     for (const r of reactionsList) {
         await reactMsg.react(r);
     }
