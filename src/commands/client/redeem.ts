@@ -1,11 +1,12 @@
 import { bank } from '../../finance/Bank';
-import { BankVisualizer } from '../../finance/BankVisualizer';
+import iouVisualizer from '../../finance/visualizers/iouVisualizer';
 import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import { getUserResponse } from '../../utils/utils';
 import { bot } from '../../utils/constants/constants';
 import { MessageEventLocal } from '../../utils/types';
 import images from '../../utils/constants/images';
 import Logger from '../../utils/Logger';
+import visualizerCommon from '../../finance/visualizers/visualizerCommon';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.userId);
@@ -15,7 +16,7 @@ exports.run = async (event: MessageEventLocal) => {
     }
     const sentIOUEmbed =
         event.data.get('REDEEM_IOU_EMBED_MSG') ||
-        (await BankVisualizer.getRedeemableIOUEmbed(ious).send(event.message.channel));
+        (await iouVisualizer.getRedeemableIOUEmbed(ious).send(event.message.channel));
     await new EmbedBuilderLocal()
         .setDescription("which IOU would you like to redeem [or 'q' to quit]")
         .send(event.message.channel);
@@ -29,9 +30,9 @@ exports.run = async (event: MessageEventLocal) => {
         event.message.channel.send('*invalid input*');
         return;
     }
-    await BankVisualizer.getRedeemableIOUEmbed(ious, iouIndex).edit(sentIOUEmbed);
+    await iouVisualizer.getRedeemableIOUEmbed(ious, iouIndex).edit(sentIOUEmbed);
     const iou = ious[iouIndex];
-    await BankVisualizer.getConfirmationEmbed('redemption').send(event.message.channel);
+    await visualizerCommon.getConfirmationEmbed('redemption').send(event.message.channel);
     const response = (await getUserResponse(event.message.channel, event.bankUser.userId))?.content;
     if (response?.toLowerCase() === 'yes') {
         const isSuccessful = await bank.redeemIOU(iou.id);

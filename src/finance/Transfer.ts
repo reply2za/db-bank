@@ -2,9 +2,9 @@ import { Colors, TextChannel } from 'discord.js';
 import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
 import { getUserResponse } from '../utils/utils';
 import { BankUser } from './BankUser';
-import { BankVisualizer } from './BankVisualizer';
 import { roundNumberTwoDecimals, validateAmount } from '../utils/numberUtils';
 import reactions from '../utils/constants/reactions';
+import visualizerCommon from './visualizers/visualizerCommon';
 
 export abstract class Transfer {
     channel;
@@ -64,7 +64,7 @@ export abstract class Transfer {
             transferEmbed = this.getTransferEmbed(transferAmount, comment);
             await transferEmbed.edit(embedMsg);
         }
-        await BankVisualizer.getConfirmationEmbed(this.actionName).send(this.channel);
+        await visualizerCommon.getConfirmationEmbed(this.actionName).send(this.channel);
         const responseConfirmation = (await getUserResponse(this.channel, this.responder.userId))?.content;
         if (responseConfirmation && responseConfirmation.toLowerCase() === 'yes') {
             const txnResponse = await this.approvedTransactionAction(transferAmount, comment);

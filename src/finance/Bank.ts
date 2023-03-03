@@ -4,9 +4,11 @@ import { TextBasedChannel, UserManager } from 'discord.js';
 import { roundNumberTwoDecimals } from '../utils/numberUtils';
 import leven from 'leven';
 import { localStorage } from '../storage/LocalStorage';
-import { BankVisualizer } from './BankVisualizer';
 import Logger from '../utils/Logger';
 import { FinalTransferStatus, TransferType } from './types';
+import chargeTransferVisualizer from './visualizers/transfers/chargeTransferVisualizer';
+import cashTransferVisualizer from './visualizers/transfers/cashTransferVisualizer';
+import visualizerCommon from './visualizers/visualizerCommon';
 
 class Bank {
     users: Map<string, BankUser> = new Map();
@@ -53,27 +55,21 @@ class Bank {
             if (transferType === TransferType.CHARGE) {
                 await sender.getDiscordUser().send({
                     embeds: [
-                        BankVisualizer.getChargeNotificationEmbed(
-                            sender,
-                            receiver.name,
-                            transferAmount,
-                            comment
-                        ).build(),
+                        chargeTransferVisualizer
+                            .getChargeNotificationEmbed(sender, receiver.name, transferAmount, comment)
+                            .build(),
                     ],
                 });
-                await BankVisualizer.getChargeReceiptEmbed(sender.name, transferAmount).send(channel);
+                await chargeTransferVisualizer.getChargeReceiptEmbed(sender.name, transferAmount).send(channel);
             } else {
                 await receiver.getDiscordUser().send({
                     embeds: [
-                        BankVisualizer.getTransferNotificationEmbed(
-                            sender.name,
-                            receiver,
-                            transferAmount,
-                            comment
-                        ).build(),
+                        cashTransferVisualizer
+                            .getTransferNotificationEmbed(sender.name, receiver, transferAmount, comment)
+                            .build(),
                     ],
                 });
-                await BankVisualizer.getTransferReceiptEmbed(receiver.name, transferAmount).send(channel);
+                await cashTransferVisualizer.getTransferReceiptEmbed(receiver.name, transferAmount).send(channel);
             }
             await Logger.transactionLog(
                 `[${transferType}] $${transferAmount} from ${sender.name} to ${receiver.name}\n` +
@@ -82,9 +78,9 @@ class Bank {
                     `${receiver.name}: ${receiver.balance}\n`
             );
         } else {
-            await BankVisualizer.getErrorEmbed(
-                `${transferType} failed: ${transferResponse.failReason || 'unknown reason'}`
-            ).send(channel);
+            await visualizerCommon
+                .getErrorEmbed(`${transferType} failed: ${transferResponse.failReason || 'unknown reason'}`)
+                .send(channel);
         }
     }
 

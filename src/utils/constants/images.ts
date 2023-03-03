@@ -20,4 +20,24 @@ export default {
         MEDIUM: 'https://static.wikia.nocookie.net/spongebob/images/7/75/One_Coarse_Meal_078.png/revision/latest?cb=20191029022119',
         LARGE: 'https://i.kym-cdn.com/entries/icons/original/000/026/111/4917038d8bbd7fe362bed691690c7da4.jpg',
     },
+    getTransferImage(transferAmount: number): string {
+        if (transferAmount < 1) {
+            return this.MoneyImages.TINY;
+        } else if (transferAmount < 5) {
+            return this.MoneyImages.SMALL;
+        } else if (transferAmount < 20) {
+            return this.MoneyImages.MEDIUM;
+        } else {
+            return this.MoneyImages.LARGE;
+        }
+    },
+    getChargeImage(transferAmount: number): string {
+        if (transferAmount < 7) {
+            return this.ChargeImages.SB_CREDIT_CARD;
+        } else if (transferAmount < 25) {
+            return this.ChargeImages.SW_BILL_LIST;
+        } else {
+            return this.ChargeImages.MK_BILL_LIST;
+        }
+    },
 };

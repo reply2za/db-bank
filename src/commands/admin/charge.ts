@@ -2,11 +2,11 @@ import { MessageEventLocal } from '../../utils/types';
 import { bank } from '../../finance/Bank';
 import { getUserResponse, getUserToTransferTo } from '../../utils/utils';
 import { TransferType } from '../../finance/types';
-import { BankVisualizer } from '../../finance/BankVisualizer';
 import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import { Colors, TextChannel } from 'discord.js';
 import { Transfer } from '../../finance/Transfer';
 import { BankUser } from '../../finance/BankUser';
+import chargeTransferVisualizer from '../../finance/visualizers/transfers/chargeTransferVisualizer';
 
 exports.run = async (event: MessageEventLocal) => {
     const sender = await getUserToTransferTo(event.message, event.args[1], 'charge');
@@ -43,6 +43,6 @@ class Charge extends Transfer {
     }
 
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {
-        return BankVisualizer.getChargeTransferEmbed(this.sender, this.receiver, amount, comment);
+        return chargeTransferVisualizer.getChargeTransferEmbed(this.sender, this.receiver, amount, comment);
     }
 }

@@ -1,13 +1,14 @@
-import { getUserResponse, getUserToTransferTo } from '../../../utils/utils';
+import { getUserToTransferTo } from '../../../utils/utils';
 import { MessageEventLocal } from '../../../utils/types';
-import { Colors, TextChannel } from 'discord.js';
+import { TextChannel } from 'discord.js';
 import { BankUser } from '../../../finance/BankUser';
-import { BankVisualizer } from '../../../finance/BankVisualizer';
 import { bank } from '../../../finance/Bank';
 import { localStorage } from '../../../storage/LocalStorage';
 import Logger from '../../../utils/Logger';
 import { Transfer } from '../../../finance/Transfer';
 import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
+import iouTransferVisualizer from '../../../finance/visualizers/transfers/iouTransferVisualizer';
+import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 
 exports.run = async (event: MessageEventLocal) => {
     const recipientBankUser = await getUserToTransferTo(event.message, event.args[1], 'transfer IOUs', event.data);
@@ -21,7 +22,7 @@ class TransferIOU extends Transfer {
     }
 
     getTransferEmbed(amount: number, comment: string): EmbedBuilderLocal {
-        return BankVisualizer.getIOUTransferEmbed(this.sender, this.receiver, Math.floor(amount), comment);
+        return iouTransferVisualizer.getIOUTransferEmbed(this.sender, this.receiver, Math.floor(amount), comment);
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {
@@ -31,24 +32,23 @@ class TransferIOU extends Transfer {
             await localStorage.saveData(bank.serializeData());
             await this.receiver.getDiscordUser().send({
                 embeds: [
-                    BankVisualizer.getIOUTransferNotificationEmbed(
-                        this.sender.name,
-                        this.receiver,
-                        transferAmount,
-                        comment
-                    ).build(),
+                    iouTransferVisualizer
+                        .getIOUTransferNotificationEmbed(this.sender.name, this.receiver, transferAmount, comment)
+                        .build(),
                 ],
             });
             await Logger.transactionLog(
                 `[IOU transfer] ${transferAmount} from ${this.sender.name} to ${this.receiver.name}\n` +
                     `comment: ${comment || 'N/A'}`
             );
-            await BankVisualizer.getIOUTransferReceiptEmbed(this.receiver.name, transferAmount).send(this.channel);
+            await iouTransferVisualizer
+                .getIOUTransferReceiptEmbed(this.receiver.name, transferAmount)
+                .send(this.channel);
             return true;
         } else {
-            await BankVisualizer.getErrorEmbed(
-                `transfer failed: ${transferResponse.failReason || 'unknown reason'}`
-            ).send(this.channel);
+            await visualizerCommon
+                .getErrorEmbed(`transfer failed: ${transferResponse.failReason || 'unknown reason'}`)
+                .send(this.channel);
         }
         return false;
     }

@@ -3,11 +3,11 @@ import { commandHandler } from '../../../handlers/CommandHandler';
 import { MessageEventLocal } from '../../../utils/types';
 import { TextChannel } from 'discord.js';
 import { BankUser } from '../../../finance/BankUser';
-import { BankVisualizer } from '../../../finance/BankVisualizer';
 import { bank } from '../../../finance/Bank';
 import { TransferType } from '../../../finance/types';
 import { Transfer } from '../../../finance/Transfer';
 import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
+import cashTransferVisualizer from '../../../finance/visualizers/transfers/cashTransferVisualizer';
 
 exports.run = async (event: MessageEventLocal) => {
     if (event.args[1]?.toLowerCase() === 'iou') {
@@ -46,6 +46,6 @@ class MonetaryTransfer extends Transfer {
     }
 
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {
-        return BankVisualizer.getCashTransferEmbed(this.sender, this.receiver, amount);
+        return cashTransferVisualizer.getCashTransferEmbed(this.sender, this.receiver, amount);
     }
 }

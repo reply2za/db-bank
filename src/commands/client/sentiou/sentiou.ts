@@ -1,6 +1,6 @@
 import { MessageEventLocal } from '../../../utils/types';
 import { bank } from '../../../finance/Bank';
-import { BankVisualizer } from '../../../finance/BankVisualizer';
+import iouVisualizer from '../../../finance/visualizers/iouVisualizer';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserSentIOUs(event.bankUser.userId);
@@ -8,5 +8,5 @@ exports.run = async (event: MessageEventLocal) => {
         event.message.channel.send('*no sent IOUs found*');
         return;
     }
-    await BankVisualizer.getSentIOUEmbed(ious).send(event.message.channel);
+    await iouVisualizer.getSentIOUEmbed(ious).send(event.message.channel);
 };
