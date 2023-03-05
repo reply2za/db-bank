@@ -19,14 +19,16 @@ export const bot: Client = new Client({
 
 export const isDevMode = process.argv.includes('--dev');
 
-let prefix = '$';
 let adminIDs = ['443150640823271436 '];
 if (isDevMode) {
-    prefix = ',';
     adminIDs.push('799524729173442620 ');
 }
 
-export const PREFIX = prefix;
+export const PREFIX = isDevMode ? '$' : ',';
 
 // IDs followed by a space (test: 799524729173442620)
 export const ADMIN_IDS = Object.freeze(adminIDs);
+
+export const TRANSACTION_LOG_CH_ID = isDevMode ? '1081761590292009041' : '1062859204177698958';
+export const INFO_LOG_CH_ID = isDevMode ? '1081761590292009041' : '1070859598627610746';
+export const ERROR_LOG_CH_ID = '1064628593772220488';
