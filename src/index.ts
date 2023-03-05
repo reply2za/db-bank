@@ -20,7 +20,9 @@ import { processManager } from './utils/ProcessManager';
         console.log('-devMode-');
     } else {
         console.log('-PROD-');
-        await Logger.infoLog(`starting ${process.pid} [${hardwareTag || 'unnamed'}]: v${processManager.version}`);
+        await Logger.infoLog(
+            `starting ${process.pid} [${hardwareTag || 'unnamed'}]: v${processManager.version} (${PREFIX})`
+        );
     }
     console.log('loading data...');
     const data = await localStorage.retrieveData();
