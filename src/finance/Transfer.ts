@@ -59,6 +59,7 @@ export abstract class Transfer {
         if (comment) {
             if (comment.toLowerCase() === 'q') {
                 await this.cancelResponse();
+                embedMsg.react(reactions.X);
                 return;
             }
             transferEmbed = this.getTransferEmbed(transferAmount, comment);
