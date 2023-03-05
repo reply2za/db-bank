@@ -1,7 +1,7 @@
-import { getUserToTransferTo } from '../../../utils/utils';
+import { getUserResponse, getUserToTransferTo } from '../../../utils/utils';
 import { commandHandler } from '../../../handlers/CommandHandler';
 import { MessageEventLocal } from '../../../utils/types';
-import { TextChannel } from 'discord.js';
+import { Colors, TextChannel } from 'discord.js';
 import { BankUser } from '../../../finance/BankUser';
 import { bank } from '../../../finance/Bank';
 import { TransferType } from '../../../finance/types';
@@ -35,14 +35,21 @@ class MonetaryTransfer extends Transfer {
             this.receiver,
             transferAmount,
             this.channel,
-            TransferType.TRANSFER
+            TransferType.TRANSFER,
+            comment
         );
         return status.success;
     }
 
     protected async getComment(): Promise<string> {
-        // comments are not currently supported with monetary transfer
-        return '';
+        await new EmbedBuilderLocal()
+            .setDescription("type a short comment/description ['b' = blank, 'q' = cancel]")
+            .setColor(Colors.Orange)
+            .send(this.channel);
+
+        const commentResponse = (await getUserResponse(this.channel, this.sender.userId))?.content || '';
+        if (commentResponse === 'b') return '';
+        return commentResponse;
     }
 
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {

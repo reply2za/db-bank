@@ -22,7 +22,7 @@ export default {
         transferAmount: number,
         comment = ''
     ): EmbedBuilderLocal {
-        const description = (comment ? `*${comment}*\n` : '').concat(
+        const description = (comment ? `comment: *${comment}*\n` : '').concat(
             `amount: $${transferAmount.toFixed(2)}\nyour balance: $${receiver.balance.toFixed(2)}`
         );
         return new EmbedBuilderLocal()
