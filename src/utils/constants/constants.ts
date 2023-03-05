@@ -24,7 +24,7 @@ if (isDevMode) {
     adminIDs.push('799524729173442620 ');
 }
 
-export const PREFIX = isDevMode ? '$' : ',';
+export const PREFIX = isDevMode ? '!' : '$';
 
 // IDs followed by a space (test: 799524729173442620)
 export const ADMIN_IDS = Object.freeze(adminIDs);
