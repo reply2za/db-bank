@@ -11,8 +11,8 @@ const MULTI_PROCESS_CMDS = ['boot'];
 const SOURCE_DIR_NAME = 'dist';
 
 class CommandHandler {
-    clientCommands = new Collection<string, any>();
-    adminCommands = new Collection<string, any>();
+    clientCommands = new Collection<string, { run: (event: MessageEventLocal) => Promise<void> }>();
+    adminCommands = new Collection<string, { run: (event: MessageEventLocal) => Promise<void> }>();
 
     /**
      * Parses the provided directory and returns an object containing two lists.
