@@ -4,7 +4,6 @@ import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import { getUserResponse } from '../../utils/utils';
 import { bot } from '../../utils/constants/constants';
 import { MessageEventLocal } from '../../utils/types';
-import images from '../../utils/constants/images';
 import Logger from '../../utils/Logger';
 import visualizerCommon from '../../finance/visualizers/visualizerCommon';
 
@@ -38,17 +37,9 @@ exports.run = async (event: MessageEventLocal) => {
         const isSuccessful = await bank.redeemIOU(iou.id);
         if (isSuccessful) {
             const iouSender = await bot.users.fetch(iou.sender.id);
-            await new EmbedBuilderLocal()
-                .setDescription(`redeemed IOU with ${iou.sender.name}!`)
-                .setColor('Blue')
-                .send(event.message.channel);
+            await iouVisualizer.iouRedemptionReceipt(iou.sender.name).send(event.message.channel);
             if (iouSender) {
-                const iouRedeemedNotifEmbed = new EmbedBuilderLocal()
-                    .setTitle(`${event.bankUser.name} redeemed your IOU`)
-                    .setColor('Aqua')
-                    .setThumbnail(images.REDEEMED_IOU_NOTIF_IMG)
-                    .setDescription(`The IOU you gave to ${event.bankUser.name} has been redeemed\nCongratulations!`)
-                    .setFooter(`IOU reason: ${iou.comment || 'none'}`);
+                const iouRedeemedNotifEmbed = iouVisualizer.iouRedeemedNotifEmbed(iou.receiver.name, iou.comment);
                 await iouSender.send({
                     embeds: [iouRedeemedNotifEmbed.build()],
                 });
