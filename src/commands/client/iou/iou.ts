@@ -1,4 +1,4 @@
-import { MessageEventLocal } from '../../../utils/types';
+import { EventDataNames, MessageEventLocal } from '../../../utils/types';
 import { bank } from '../../../finance/Bank';
 import { attachReactionToMessage } from '../../../utils/utils';
 import reactions from '../../../utils/constants/reactions';
@@ -30,7 +30,7 @@ exports.run = async (event: MessageEventLocal) => {
             case reactions.KEY:
                 if (processingRedeemCmd) return;
                 processingRedeemCmd = true;
-                event.data.set('REDEEM_IOU_EMBED_MSG', redeemableIOUMsg);
+                event.data.set(EventDataNames.REDEEM_IOU_EMBED_MSG, redeemableIOUMsg);
                 await commandHandler.execute({ ...event, statement: 'redeem', args: [] });
                 processingRedeemCmd = false;
                 break;

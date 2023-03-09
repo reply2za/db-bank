@@ -3,7 +3,7 @@ import iouVisualizer from '../../finance/visualizers/iouVisualizer';
 import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import { getUserResponse } from '../../utils/utils';
 import { bot } from '../../utils/constants/constants';
-import { MessageEventLocal } from '../../utils/types';
+import { EventDataNames, MessageEventLocal } from '../../utils/types';
 import Logger from '../../utils/Logger';
 import visualizerCommon from '../../finance/visualizers/visualizerCommon';
 
@@ -14,7 +14,7 @@ exports.run = async (event: MessageEventLocal) => {
         return;
     }
     const sentIOUEmbed =
-        event.data.get('REDEEM_IOU_EMBED_MSG') ||
+        event.data.get(EventDataNames.REDEEM_IOU_EMBED_MSG) ||
         (await iouVisualizer.getRedeemableIOUEmbed(ious).send(event.message.channel));
     await new EmbedBuilderLocal()
         .setDescription("which IOU would you like to redeem [or 'q' to quit]")
@@ -26,7 +26,7 @@ exports.run = async (event: MessageEventLocal) => {
     }
     const iouIndex = Math.floor(Number(iouIndexResponse)) - 1;
     if (!Number.isFinite(iouIndex) || !ious[iouIndex]) {
-        event.message.channel.send('*invalid input*');
+        event.message.channel.send('*cancelled: invalid input*');
         return;
     }
     await iouVisualizer.getRedeemableIOUEmbed(ious, iouIndex).edit(sentIOUEmbed);

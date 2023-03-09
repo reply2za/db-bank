@@ -1,5 +1,5 @@
 import { bank } from '../../../finance/Bank';
-import { MessageEventLocal } from '../../../utils/types';
+import { EventDataNames, MessageEventLocal } from '../../../utils/types';
 import { attachReactionToMessage } from '../../../utils/utils';
 import reactions from '../../../utils/constants/reactions';
 import { commandHandler } from '../../../handlers/CommandHandler';
@@ -32,29 +32,29 @@ exports.run = async (event: MessageEventLocal) => {
             default:
                 return;
         }
-        let transferMsg = event.data.get('INITIAL_TRANSFER_MSG');
+        let transferMsg = event.data.get(EventDataNames.INITIAL_TRANSFER_MSG);
         if (transferMsg) {
-            const activeTransferReq = event.data.get('REACTION_TSFR_REQ');
+            const activeTransferReq = event.data.get(EventDataNames.REACTION_TSFR_REQ);
             if (activeTransferReq?.cmdName !== cmdName) {
                 transferMsg.delete();
-                event.data.delete('INITIAL_TRANSFER_MSG');
-                event.data.delete('REACTION_TSFR_REQ');
+                event.data.delete(EventDataNames.INITIAL_TRANSFER_MSG);
+                event.data.delete(EventDataNames.REACTION_TSFR_REQ);
             }
         }
         // a unique id for the transfer request
         let transferRequestId;
         // allow the 'view iou' command to be called while a transfer is being initiated
         if (cmdName.includes('transfer')) {
-            if (event.data.get('REACTION_TSFR_REQ')) {
+            if (event.data.get(EventDataNames.REACTION_TSFR_REQ)) {
                 return;
             } else {
                 transferRequestId = uuidv4();
-                event.data.set('REACTION_TSFR_REQ', { id: transferRequestId, cmdName });
+                event.data.set(EventDataNames.REACTION_TSFR_REQ, { id: transferRequestId, cmdName });
             }
         }
         await commandHandler.execute({ ...event, statement: cmdName, args: [] });
-        if (event.data.get('REACTION_TSFR_REQ')?.id === transferRequestId) {
-            event.data.delete('REACTION_TSFR_REQ');
+        if (event.data.get(EventDataNames.REACTION_TSFR_REQ)?.id === transferRequestId) {
+            event.data.delete(EventDataNames.REACTION_TSFR_REQ);
         }
     };
     await attachReactionToMessage(

@@ -11,6 +11,7 @@ import {
 import { bank } from '../finance/Bank';
 import { ADMIN_IDS, isDevMode } from './constants/constants';
 import { BankUser } from '../finance/BankUser';
+import { EventDataNames } from './types';
 
 const getFilterForUser = (userId: string) => {
     return (m: Message) => userId === m.author.id;
@@ -42,16 +43,16 @@ export async function getUserToTransferTo(
     message: Message,
     name = '',
     actionName = 'transfer',
-    eventData = new Map<string, any>()
+    eventData = new Map<EventDataNames, any>()
 ): Promise<BankUser | undefined> {
     let recipientID = message.mentions?.users.first()?.id;
     if (!name && !recipientID) {
         const initialTransferMsg = await message.channel.send(`Who you would like to ${actionName} to?`);
-        eventData.set('INITIAL_TRANSFER_MSG', initialTransferMsg);
+        eventData.set(EventDataNames.INITIAL_TRANSFER_MSG, initialTransferMsg);
         const newMsg = await getUserResponse(message.channel, message.author.id);
         // determines if abandoned, meaning that the same transfer is no longer active
-        if (initialTransferMsg.id !== eventData.get('INITIAL_TRANSFER_MSG')?.id) return;
-        eventData.delete('INITIAL_TRANSFER_MSG');
+        if (initialTransferMsg.id !== eventData.get(EventDataNames.INITIAL_TRANSFER_MSG)?.id) return;
+        eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
         if (!newMsg) {
             message.channel.send('*no response provided*');
             return;
