@@ -53,6 +53,6 @@ class MonetaryTransfer extends Transfer {
     }
 
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {
-        return cashTransferVisualizer.getCashTransferEmbed(this.sender, this.receiver, amount);
+        return cashTransferVisualizer.getCashTransferEmbed(this.sender, this.receiver, amount, comment);
     }
 }

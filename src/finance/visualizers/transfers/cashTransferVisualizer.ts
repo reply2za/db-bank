@@ -5,11 +5,20 @@ import visualizerCommon from '../visualizerCommon';
 import images from '../../../utils/constants/images';
 
 export default {
-    getCashTransferEmbed(sender: Readonly<BankUser>, receiver: Readonly<BankUser>, amount = 0): EmbedBuilderLocal {
+    getCashTransferEmbed(
+        sender: Readonly<BankUser>,
+        receiver: Readonly<BankUser>,
+        amount = 0,
+        comment?: string
+    ): EmbedBuilderLocal {
         const e = visualizerCommon.getCoreTransferEmbed();
         return e
             .setTitle(`Transfer to ${receiver.name}`)
-            .setDescription(amount ? `sending $${amount.toFixed(2)}` : '*no amount selected*')
+            .setDescription(
+                (amount ? `sending \`$${amount.toFixed(2)}\`` : '*no amount selected*').concat(
+                    `${comment ? `\ncomment: ${comment}` : ''}`
+                )
+            )
             .setFooter(
                 `your balance: $${sender.balance.toFixed(2)}${
                     amount ? ` => ${roundNumberTwoDecimals(sender.balance - amount).toFixed(2)}` : ''
