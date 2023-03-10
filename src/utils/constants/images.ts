@@ -7,7 +7,7 @@ export default {
     REDEEM_IOU_IMG: 'https://i.pinimg.com/originals/a1/b0/59/a1b0599a8c4e26bb279c3b7a2f23dabc.gif',
     SENT_IOU_IMG: 'https://thumbs.gfycat.com/UnlinedSoreDowitcher-size_restricted.gif',
     REDEEMED_IOU_NOTIF_IMG:
-        'https://static.wikia.nocookie.net/spongebob/images/8/89/Drifter.png/revision/latest?cb=20150728004136',
+        'https://m.media-amazon.com/images/M/MV5BOWZjOTQxNzEtMTk1ZS00ZWU4LWFlOGQtNWQ5MjhiYWM0YmNkXkEyXkFqcGdeQXVyMTM1NTIzOTI1._V1_.jpg',
     CHARGE_TRANSFER_IMG: 'https://assets.teenvogue.com/photos/5dcdb6c29e7c33000970e45b/16:9/w_1280,c_limit/fb.jpg',
     ChargeImages: {
         SB_CREDIT_CARD: 'https://m.media-amazon.com/images/M/MV5BMTk2MDA4MzQ4MV5BMl5BanBnXkFtZTgwNzQzNTEzMjE@._V1_.jpg',
