@@ -15,7 +15,7 @@ export default {
             .setThumbnail(images.CHARGE_TRANSFER_IMG)
             .setTitle(`Charge ${sender.name}`)
             .setDescription(
-                (amount ? `charging $${amount.toFixed(2)}` : '*no amount selected*').concat(
+                (amount ? `charging \`$${amount.toFixed(2)}\`` : '*no amount selected*').concat(
                     `${comment ? `\ncomment: ${comment}` : ''}`
                 )
             )
