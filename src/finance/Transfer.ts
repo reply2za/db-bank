@@ -2,7 +2,7 @@ import { Colors, TextChannel } from 'discord.js';
 import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
 import { getUserResponse } from '../utils/utils';
 import { BankUser } from './BankUser';
-import { roundNumberTwoDecimals, validateAmount } from '../utils/numberUtils';
+import { roundNumberTwoDecimals } from '../utils/numberUtils';
 import reactions from '../utils/constants/reactions';
 import visualizerCommon from './visualizers/visualizerCommon';
 
@@ -48,7 +48,7 @@ export abstract class Transfer {
             return;
         }
         const transferAmount = roundNumberTwoDecimals(Number(responseAmt));
-        const isValid = validateAmount(transferAmount, this.channel);
+        const isValid = await this.validateAmount(transferAmount, this.channel);
         if (!isValid) {
             embedMsg.deletable && embedMsg.delete();
             return;
@@ -101,5 +101,17 @@ export abstract class Transfer {
 
     protected async cancelResponse(): Promise<void> {
         await this.channel.send(`*cancelled ${this.actionName}*`);
+    }
+
+    private async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
+        if (!Number.isFinite(transferAmount)) {
+            await channel.send('*cancelled transfer: `invalid input`*');
+            return false;
+        }
+        if (transferAmount <= 0) {
+            await channel.send('*cancelled transfer: `amount must be greater than 0`*');
+            return false;
+        }
+        return true;
     }
 }
