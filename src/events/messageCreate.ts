@@ -15,6 +15,7 @@ module.exports = async (message: Message) => {
     let bankUser;
     bankUser = bank.getUser(message.author.id);
     if (!bankUser) {
+        if (message.author.bot) return;
         try {
             bank.addNewUser(new BankUser(message.author, message.author.username, 0));
             await localStorage.saveData(bank.serializeData());
