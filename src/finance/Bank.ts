@@ -24,6 +24,12 @@ class Bank {
     }
 
     transferIOU(sender: BankUser, receiver: BankUser, amount: number, comment: string): FinalTransferStatus {
+        if (amount > 99) {
+            return {
+                success: false,
+                failReason: 'cannot send more than 99 IOUs',
+            };
+        }
         const date = new Date();
         for (let i = 0; i < amount; i++) {
             const iou = new IOUTicket(
