@@ -28,7 +28,7 @@ class IOUTicket {
         this.receiver = receiver;
         this.date = date;
         this.comment = comment;
-        this.quantity = Math.floor(quantity);
+        this.quantity = Math.floor(quantity || 1);
         if (this.quantity < 1) throw new Error('IOU quantity must be a positive integer');
     }
 
