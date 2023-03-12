@@ -14,7 +14,7 @@ export default {
         let iouDescription = '';
         const iouMap = new Map<string, number>();
         for (const iou of ious) {
-            iouMap.set(iou.sender.id, (iouMap.get(iou.sender.id) || 0) + 1);
+            iouMap.set(iou.sender.id, (iouMap.get(iou.sender.id) || 0) + iou.quantity);
         }
         for (const [key, value] of iouMap) {
             const sender = await bot.users.fetch(key);
