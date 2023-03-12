@@ -12,13 +12,13 @@ import visualizerCommon from './visualizers/visualizerCommon';
 import { BankUserCopy } from './BankUser/BankUserCopy';
 
 class Bank {
-    users: Map<string, OriginalBankUser> = new Map();
-    iOUList: Array<IOUTicket> = [];
+    protected users: Map<string, OriginalBankUser> = new Map();
+    protected iOUList: Array<IOUTicket> = [];
     #usernames: Set<string> = new Set();
 
     constructor() {}
 
-    transferIOU(senderId: string, receiverId: string, amount: number, comment: string): StatusWithErrorResponse {
+    transferIOU(senderId: string, receiverId: string, quantity: number, comment: string): StatusWithErrorResponse {
         const senderAndReceiverObj = this.#getSenderAndReceiver(senderId, receiverId);
         const senderAndReceiverStatus = this.#verifySenderAndReceiver(senderAndReceiverObj);
         if (!senderAndReceiverStatus.success) {
@@ -26,23 +26,28 @@ class Bank {
         }
         const sender = <OriginalBankUser>senderAndReceiverObj.sender;
         const receiver = <OriginalBankUser>senderAndReceiverObj.receiver;
-        if (amount > 99) {
+        if (quantity > 99) {
             return {
                 success: false,
                 failReason: 'cannot send more than 99 IOUs',
             };
         }
-        const date = new Date();
-        for (let i = 0; i < amount; i++) {
-            const iou = new IOUTicket(
-                null,
-                { id: sender.getUserId(), name: sender.getName() },
-                { id: receiver.getUserId(), name: receiver.getName() },
-                `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().substring(2)}`,
-                comment
-            );
-            this.iOUList.push(iou);
+        if (quantity < 1) {
+            return {
+                success: false,
+                failReason: 'cannot send less than 1 IOUs',
+            };
         }
+        const date = new Date();
+        const iou = new IOUTicket(
+            null,
+            { id: sender.getUserId(), name: sender.getName() },
+            { id: receiver.getUserId(), name: receiver.getName() },
+            `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().substring(2)}`,
+            comment,
+            quantity
+        );
+        this.iOUList.push(iou);
         return {
             success: true,
             failReason: '',
@@ -131,7 +136,7 @@ class Bank {
             }
         }
         for (let iou of parsedData.bank.ious) {
-            this.iOUList.push(new IOUTicket(iou.id, iou.sender, iou.receiver, iou.date, iou.comment));
+            this.iOUList.push(new IOUTicket(iou.id, iou.sender, iou.receiver, iou.date, iou.comment, iou.quantity));
         }
     }
 
@@ -147,13 +152,18 @@ class Bank {
     }
 
     async redeemIOU(id: string): Promise<boolean> {
-        const prevLength = this.iOUList.length;
-        this.iOUList = this.iOUList.filter((value) => {
-            return value.id !== id;
-        });
-        const newLength = this.iOUList.length;
+        const iouToRedeemIndex = this.iOUList.findIndex((value) => value.id == id);
+        if (!iouToRedeemIndex) {
+            return false;
+        }
+        const iouToRedeem = this.iOUList[iouToRedeemIndex];
+        if (iouToRedeem.quantity > 1) {
+            this.iOUList[iouToRedeemIndex] = iouToRedeem.cloneWithNewQuantity(iouToRedeem.quantity - 1);
+        } else {
+            this.iOUList.splice(iouToRedeemIndex, 1);
+        }
         await localStorage.saveData(bank.serializeData());
-        return prevLength !== newLength;
+        return true;
     }
 
     #resetAllData() {

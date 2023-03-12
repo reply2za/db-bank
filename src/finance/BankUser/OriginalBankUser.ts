@@ -21,8 +21,7 @@ class OriginalBankUser extends ABankUser {
     }
 
     getBankUserCopy(): BankUserCopy {
-        const discordUser = Object.assign({}, this.discordUser);
-        return new BankUserCopy(discordUser, this.name, this.balance);
+        return new BankUserCopy(this.discordUser, this.name, this.balance);
     }
 }
 

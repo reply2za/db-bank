@@ -31,7 +31,7 @@ exports.run = async (event: MessageEventLocal) => {
     }
     await iouVisualizer.getRedeemableIOUEmbed(ious, iouIndex).edit(sentIOUEmbed);
     const iou = ious[iouIndex];
-    await visualizerCommon.getConfirmationEmbed('redemption').send(event.message.channel);
+    await visualizerCommon.getConfirmationEmbed('1 IOU redemption').send(event.message.channel);
     const response = (await getUserResponse(event.message.channel, event.bankUser.getUserId()))?.content;
     if (response?.toLowerCase() === 'yes') {
         const isSuccessful = await bank.redeemIOU(iou.id);

@@ -43,8 +43,9 @@ class TransferIOU extends Transfer {
                 ],
             });
             await Logger.transactionLog(
-                `[IOU transfer] ${transferAmount} from ${this.sender.getName()} to ${this.receiver.getName()}\n` +
-                    `comment: ${comment || 'N/A'}`
+                `[IOU transfer] ${transferAmount} IOU${
+                    transferAmount === 1 ? '' : 's'
+                } from ${this.sender.getName()} to ${this.receiver.getName()}\n` + `comment: ${comment || 'N/A'}`
             );
             await iouTransferVisualizer
                 .getIOUTransferReceiptEmbed(this.receiver.getName(), transferAmount)

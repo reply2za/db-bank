@@ -8,25 +8,31 @@ export default {
      * @param ious A list of IOUs that are redeemable.
      * @param highlight Optional - An index, starting from 0, of the IOU to emphasis for redemption.
      */
-    getRedeemableIOUEmbed(ious: IOUTicket[], highlight?: number) {
+    getRedeemableIOUEmbed(ious: IOUTicket[], highlight?: number): EmbedBuilderLocal {
         let descriptionText = '';
         let i = 1;
         if (highlight !== undefined) highlight++;
+        let selectedIOU;
         for (const singleIOU of ious) {
-            const iouDescription = `${i}. **${singleIOU.sender.name}**: ${singleIOU.comment.substring(0, 50)}`;
+            const iouDescription = getIOUDescription(i, singleIOU.sender.name, singleIOU.comment, singleIOU.quantity);
             if (i === highlight) {
                 descriptionText += `[${iouDescription}]`;
+                selectedIOU = singleIOU;
             } else {
                 descriptionText += iouDescription;
             }
             descriptionText += '\n';
             i++;
         }
-        return new EmbedBuilderLocal()
+        const embed = new EmbedBuilderLocal()
             .setTitle(`Your redeemable IOU tickets`)
             .setDescription(descriptionText)
             .setColor('Blue')
             .setThumbnail(images.REDEEM_IOU_IMG);
+        if (selectedIOU && selectedIOU.quantity > 1) {
+            embed.setFooter(`this will use 1 of your ${selectedIOU.quantity} IOUs in this pack`);
+        }
+        return embed;
     },
     /**
      * Shows sent IOUs.
@@ -36,7 +42,7 @@ export default {
         let descriptionText = '';
         let i = 1;
         for (const singleIOU of ious) {
-            descriptionText += `${i}. **${singleIOU.receiver.name}**: *${singleIOU.comment.substring(0, 50)}*`;
+            descriptionText += getIOUDescription(i, singleIOU.receiver.name, singleIOU.comment, singleIOU.quantity);
             descriptionText += '\n';
             i++;
         }
@@ -67,3 +73,7 @@ export default {
             .setFooter(`IOU reason: ${iouComment || 'none'}`);
     },
 };
+
+function getIOUDescription(num: number, name: string, comment: string, quantity: number) {
+    return `${num}. **${name}**${quantity > 1 ? ` (x${quantity})` : ''}: ${comment.substring(0, 50)}`;
+}
