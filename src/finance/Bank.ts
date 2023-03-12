@@ -18,12 +18,6 @@ class Bank {
 
     constructor() {}
 
-    #resetAllData() {
-        this.users = new Map();
-        this.iOUList = [];
-        this.#usernames = new Set();
-    }
-
     transferIOU(senderId: string, receiverId: string, amount: number, comment: string): StatusWithErrorResponse {
         const senderAndReceiverObj = this.#getSenderAndReceiver(senderId, receiverId);
         const senderAndReceiverStatus = this.#verifySenderAndReceiver(senderAndReceiverObj);
@@ -55,102 +49,6 @@ class Bank {
         };
     }
 
-    async #recordTransfer(
-        transferResponse: StatusWithErrorResponse,
-        transferAmount: number,
-        senderId: string,
-        receiverId: string,
-        channel: TextBasedChannel,
-        transferType: TransferType,
-        comment = ''
-    ) {
-        const senderAndReceiverObj = this.#getSenderAndReceiver(senderId, receiverId);
-        const senderAndReceiverStatus = this.#verifySenderAndReceiver(senderAndReceiverObj);
-        if (!senderAndReceiverStatus.success) {
-            return senderAndReceiverStatus;
-        }
-        const sender = <OriginalBankUser>senderAndReceiverObj.sender;
-        const receiver = <OriginalBankUser>senderAndReceiverObj.receiver;
-        if (transferResponse.success) {
-            await localStorage.saveData(bank.serializeData());
-            if (transferType === TransferType.CHARGE) {
-                await sender.getDiscordUser().send({
-                    embeds: [
-                        chargeTransferVisualizer
-                            .getChargeNotificationEmbed(sender, receiver.getName(), transferAmount, comment)
-                            .build(),
-                    ],
-                });
-                await chargeTransferVisualizer.getChargeReceiptEmbed(sender.getName(), transferAmount).send(channel);
-            } else {
-                await receiver.getDiscordUser().send({
-                    embeds: [
-                        cashTransferVisualizer
-                            .getTransferNotificationEmbed(sender.getName(), receiver, transferAmount, comment)
-                            .build(),
-                    ],
-                });
-                await cashTransferVisualizer.getTransferReceiptEmbed(receiver.getName(), transferAmount).send(channel);
-            }
-            await Logger.transactionLog(
-                `[${transferType}] $${transferAmount} from ${sender.getName()} to ${receiver.getName()}\n` +
-                    `new balances:\n` +
-                    `${sender.getName()}: ${sender.getBalance()}\n` +
-                    `${receiver.getName()}: ${receiver.getBalance()}\n`
-            );
-        } else {
-            await visualizerCommon
-                .getErrorEmbed(`${transferType} failed: ${transferResponse.failReason || 'unknown reason'}`)
-                .send(channel);
-        }
-    }
-
-    #transferAmountCore(sender: OriginalBankUser, receiver: OriginalBankUser, amount: number): StatusWithErrorResponse {
-        if (!amount) return { success: false, failReason: 'input error' };
-        amount = roundNumberTwoDecimals(amount);
-        if (sender.getBalance() < amount) {
-            return { success: false, failReason: 'balance is too low' };
-        }
-        if (amount < 0) {
-            return { success: false, failReason: 'cannot transfer negative balance' };
-        }
-        sender.subtractBalance(amount);
-        receiver.addBalance(amount);
-
-        return { success: true, failReason: '' };
-    }
-
-    #getSenderAndReceiver(
-        senderId: string,
-        receiverId: string
-    ): { sender: OriginalBankUser | undefined; receiver: OriginalBankUser | undefined } {
-        const sender = this.#getOriginalUser(senderId);
-        const receiver = this.#getOriginalUser(receiverId);
-        return { sender, receiver };
-    }
-
-    #verifySenderAndReceiver(senderReceiverPayload: {
-        sender: OriginalBankUser | undefined;
-        receiver: OriginalBankUser | undefined;
-    }): StatusWithErrorResponse {
-        if (!senderReceiverPayload.sender) {
-            return {
-                success: false,
-                failReason: 'cannot find sender',
-            };
-        }
-        if (!senderReceiverPayload.receiver) {
-            return {
-                success: false,
-                failReason: 'cannot find receiver',
-            };
-        }
-        return {
-            success: true,
-            failReason: '',
-        };
-    }
-
     async transferAmount(
         senderId: string,
         receiverId: string,
@@ -173,10 +71,6 @@ class Bank {
 
     getUserCopy(id: string): BankUserCopy | undefined {
         return this.users.get(id)?.getBankUserCopy();
-    }
-
-    #getOriginalUser(id: string): OriginalBankUser | undefined {
-        return this.users.get(id);
     }
 
     getAllUsers(): BankUserCopy[] {
@@ -260,6 +154,112 @@ class Bank {
         const newLength = this.iOUList.length;
         await localStorage.saveData(bank.serializeData());
         return prevLength !== newLength;
+    }
+
+    #resetAllData() {
+        this.users = new Map();
+        this.iOUList = [];
+        this.#usernames = new Set();
+    }
+
+    async #recordTransfer(
+        transferResponse: StatusWithErrorResponse,
+        transferAmount: number,
+        senderId: string,
+        receiverId: string,
+        channel: TextBasedChannel,
+        transferType: TransferType,
+        comment = ''
+    ) {
+        const senderAndReceiverObj = this.#getSenderAndReceiver(senderId, receiverId);
+        const senderAndReceiverStatus = this.#verifySenderAndReceiver(senderAndReceiverObj);
+        if (!senderAndReceiverStatus.success) {
+            return senderAndReceiverStatus;
+        }
+        const sender = <OriginalBankUser>senderAndReceiverObj.sender;
+        const receiver = <OriginalBankUser>senderAndReceiverObj.receiver;
+        if (transferResponse.success) {
+            await localStorage.saveData(bank.serializeData());
+            if (transferType === TransferType.CHARGE) {
+                await sender.getDiscordUser().send({
+                    embeds: [
+                        chargeTransferVisualizer
+                            .getChargeNotificationEmbed(sender, receiver.getName(), transferAmount, comment)
+                            .build(),
+                    ],
+                });
+                await chargeTransferVisualizer.getChargeReceiptEmbed(sender.getName(), transferAmount).send(channel);
+            } else {
+                await receiver.getDiscordUser().send({
+                    embeds: [
+                        cashTransferVisualizer
+                            .getTransferNotificationEmbed(sender.getName(), receiver, transferAmount, comment)
+                            .build(),
+                    ],
+                });
+                await cashTransferVisualizer.getTransferReceiptEmbed(receiver.getName(), transferAmount).send(channel);
+            }
+            await Logger.transactionLog(
+                `[${transferType}] $${transferAmount} from ${sender.getName()} to ${receiver.getName()}\n` +
+                    `new balances:\n` +
+                    `${sender.getName()}: ${sender.getBalance()}\n` +
+                    `${receiver.getName()}: ${receiver.getBalance()}\n`
+            );
+        } else {
+            await visualizerCommon
+                .getErrorEmbed(`${transferType} failed: ${transferResponse.failReason || 'unknown reason'}`)
+                .send(channel);
+        }
+    }
+
+    #transferAmountCore(sender: OriginalBankUser, receiver: OriginalBankUser, amount: number): StatusWithErrorResponse {
+        if (!amount) return { success: false, failReason: 'input error' };
+        amount = roundNumberTwoDecimals(amount);
+        if (sender.getBalance() < amount) {
+            return { success: false, failReason: 'balance is too low' };
+        }
+        if (amount < 0) {
+            return { success: false, failReason: 'cannot transfer negative balance' };
+        }
+        sender.subtractBalance(amount);
+        receiver.addBalance(amount);
+
+        return { success: true, failReason: '' };
+    }
+
+    #getSenderAndReceiver(
+        senderId: string,
+        receiverId: string
+    ): { sender: OriginalBankUser | undefined; receiver: OriginalBankUser | undefined } {
+        const sender = this.#getOrigBankUser(senderId);
+        const receiver = this.#getOrigBankUser(receiverId);
+        return { sender, receiver };
+    }
+
+    #getOrigBankUser(id: string): OriginalBankUser | undefined {
+        return this.users.get(id);
+    }
+
+    #verifySenderAndReceiver(senderReceiverPayload: {
+        sender: OriginalBankUser | undefined;
+        receiver: OriginalBankUser | undefined;
+    }): StatusWithErrorResponse {
+        if (!senderReceiverPayload.sender) {
+            return {
+                success: false,
+                failReason: 'cannot find sender',
+            };
+        }
+        if (!senderReceiverPayload.receiver) {
+            return {
+                success: false,
+                failReason: 'cannot find receiver',
+            };
+        }
+        return {
+            success: true,
+            failReason: '',
+        };
     }
 }
 
