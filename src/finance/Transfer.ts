@@ -1,10 +1,10 @@
 import { Colors, TextChannel } from 'discord.js';
 import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
 import { getUserResponse } from '../utils/utils';
-import { BankUser } from './BankUser';
 import { roundNumberTwoDecimals } from '../utils/numberUtils';
 import reactions from '../utils/constants/reactions';
 import visualizerCommon from './visualizers/visualizerCommon';
+import { BankUserCopy } from './BankUser/BankUserCopy';
 
 export abstract class Transfer {
     channel;
@@ -15,8 +15,8 @@ export abstract class Transfer {
 
     protected constructor(
         channel: TextChannel,
-        sender: BankUser,
-        receiver: BankUser,
+        sender: BankUserCopy,
+        receiver: BankUserCopy,
         actionName = 'transfer',
         responder = sender
     ) {
@@ -32,7 +32,7 @@ export abstract class Transfer {
             .setDescription(`enter the amount you would like to ${this.actionName}`)
             .setFooter('or `q` to quit')
             .send(this.channel);
-        const response = await getUserResponse(this.channel, this.responder.userId);
+        const response = await getUserResponse(this.channel, this.responder.getUserId());
         if (!response) this.channel.send('*no response provided*');
         enterAmountMsg.deletable && enterAmountMsg.delete();
         return response?.content;
@@ -66,7 +66,7 @@ export abstract class Transfer {
             await transferEmbed.edit(embedMsg);
         }
         await visualizerCommon.getConfirmationEmbed(this.actionName).send(this.channel);
-        const responseConfirmation = (await getUserResponse(this.channel, this.responder.userId))?.content;
+        const responseConfirmation = (await getUserResponse(this.channel, this.responder.getUserId()))?.content;
         if (responseConfirmation && responseConfirmation.toLowerCase() === 'yes') {
             const txnResponse = await this.approvedTransactionAction(transferAmount, comment);
             embedMsg.react(txnResponse ? reactions.CHECK : reactions.X);
@@ -87,7 +87,7 @@ export abstract class Transfer {
             .setDescription("type a short comment/description ['q' = cancel]")
             .setColor(Colors.Orange)
             .send(this.channel);
-        return (await getUserResponse(this.channel, this.sender.userId))?.content || '';
+        return (await getUserResponse(this.channel, this.sender.getUserId()))?.content || '';
     }
 
     /**

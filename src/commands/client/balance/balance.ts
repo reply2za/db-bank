@@ -11,7 +11,7 @@ exports.run = async (event: MessageEventLocal) => {
     const balanceMsg = await visualizerCommon.showBalance(
         event.message.channel,
         event.bankUser,
-        bank.getUserIOUs(event.bankUser.userId)
+        bank.getUserIOUs(event.bankUser.getUserId())
     );
     const reactionsList = [reactions.MONEY, reactions.TICKET];
     const userIOUs = bank.getUserIOUs(event.message.author.id);

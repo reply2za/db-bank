@@ -2,12 +2,12 @@ import { getUserResponse, getUserToTransferTo } from '../../../utils/utils';
 import { commandHandler } from '../../../handlers/CommandHandler';
 import { MessageEventLocal } from '../../../utils/types';
 import { Colors, TextChannel } from 'discord.js';
-import { BankUser } from '../../../finance/BankUser';
 import { bank } from '../../../finance/Bank';
 import { TransferType } from '../../../finance/types';
 import { Transfer } from '../../../finance/Transfer';
 import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
 import cashTransferVisualizer from '../../../finance/visualizers/transfers/cashTransferVisualizer';
+import { BankUserCopy } from '../../../finance/BankUser/BankUserCopy';
 
 exports.run = async (event: MessageEventLocal) => {
     if (event.args[1]?.toLowerCase() === 'iou') {
@@ -25,14 +25,14 @@ exports.run = async (event: MessageEventLocal) => {
 };
 
 class MonetaryTransfer extends Transfer {
-    constructor(channel: TextChannel, sender: BankUser, receiver: BankUser) {
+    constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy) {
         super(channel, sender, receiver);
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {
         const status = await bank.transferAmount(
-            this.sender,
-            this.receiver,
+            this.sender.getUserId(),
+            this.receiver.getUserId(),
             transferAmount,
             this.channel,
             TransferType.TRANSFER,
@@ -47,7 +47,7 @@ class MonetaryTransfer extends Transfer {
             .setColor(Colors.Orange)
             .send(this.channel);
 
-        const commentResponse = (await getUserResponse(this.channel, this.sender.userId))?.content || '';
+        const commentResponse = (await getUserResponse(this.channel, this.sender.getUserId()))?.content || '';
         if (commentResponse === 'b') return '';
         return commentResponse;
     }

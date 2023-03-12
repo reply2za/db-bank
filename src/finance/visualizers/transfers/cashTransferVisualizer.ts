@@ -1,38 +1,39 @@
-import { BankUser } from '../../BankUser';
+import { OriginalBankUser } from '../../BankUser/OriginalBankUser';
 import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
 import { roundNumberTwoDecimals } from '../../../utils/numberUtils';
 import visualizerCommon from '../visualizerCommon';
 import images from '../../../utils/constants/images';
+import { BankUserCopy } from '../../BankUser/BankUserCopy';
 
 export default {
     getCashTransferEmbed(
-        sender: Readonly<BankUser>,
-        receiver: Readonly<BankUser>,
+        sender: Readonly<BankUserCopy>,
+        receiver: Readonly<BankUserCopy>,
         amount = 0,
         comment?: string
     ): EmbedBuilderLocal {
         const e = visualizerCommon.getCoreTransferEmbed();
         return e
-            .setTitle(`Transfer to ${receiver.name}`)
+            .setTitle(`Transfer to ${receiver.getName()}`)
             .setDescription(
                 (amount ? `sending \`$${amount.toFixed(2)}\`` : '*no amount selected*').concat(
                     `${comment ? `\ncomment: ${comment}` : ''}`
                 )
             )
             .setFooter(
-                `your balance: $${sender.balance.toFixed(2)}${
-                    amount ? ` => ${roundNumberTwoDecimals(sender.balance - amount).toFixed(2)}` : ''
+                `your balance: $${sender.getBalance().toFixed(2)}${
+                    amount ? ` => ${roundNumberTwoDecimals(sender.getBalance() - amount).toFixed(2)}` : ''
                 }`
             );
     },
     getTransferNotificationEmbed(
         senderName: string,
-        receiver: Readonly<BankUser>,
+        receiver: Readonly<OriginalBankUser>,
         transferAmount: number,
         comment = ''
     ): EmbedBuilderLocal {
         const description = (comment ? `comment: *${comment}*\n` : '').concat(
-            `amount: $${transferAmount.toFixed(2)}\nyour balance: $${receiver.balance.toFixed(2)}`
+            `amount: $${transferAmount.toFixed(2)}\nyour balance: $${receiver.getBalance().toFixed(2)}`
         );
         return new EmbedBuilderLocal()
             .setTitle(`${senderName} sent you money`)

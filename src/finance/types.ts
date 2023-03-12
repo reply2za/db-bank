@@ -3,4 +3,4 @@ export enum TransferType {
     CHARGE = 'charge',
 }
 
-export type FinalTransferStatus = { success: boolean; failReason: string };
+export type StatusWithErrorResponse = { success: boolean; failReason: string };

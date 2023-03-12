@@ -1,17 +1,11 @@
 import { User } from 'discord.js';
-import { roundNumberTwoDecimals } from '../utils/numberUtils';
+import { roundNumberTwoDecimals } from '../../utils/numberUtils';
+import { ABankUser } from './ABankUser';
+import { BankUserCopy } from './BankUserCopy';
 
-class BankUser {
-    readonly userId;
-    readonly name;
-    balance;
-    readonly #discordUser;
-
+class OriginalBankUser extends ABankUser {
     constructor(discordUser: User, name: string, balance: number) {
-        this.userId = discordUser.id;
-        this.name = name;
-        this.balance = balance;
-        this.#discordUser = discordUser;
+        super(discordUser, name, balance);
     }
 
     addBalance(amount: number) {
@@ -26,13 +20,10 @@ class BankUser {
         return this.balance;
     }
 
-    getBalance() {
-        return this.balance;
-    }
-
-    getDiscordUser() {
-        return this.#discordUser;
+    getBankUserCopy(): BankUserCopy {
+        const discordUser = Object.assign({}, this.discordUser);
+        return new BankUserCopy(discordUser, this.name, this.balance);
     }
 }
 
-export { BankUser };
+export { OriginalBankUser };

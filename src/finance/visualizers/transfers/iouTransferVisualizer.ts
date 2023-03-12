@@ -1,24 +1,24 @@
-import { BankUser } from '../../BankUser';
 import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
 import visualizerCommon from '../visualizerCommon';
 import images from '../../../utils/constants/images';
+import { BankUserCopy } from '../../BankUser/BankUserCopy';
 
 export default {
     getIOUTransferEmbed(
-        sender: Readonly<BankUser>,
-        receiver: Readonly<BankUser>,
+        sender: Readonly<BankUserCopy>,
+        receiver: Readonly<BankUserCopy>,
         amount = 0,
         comment = ''
     ): EmbedBuilderLocal {
         return visualizerCommon
             .getCoreTransferEmbed()
-            .setTitle(`Transfer IOU to ${receiver.name}`)
+            .setTitle(`Transfer IOU to ${receiver.getName()}`)
             .setDescription(amount ? `sending ${amount} IOU${amount > 1 ? 's' : ''}` : '*no amount selected*')
             .setFooter(`${comment ? `comment: ${comment}` : ' '}`);
     },
     getIOUTransferNotificationEmbed(
         senderName: string,
-        receiver: Readonly<BankUser>,
+        receiver: Readonly<BankUserCopy>,
         transferAmount: number,
         comment: string
     ): EmbedBuilderLocal {

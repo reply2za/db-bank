@@ -1,17 +1,18 @@
-import { BankUser } from './BankUser';
+import { OriginalBankUser } from './BankUser/OriginalBankUser';
 import { IOUTicket } from './IOUTicket';
-import { TextBasedChannel, UserManager } from 'discord.js';
+import { TextBasedChannel, User, UserManager } from 'discord.js';
 import { roundNumberTwoDecimals } from '../utils/numberUtils';
 import leven from 'leven';
 import { localStorage } from '../storage/LocalStorage';
 import Logger from '../utils/Logger';
-import { FinalTransferStatus, TransferType } from './types';
+import { StatusWithErrorResponse, TransferType } from './types';
 import chargeTransferVisualizer from './visualizers/transfers/chargeTransferVisualizer';
 import cashTransferVisualizer from './visualizers/transfers/cashTransferVisualizer';
 import visualizerCommon from './visualizers/visualizerCommon';
+import { BankUserCopy } from './BankUser/BankUserCopy';
 
 class Bank {
-    users: Map<string, BankUser> = new Map();
+    users: Map<string, OriginalBankUser> = new Map();
     iOUList: Array<IOUTicket> = [];
     #usernames: Set<string> = new Set();
 
@@ -23,7 +24,14 @@ class Bank {
         this.#usernames = new Set();
     }
 
-    transferIOU(sender: BankUser, receiver: BankUser, amount: number, comment: string): FinalTransferStatus {
+    transferIOU(senderId: string, receiverId: string, amount: number, comment: string): StatusWithErrorResponse {
+        const senderAndReceiverObj = this.#getSenderAndReceiver(senderId, receiverId);
+        const senderAndReceiverStatus = this.#verifySenderAndReceiver(senderAndReceiverObj);
+        if (!senderAndReceiverStatus.success) {
+            return senderAndReceiverStatus;
+        }
+        const sender = <OriginalBankUser>senderAndReceiverObj.sender;
+        const receiver = <OriginalBankUser>senderAndReceiverObj.receiver;
         if (amount > 99) {
             return {
                 success: false,
@@ -34,8 +42,8 @@ class Bank {
         for (let i = 0; i < amount; i++) {
             const iou = new IOUTicket(
                 null,
-                { id: sender.userId, name: sender.name },
-                { id: receiver.userId, name: receiver.name },
+                { id: sender.getUserId(), name: sender.getName() },
+                { id: receiver.getUserId(), name: receiver.getName() },
                 `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().substring(2)}`,
                 comment
             );
@@ -48,40 +56,47 @@ class Bank {
     }
 
     async #recordTransfer(
-        transferResponse: FinalTransferStatus,
+        transferResponse: StatusWithErrorResponse,
         transferAmount: number,
-        sender: BankUser,
-        receiver: BankUser,
+        senderId: string,
+        receiverId: string,
         channel: TextBasedChannel,
         transferType: TransferType,
         comment = ''
     ) {
+        const senderAndReceiverObj = this.#getSenderAndReceiver(senderId, receiverId);
+        const senderAndReceiverStatus = this.#verifySenderAndReceiver(senderAndReceiverObj);
+        if (!senderAndReceiverStatus.success) {
+            return senderAndReceiverStatus;
+        }
+        const sender = <OriginalBankUser>senderAndReceiverObj.sender;
+        const receiver = <OriginalBankUser>senderAndReceiverObj.receiver;
         if (transferResponse.success) {
             await localStorage.saveData(bank.serializeData());
             if (transferType === TransferType.CHARGE) {
                 await sender.getDiscordUser().send({
                     embeds: [
                         chargeTransferVisualizer
-                            .getChargeNotificationEmbed(sender, receiver.name, transferAmount, comment)
+                            .getChargeNotificationEmbed(sender, receiver.getName(), transferAmount, comment)
                             .build(),
                     ],
                 });
-                await chargeTransferVisualizer.getChargeReceiptEmbed(sender.name, transferAmount).send(channel);
+                await chargeTransferVisualizer.getChargeReceiptEmbed(sender.getName(), transferAmount).send(channel);
             } else {
                 await receiver.getDiscordUser().send({
                     embeds: [
                         cashTransferVisualizer
-                            .getTransferNotificationEmbed(sender.name, receiver, transferAmount, comment)
+                            .getTransferNotificationEmbed(sender.getName(), receiver, transferAmount, comment)
                             .build(),
                     ],
                 });
-                await cashTransferVisualizer.getTransferReceiptEmbed(receiver.name, transferAmount).send(channel);
+                await cashTransferVisualizer.getTransferReceiptEmbed(receiver.getName(), transferAmount).send(channel);
             }
             await Logger.transactionLog(
-                `[${transferType}] $${transferAmount} from ${sender.name} to ${receiver.name}\n` +
+                `[${transferType}] $${transferAmount} from ${sender.getName()} to ${receiver.getName()}\n` +
                     `new balances:\n` +
-                    `${sender.name}: ${sender.balance}\n` +
-                    `${receiver.name}: ${receiver.balance}\n`
+                    `${sender.getName()}: ${sender.getBalance()}\n` +
+                    `${receiver.getName()}: ${receiver.getBalance()}\n`
             );
         } else {
             await visualizerCommon
@@ -90,7 +105,7 @@ class Bank {
         }
     }
 
-    #transferAmountCore(sender: BankUser, receiver: BankUser, amount: number): FinalTransferStatus {
+    #transferAmountCore(sender: OriginalBankUser, receiver: OriginalBankUser, amount: number): StatusWithErrorResponse {
         if (!amount) return { success: false, failReason: 'input error' };
         amount = roundNumberTwoDecimals(amount);
         if (sender.getBalance() < amount) {
@@ -105,25 +120,67 @@ class Bank {
         return { success: true, failReason: '' };
     }
 
+    #getSenderAndReceiver(
+        senderId: string,
+        receiverId: string
+    ): { sender: OriginalBankUser | undefined; receiver: OriginalBankUser | undefined } {
+        const sender = this.#getOriginalUser(senderId);
+        const receiver = this.#getOriginalUser(receiverId);
+        return { sender, receiver };
+    }
+
+    #verifySenderAndReceiver(senderReceiverPayload: {
+        sender: OriginalBankUser | undefined;
+        receiver: OriginalBankUser | undefined;
+    }): StatusWithErrorResponse {
+        if (!senderReceiverPayload.sender) {
+            return {
+                success: false,
+                failReason: 'cannot find sender',
+            };
+        }
+        if (!senderReceiverPayload.receiver) {
+            return {
+                success: false,
+                failReason: 'cannot find receiver',
+            };
+        }
+        return {
+            success: true,
+            failReason: '',
+        };
+    }
+
     async transferAmount(
-        sender: BankUser,
-        receiver: BankUser,
+        senderId: string,
+        receiverId: string,
         amount: number,
         channel: TextBasedChannel,
         type = TransferType.TRANSFER,
         comment = ''
-    ): Promise<FinalTransferStatus> {
+    ): Promise<StatusWithErrorResponse> {
+        const senderAndReceiverObj = this.#getSenderAndReceiver(senderId, receiverId);
+        const senderAndReceiverStatus = this.#verifySenderAndReceiver(senderAndReceiverObj);
+        if (!senderAndReceiverStatus.success) {
+            return senderAndReceiverStatus;
+        }
+        const sender = <OriginalBankUser>senderAndReceiverObj.sender;
+        const receiver = <OriginalBankUser>senderAndReceiverObj.receiver;
         const transferResponse = this.#transferAmountCore(sender, receiver, amount);
-        await this.#recordTransfer(transferResponse, amount, sender, receiver, channel, type, comment);
+        await this.#recordTransfer(transferResponse, amount, senderId, receiverId, channel, type, comment);
         return transferResponse;
     }
 
-    getUser(id: string) {
+    getUserCopy(id: string): BankUserCopy | undefined {
+        return this.users.get(id)?.getBankUserCopy();
+    }
+
+    #getOriginalUser(id: string): OriginalBankUser | undefined {
         return this.users.get(id);
     }
 
-    getAllUsers() {
-        return Array.from(this.users.values());
+    getAllUsers(): BankUserCopy[] {
+        return Array.from(this.users.values()).map((bankUser) => bankUser.getBankUserCopy());
     }
 
     /**
@@ -146,17 +203,18 @@ class Bank {
         return this.iOUList;
     }
 
-    addNewUser(bankUser: BankUser) {
-        if (this.#usernames.has(bankUser.name)) {
-            throw new Error('name already exists');
+    addNewUser(author: User, username: string, balance: number): BankUserCopy {
+        const bankUser = new OriginalBankUser(author, username, balance);
+        if (this.#usernames.has(bankUser.getName())) {
+            throw new Error('#name already exists');
         }
-        this.#usernames.add(bankUser.name);
-        this.users.set(bankUser.userId, bankUser);
-        return bankUser;
+        this.#usernames.add(bankUser.getName());
+        this.users.set(bankUser.getUserId(), bankUser);
+        return bankUser.getBankUserCopy();
     }
 
     serializeData() {
-        const userData = this.getAllUsers();
+        const userData = this.getAllUsers().map((bankUser) => bankUser.getSerializableData());
         const iouData = this.getAllIOUs();
         const serializedData = {
             bank: {
@@ -173,7 +231,7 @@ class Bank {
         for (let userObj of parsedData.bank.users) {
             try {
                 const user = await userManager.fetch(userObj.userId);
-                this.users.set(userObj.userId, new BankUser(user, userObj.name, userObj.balance));
+                this.users.set(userObj.userId, new OriginalBankUser(user, userObj.name, userObj.balance));
             } catch (e) {
                 console.log('could not load user data\n', e);
             }
@@ -183,14 +241,14 @@ class Bank {
         }
     }
 
-    findUser(name: string): Array<BankUser> {
+    findUser(name: string): Array<BankUserCopy> {
         const matches = [];
         for (const [, value] of this.users) {
-            if (leven(value.name.toLowerCase(), name.toLowerCase()) < 2) {
+            if (leven(value.getName().toLowerCase(), name.toLowerCase()) < 2) {
                 matches.push(value);
             }
         }
-        matches.sort((a: BankUser, b: BankUser) => a.name.length - b.name.length);
+        matches.sort((a: OriginalBankUser, b: OriginalBankUser) => a.getName().length - b.getName().length);
         return matches;
     }
 

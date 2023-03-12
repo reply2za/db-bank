@@ -7,7 +7,7 @@ import path from 'path';
 
 // list of commands that should not be process-specific
 const MULTI_PROCESS_CMDS = ['boot'];
-// the output directory name where source files are generated
+// the output directory #name where source files are generated
 const SOURCE_DIR_NAME = 'dist';
 
 class CommandHandler {

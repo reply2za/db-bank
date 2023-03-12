@@ -55,7 +55,7 @@ export default {
     },
     /**
      * Notifies the original IOU sender that their IOU has been redeemed.
-     * @param iouRecipientName The name user that redeemed the IOU.
+     * @param iouRecipientName The #name user that redeemed the IOU.
      * @param iouComment The reason for the IOU.
      */
     iouRedeemedNotifEmbed(iouRecipientName: string, iouComment?: string) {

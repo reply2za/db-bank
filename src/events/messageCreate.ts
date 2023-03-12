@@ -1,7 +1,6 @@
 import { isDevMode, PREFIX } from '../utils/constants/constants';
 import { Message } from 'discord.js';
 import { bank } from '../finance/Bank';
-import { BankUser } from '../finance/BankUser';
 import { localStorage } from '../storage/LocalStorage';
 import { commandHandler } from '../handlers/CommandHandler';
 import { MessageEventLocal } from '../utils/types';
@@ -13,11 +12,11 @@ module.exports = async (message: Message) => {
     if (msgPrefix !== PREFIX) return;
     if (isDevMode && !isAdmin(message.author.id)) return;
     let bankUser;
-    bankUser = bank.getUser(message.author.id);
+    bankUser = bank.getUserCopy(message.author.id);
     if (!bankUser) {
         if (message.author.bot) return;
         try {
-            bank.addNewUser(new BankUser(message.author, message.author.username, 0));
+            bank.addNewUser(message.author, message.author.username, 0);
             await localStorage.saveData(bank.serializeData());
         } catch (e) {
             if (e instanceof Error) Logger.errorLog(e);
@@ -30,7 +29,7 @@ module.exports = async (message: Message) => {
         }
     }
     const args = message.content.replace(/\s+/g, ' ').split(' ');
-    // the command name, removes the prefix and any args
+    // the command #name, removes the prefix and any args
     const statement = args[0].substring(1).toLowerCase();
     const event: MessageEventLocal = {
         statement,

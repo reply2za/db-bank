@@ -10,8 +10,8 @@ import {
 } from 'discord.js';
 import { bank } from '../finance/Bank';
 import { ADMIN_IDS, isDevMode } from './constants/constants';
-import { BankUser } from '../finance/BankUser';
 import { EventDataNames } from './types';
+import { BankUserCopy } from '../finance/BankUser/BankUserCopy';
 
 const getFilterForUser = (userId: string) => {
     return (m: Message) => userId === m.author.id;
@@ -33,10 +33,10 @@ export async function getUserResponse(
 }
 
 /**
- * Searches the message for a mention. If there is none then searches the name. If there is no name then prompts the user.
+ * Searches the message for a mention. If there is none then searches the #name. If there is no #name then prompts the user.
  * @param message The user's message.
- * @param name Optional - A name of a user to search for.
- * @param actionName Optional - The name of the action that is being attempted
+ * @param name Optional - A #name of a user to search for.
+ * @param actionName Optional - The #name of the action that is being attempted
  * @param eventData Optional - Event data
  */
 export async function getUserToTransferTo(
@@ -44,7 +44,7 @@ export async function getUserToTransferTo(
     name = '',
     actionName = 'transfer',
     eventData = new Map<EventDataNames, any>()
-): Promise<BankUser | undefined> {
+): Promise<BankUserCopy | undefined> {
     let recipientID = message.mentions?.users.first()?.id;
     if (!name && !recipientID) {
         const initialTransferMsg = await message.channel.send(`Who you would like to ${actionName} to?`);
@@ -69,7 +69,7 @@ export async function getUserToTransferTo(
     }
     let recipientBankUser;
     if (recipientID) {
-        recipientBankUser = bank.getUser(recipientID);
+        recipientBankUser = bank.getUserCopy(recipientID);
     } else if (name) {
         const matchingUsers = bank.findUser(name);
         recipientBankUser = matchingUsers[0];
@@ -78,7 +78,7 @@ export async function getUserToTransferTo(
         message.channel.send('*could not find user*');
         return;
     }
-    if (recipientBankUser.userId === message.author.id && !ADMIN_IDS.includes(`${message.author.id} `)) {
+    if (recipientBankUser.getUserId() === message.author.id && !ADMIN_IDS.includes(`${message.author.id} `)) {
         message.channel.send(`you cannot make a ${actionName} to yourself`);
         return;
     }

@@ -7,12 +7,12 @@ import { MessageReaction } from 'discord.js';
 import iouVisualizer from '../../../finance/visualizers/iouVisualizer';
 
 exports.run = async (event: MessageEventLocal) => {
-    const ious = bank.getUserIOUs(event.bankUser.userId);
+    const ious = bank.getUserIOUs(event.bankUser.getUserId());
     if (ious.length < 1) {
         event.message.channel.send('*no redeemable IOUs found*');
         return;
     }
-    const sentIOUs = bank.getUserSentIOUs(event.bankUser.userId);
+    const sentIOUs = bank.getUserSentIOUs(event.bankUser.getUserId());
     const reactionsList = [reactions.KEY];
     if (sentIOUs.length) {
         reactionsList.push(reactions.OUTBOX);

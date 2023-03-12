@@ -1,14 +1,14 @@
 import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js';
-import { BankUser } from '../BankUser';
 import { IOUTicket } from '../IOUTicket';
 import { bot } from '../../utils/constants/constants';
 import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import images from '../../utils/constants/images';
+import { BankUserCopy } from '../BankUser/BankUserCopy';
 
 export default {
     async showBalance(
         channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>,
-        user: Readonly<BankUser>,
+        user: Readonly<BankUserCopy>,
         ious: IOUTicket[]
     ): Promise<Message> {
         let iouDescription = '';
@@ -21,7 +21,7 @@ export default {
             iouDescription += `${sender.username}: ${value}\n`;
         }
         return new EmbedBuilderLocal()
-            .setTitle(`${user.name}'s Bank`)
+            .setTitle(`${user.getName()}'s Bank`)
             .setColor('Green')
             .setDescription(
                 `\`$${user.getBalance().toFixed(2)}\`\n${

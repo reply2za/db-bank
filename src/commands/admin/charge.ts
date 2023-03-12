@@ -5,8 +5,8 @@ import { TransferType } from '../../finance/types';
 import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import { Colors, TextChannel } from 'discord.js';
 import { Transfer } from '../../finance/Transfer';
-import { BankUser } from '../../finance/BankUser';
 import chargeTransferVisualizer from '../../finance/visualizers/transfers/chargeTransferVisualizer';
+import { BankUserCopy } from '../../finance/BankUser/BankUserCopy';
 
 exports.run = async (event: MessageEventLocal) => {
     const sender = await getUserToTransferTo(event.message, event.args[1], 'charge');
@@ -15,14 +15,14 @@ exports.run = async (event: MessageEventLocal) => {
 };
 
 class Charge extends Transfer {
-    constructor(channel: TextChannel, sender: BankUser, receiver: BankUser, actionName: string) {
+    constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy, actionName: string) {
         super(channel, sender, receiver, actionName, receiver);
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {
         const status = await bank.transferAmount(
-            this.sender,
-            this.receiver,
+            this.sender.getUserId(),
+            this.receiver.getUserId(),
             transferAmount,
             this.channel,
             TransferType.CHARGE,
@@ -37,7 +37,7 @@ class Charge extends Transfer {
             .setColor(Colors.Orange)
             .send(this.channel);
 
-        const commentResponse = (await getUserResponse(this.channel, this.receiver.userId))?.content || '';
+        const commentResponse = (await getUserResponse(this.channel, this.receiver.getUserId()))?.content || '';
         if (commentResponse === 'b') return '';
         return commentResponse;
     }

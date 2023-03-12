@@ -8,7 +8,7 @@ import Logger from '../../utils/Logger';
 import visualizerCommon from '../../finance/visualizers/visualizerCommon';
 
 exports.run = async (event: MessageEventLocal) => {
-    const ious = bank.getUserIOUs(event.bankUser.userId);
+    const ious = bank.getUserIOUs(event.bankUser.getUserId());
     if (ious.length < 1) {
         event.message.channel.send('*no redeemable IOUs found*');
         return;
@@ -19,7 +19,7 @@ exports.run = async (event: MessageEventLocal) => {
     await new EmbedBuilderLocal()
         .setDescription("which IOU would you like to redeem [or 'q' to quit]")
         .send(event.message.channel);
-    const iouIndexResponse = (await getUserResponse(event.message.channel, event.bankUser.userId))?.content;
+    const iouIndexResponse = (await getUserResponse(event.message.channel, event.bankUser.getUserId()))?.content;
     if (!iouIndexResponse || iouIndexResponse.toLowerCase() === 'q') {
         event.message.channel.send('*cancelled*');
         return;
@@ -32,7 +32,7 @@ exports.run = async (event: MessageEventLocal) => {
     await iouVisualizer.getRedeemableIOUEmbed(ious, iouIndex).edit(sentIOUEmbed);
     const iou = ious[iouIndex];
     await visualizerCommon.getConfirmationEmbed('redemption').send(event.message.channel);
-    const response = (await getUserResponse(event.message.channel, event.bankUser.userId))?.content;
+    const response = (await getUserResponse(event.message.channel, event.bankUser.getUserId()))?.content;
     if (response?.toLowerCase() === 'yes') {
         const isSuccessful = await bank.redeemIOU(iou.id);
         if (isSuccessful) {
