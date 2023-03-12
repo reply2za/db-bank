@@ -11,7 +11,9 @@ exports.run = async (event: MessageEventLocal) => {
     });
     finalString += '\n---IOUs---\n';
     bank.getAllIOUs().forEach((iou) => {
-        finalString += `**from ${iou.sender.name} to ${iou.receiver.name}**\nreason: ${iou.comment}\n`;
+        finalString += `**from ${iou.sender.name} to ${iou.receiver.name}**${
+            iou.quantity > 1 ? ` (x${iou.quantity})` : ''
+        }\nreason: ${iou.comment}\n`;
     });
     await new EmbedBuilderLocal().setTitle('Accounts').setDescription(finalString).send(event.message.channel);
 };
