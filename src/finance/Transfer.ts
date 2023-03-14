@@ -7,11 +7,11 @@ import visualizerCommon from './visualizers/visualizerCommon';
 import { BankUserCopy } from './BankUser/BankUserCopy';
 
 export abstract class Transfer {
-    channel;
-    sender;
-    receiver;
-    actionName;
-    responder;
+    readonly channel;
+    readonly sender;
+    readonly receiver;
+    readonly actionName;
+    readonly responder;
 
     protected constructor(
         channel: TextChannel,

@@ -12,8 +12,8 @@ import visualizerCommon from './visualizers/visualizerCommon';
 import { BankUserCopy } from './BankUser/BankUserCopy';
 
 class Bank {
-    protected users: Map<string, OriginalBankUser> = new Map();
-    protected iOUList: Array<IOUTicket> = [];
+    #users: Map<string, OriginalBankUser> = new Map();
+    #iOUList: Array<IOUTicket> = [];
     #usernames: Set<string> = new Set();
 
     constructor() {}
@@ -47,7 +47,7 @@ class Bank {
             comment,
             quantity
         );
-        this.iOUList.push(iou);
+        this.#iOUList.push(iou);
         return {
             success: true,
             failReason: '',
@@ -75,11 +75,11 @@ class Bank {
     }
 
     getUserCopy(id: string): BankUserCopy | undefined {
-        return this.users.get(id)?.getBankUserCopy();
+        return this.#users.get(id)?.getBankUserCopy();
     }
 
     getAllUsers(): BankUserCopy[] {
-        return Array.from(this.users.values()).map((bankUser) => bankUser.getBankUserCopy());
+        return Array.from(this.#users.values()).map((bankUser) => bankUser.getBankUserCopy());
     }
 
     /**
@@ -87,7 +87,7 @@ class Bank {
      * @param id The user id
      */
     getUserIOUs(id: string): IOUTicket[] {
-        return this.iOUList.filter((value: IOUTicket) => value.receiver.id === id);
+        return this.#iOUList.filter((value: IOUTicket) => value.receiver.id === id);
     }
 
     /**
@@ -95,11 +95,11 @@ class Bank {
      * @param id The user id
      */
     getUserSentIOUs(id: string) {
-        return this.iOUList.filter((value: IOUTicket) => value.sender.id === id);
+        return this.#iOUList.filter((value: IOUTicket) => value.sender.id === id);
     }
 
     getAllIOUs() {
-        return this.iOUList;
+        return this.#iOUList;
     }
 
     addNewUser(author: User, username: string, balance: number): BankUserCopy {
@@ -108,7 +108,7 @@ class Bank {
             throw new Error('#name already exists');
         }
         this.#usernames.add(bankUser.getName());
-        this.users.set(bankUser.getUserId(), bankUser);
+        this.#users.set(bankUser.getUserId(), bankUser);
         return bankUser.getBankUserCopy();
     }
 
@@ -130,19 +130,19 @@ class Bank {
         for (let userObj of parsedData.bank.users) {
             try {
                 const user = await userManager.fetch(userObj.userId);
-                this.users.set(userObj.userId, new OriginalBankUser(user, userObj.name, userObj.balance));
+                this.#users.set(userObj.userId, new OriginalBankUser(user, userObj.name, userObj.balance));
             } catch (e) {
                 console.log('could not load user data\n', e);
             }
         }
         for (let iou of parsedData.bank.ious) {
-            this.iOUList.push(new IOUTicket(iou.id, iou.sender, iou.receiver, iou.date, iou.comment, iou.quantity));
+            this.#iOUList.push(new IOUTicket(iou.id, iou.sender, iou.receiver, iou.date, iou.comment, iou.quantity));
         }
     }
 
     findUser(name: string): Array<BankUserCopy> {
         const matches = [];
-        for (const [, value] of this.users) {
+        for (const [, value] of this.#users) {
             if (leven(value.getName().toLowerCase(), name.toLowerCase()) < 2) {
                 matches.push(value);
             }
@@ -152,23 +152,23 @@ class Bank {
     }
 
     async redeemIOU(id: string): Promise<boolean> {
-        const iouToRedeemIndex = this.iOUList.findIndex((value) => value.id == id);
+        const iouToRedeemIndex = this.#iOUList.findIndex((value) => value.id == id);
         if (!iouToRedeemIndex) {
             return false;
         }
-        const iouToRedeem = this.iOUList[iouToRedeemIndex];
+        const iouToRedeem = this.#iOUList[iouToRedeemIndex];
         if (iouToRedeem.quantity > 1) {
-            this.iOUList[iouToRedeemIndex] = iouToRedeem.cloneWithNewQuantity(iouToRedeem.quantity - 1);
+            this.#iOUList[iouToRedeemIndex] = iouToRedeem.cloneWithNewQuantity(iouToRedeem.quantity - 1);
         } else {
-            this.iOUList.splice(iouToRedeemIndex, 1);
+            this.#iOUList.splice(iouToRedeemIndex, 1);
         }
         await localStorage.saveData(bank.serializeData());
         return true;
     }
 
     #resetAllData() {
-        this.users = new Map();
-        this.iOUList = [];
+        this.#users = new Map();
+        this.#iOUList = [];
         this.#usernames = new Set();
     }
 
@@ -247,7 +247,7 @@ class Bank {
     }
 
     #getOrigBankUser(id: string): OriginalBankUser | undefined {
-        return this.users.get(id);
+        return this.#users.get(id);
     }
 
     #verifySenderAndReceiver(senderReceiverPayload: {
