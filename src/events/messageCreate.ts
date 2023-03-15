@@ -29,7 +29,7 @@ module.exports = async (message: Message) => {
         }
     }
     const args = message.content.replace(/\s+/g, ' ').split(' ');
-    // the command #name, removes the prefix and any args
+    // the command name, removes the prefix and any args
     const statement = args[0].substring(1).toLowerCase();
     const event: MessageEventLocal = {
         statement,

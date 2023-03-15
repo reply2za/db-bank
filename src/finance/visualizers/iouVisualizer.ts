@@ -54,14 +54,14 @@ export default {
     },
     /**
      * Informs the user that redeemed the IOU that the redemption is complete.
-     * @param origIOUSender The user that originally sent the IOU.
+     * @param origIOUSender The name of the user that originally sent the IOU.
      */
     iouRedemptionReceipt(origIOUSender: string) {
         return new EmbedBuilderLocal().setDescription(`redeemed IOU with ${origIOUSender}!`).setColor('Blue');
     },
     /**
      * Notifies the original IOU sender that their IOU has been redeemed.
-     * @param iouRecipientName The #name user that redeemed the IOU.
+     * @param iouRecipientName The name user that redeemed the IOU.
      * @param iouComment The reason for the IOU.
      */
     iouRedeemedNotifEmbed(iouRecipientName: string, iouComment?: string) {

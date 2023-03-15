@@ -105,7 +105,7 @@ class Bank {
     addNewUser(author: User, username: string, balance: number): BankUserCopy {
         const bankUser = new OriginalBankUser(author, username, balance);
         if (this.#usernames.has(bankUser.getName())) {
-            throw new Error('#name already exists');
+            throw new Error('name already exists');
         }
         this.#usernames.add(bankUser.getName());
         this.#users.set(bankUser.getUserId(), bankUser);
