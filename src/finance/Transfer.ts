@@ -27,17 +27,6 @@ export abstract class Transfer {
         this.responder = responder;
     }
 
-    protected async getAmount() {
-        const enterAmountMsg = await new EmbedBuilderLocal()
-            .setDescription(`enter the amount you would like to ${this.actionName}`)
-            .setFooter('or `q` to quit')
-            .send(this.channel);
-        const response = await getUserResponse(this.channel, this.responder.getUserId());
-        if (!response) this.channel.send('*no response provided*');
-        enterAmountMsg.deletable && enterAmountMsg.delete();
-        return response?.content;
-    }
-
     async processTransfer(): Promise<void> {
         let transferEmbed = this.getTransferEmbed(0, '');
         const embedMsg = await transferEmbed.send(this.channel);
@@ -73,6 +62,17 @@ export abstract class Transfer {
             await this.cancelResponse();
             embedMsg.react(reactions.X);
         }
+    }
+
+    protected async getAmount() {
+        const enterAmountMsg = await new EmbedBuilderLocal()
+            .setDescription(`enter the amount you would like to ${this.actionName}`)
+            .setFooter('or `q` to quit')
+            .send(this.channel);
+        const response = await getUserResponse(this.channel, this.responder.getUserId());
+        if (!response) this.channel.send('*no response provided*');
+        enterAmountMsg.deletable && enterAmountMsg.delete();
+        return response?.content;
     }
 
     protected async getFinalConfirmation(): Promise<boolean> {
