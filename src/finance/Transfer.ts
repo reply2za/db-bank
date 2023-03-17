@@ -81,8 +81,6 @@ export abstract class Transfer {
         return responseConfirmation?.toLowerCase() === 'yes';
     }
 
-    protected abstract getTransferEmbed(number: number, comment: string): EmbedBuilderLocal;
-
     /**
      * Returning a 'q' (case-insensitive) will cancel the transfer flow.
      * @protected
@@ -94,15 +92,6 @@ export abstract class Transfer {
             .send(this.channel);
         return (await getUserResponse(this.channel, this.sender.getUserId()))?.content || '';
     }
-
-    /**
-     * The action to perform if the user wishes to continue with the transaction after the confirmation page.
-     * @param transferAmount The amount to transfer
-     * @param comment A user comment associated with this transaction.
-     * @protected
-     * @returns Whether the transaction succeeded.
-     */
-    protected abstract approvedTransactionAction(transferAmount: number, comment: string): Promise<boolean>;
 
     protected async cancelResponse(): Promise<void> {
         await this.channel.send(`*cancelled ${this.actionName}*`);
@@ -119,4 +108,21 @@ export abstract class Transfer {
         }
         return true;
     }
+
+    /**
+     * The transfer embed to show during the transfer process.
+     * @param number A user provided amount to transfer.
+     * @param comment A user provided comment for the transfer.
+     * @protected
+     */
+    protected abstract getTransferEmbed(number: number, comment: string): EmbedBuilderLocal;
+
+    /**
+     * The action to perform if the user wishes to continue with the transaction after the confirmation page.
+     * @param transferAmount The amount to transfer
+     * @param comment A user comment associated with this transaction.
+     * @protected
+     * @returns Whether the transaction succeeded.
+     */
+    protected abstract approvedTransactionAction(transferAmount: number, comment: string): Promise<boolean>;
 }
