@@ -213,7 +213,8 @@ class Bank {
                 `[${transferType}] $${transferAmount} from ${sender.getName()} to ${receiver.getName()}\n` +
                     `new balances:\n` +
                     `${sender.getName()}: ${sender.getBalance()}\n` +
-                    `${receiver.getName()}: ${receiver.getBalance()}\n`
+                    `${receiver.getName()}: ${receiver.getBalance()}\n` +
+                    `comment: ${comment}`
             );
         } else {
             await visualizerCommon
