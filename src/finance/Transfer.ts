@@ -65,15 +65,20 @@ export abstract class Transfer {
             transferEmbed = this.getTransferEmbed(transferAmount, comment);
             await transferEmbed.edit(embedMsg);
         }
-        await visualizerCommon.getConfirmationEmbed(this.actionName).send(this.channel);
-        const responseConfirmation = (await getUserResponse(this.channel, this.responder.getUserId()))?.content;
-        if (responseConfirmation && responseConfirmation.toLowerCase() === 'yes') {
+        const confirmationResponse = await this.getFinalConfirmation();
+        if (confirmationResponse) {
             const txnResponse = await this.approvedTransactionAction(transferAmount, comment);
             embedMsg.react(txnResponse ? reactions.CHECK : reactions.X);
         } else {
             await this.cancelResponse();
             embedMsg.react(reactions.X);
         }
+    }
+
+    protected async getFinalConfirmation(): Promise<boolean> {
+        await visualizerCommon.getConfirmationEmbed(this.actionName).send(this.channel);
+        const responseConfirmation = (await getUserResponse(this.channel, this.responder.getUserId()))?.content;
+        return responseConfirmation?.toLowerCase() === 'yes';
     }
 
     protected abstract getTransferEmbed(number: number, comment: string): EmbedBuilderLocal;
