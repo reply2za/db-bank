@@ -55,4 +55,12 @@ class MonetaryTransfer extends Transfer {
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {
         return cashTransferVisualizer.getCashTransferEmbed(this.sender, this.receiver, amount, comment);
     }
+
+    protected async getAmount(): Promise<string | undefined> {
+        const amount = await super.getAmount();
+        if (amount?.includes('$')) {
+            return amount?.replace('$', '');
+        }
+        return amount;
+    }
 }
