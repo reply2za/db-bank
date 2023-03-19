@@ -48,7 +48,7 @@ class MonetaryTransfer extends Transfer {
             .send(this.channel);
 
         const commentResponse = (await getUserResponse(this.channel, this.sender.getUserId()))?.content;
-        if (commentResponse === 'b') return '';
+        if (commentResponse?.toLowerCase() === 'b') return '';
         return commentResponse;
     }
 

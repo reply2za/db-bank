@@ -38,7 +38,7 @@ class Charge extends Transfer {
             .send(this.channel);
 
         const commentResponse = (await getUserResponse(this.channel, this.receiver.getUserId()))?.content;
-        if (commentResponse === 'b') return '';
+        if (commentResponse?.toLowerCase() === 'b') return '';
         return commentResponse;
     }
 
