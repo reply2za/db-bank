@@ -45,12 +45,12 @@ export abstract class Transfer {
         transferEmbed = this.getTransferEmbed(transferAmount, '');
         await transferEmbed.edit(embedMsg);
         const comment = await this.getComment();
-        if (comment) {
-            if (comment.toLowerCase() === 'q') {
-                await this.cancelResponse();
-                embedMsg.react(reactions.X);
-                return;
-            }
+        if (comment === undefined || comment.toLowerCase() === 'q') {
+            await this.cancelResponse(comment === undefined ? 'no response provided' : '');
+            embedMsg.react(reactions.X);
+            return;
+        }
+        if (comment.trim() !== '') {
             transferEmbed = this.getTransferEmbed(transferAmount, comment);
             await transferEmbed.edit(embedMsg);
         }
@@ -82,19 +82,20 @@ export abstract class Transfer {
     }
 
     /**
-     * Returning a 'q' (case-insensitive) will cancel the transfer flow.
+     * Returning a 'q' (case-insensitive) allows users to cancel the transfer flow.
+     * Returning undefined means user-abandoned and will also cancel the flow.
      * @protected
      */
-    protected async getComment(): Promise<string> {
+    protected async getComment(): Promise<string | undefined> {
         await new EmbedBuilderLocal()
             .setDescription("type a short comment/description ['q' = cancel]")
             .setColor(Colors.Orange)
             .send(this.channel);
-        return (await getUserResponse(this.channel, this.sender.getUserId()))?.content || '';
+        return (await getUserResponse(this.channel, this.sender.getUserId()))?.content;
     }
 
-    protected async cancelResponse(): Promise<void> {
-        await this.channel.send(`*cancelled ${this.actionName}*`);
+    protected async cancelResponse(reason = ''): Promise<void> {
+        await this.channel.send(`*cancelled ${this.actionName}${reason ? `: ${reason}` : ''}*`);
     }
 
     private async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {

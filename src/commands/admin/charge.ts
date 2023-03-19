@@ -31,13 +31,13 @@ class Charge extends Transfer {
         return status.success;
     }
 
-    protected async getComment(): Promise<string> {
+    protected async getComment(): Promise<string | undefined> {
         await new EmbedBuilderLocal()
             .setDescription("type a short comment/description ['b' = blank, 'q' = cancel]")
             .setColor(Colors.Orange)
             .send(this.channel);
 
-        const commentResponse = (await getUserResponse(this.channel, this.receiver.getUserId()))?.content || '';
+        const commentResponse = (await getUserResponse(this.channel, this.receiver.getUserId()))?.content;
         if (commentResponse === 'b') return '';
         return commentResponse;
     }
