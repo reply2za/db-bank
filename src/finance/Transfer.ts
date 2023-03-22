@@ -102,7 +102,7 @@ export abstract class Transfer {
         await this.channel.send(`*cancelled ${this.actionName}${reason ? `: ${reason}` : ''}*`);
     }
 
-    private async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
+    protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
         if (!Number.isFinite(transferAmount)) {
             await channel.send('*cancelled transfer: `invalid input`*');
             return false;

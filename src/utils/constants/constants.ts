@@ -32,3 +32,5 @@ export const ADMIN_IDS = Object.freeze(adminIDs);
 export const TRANSACTION_LOG_CH_ID = isDevMode ? '1081761590292009041' : '1062859204177698958';
 export const INFO_LOG_CH_ID = isDevMode ? '1081761590292009041' : '1070859598627610746';
 export const ERROR_LOG_CH_ID = '1064628593772220488';
+
+export const MAX_IOU_COUNT_PER_REQ = 99;

@@ -9,6 +9,7 @@ import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
 import iouTransferVisualizer from '../../../finance/visualizers/transfers/iouTransferVisualizer';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 import { BankUserCopy } from '../../../finance/BankUser/BankUserCopy';
+import { MAX_IOU_COUNT_PER_REQ } from '../../../utils/constants/constants';
 
 exports.run = async (event: MessageEventLocal) => {
     const recipientBankUser = await getUserToTransferTo(event.message, event.args[1], 'transfer IOUs', event.data);
@@ -57,5 +58,18 @@ class TransferIOU extends Transfer {
                 .send(this.channel);
         }
         return false;
+    }
+
+    protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
+        return (
+            (await super.validateAmount(transferAmount, channel)) &&
+            (() => {
+                if (transferAmount > MAX_IOU_COUNT_PER_REQ) {
+                    channel.send(`*cancelled: \`cannot send more than ${MAX_IOU_COUNT_PER_REQ} IOUs\`*`);
+                    return false;
+                }
+                return true;
+            })()
+        );
     }
 }
