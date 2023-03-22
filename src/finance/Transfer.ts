@@ -64,7 +64,11 @@ export abstract class Transfer {
         }
     }
 
-    protected async getAmount() {
+    /**
+     * Prompts the user to enter an amount.
+     * @protected
+     */
+    protected async getAmount(): Promise<string | undefined> {
         const enterAmountMsg = await new EmbedBuilderLocal()
             .setDescription(`enter the amount you would like to ${this.actionName}`)
             .setFooter('or `q` to quit')
