@@ -45,4 +45,10 @@ class Charge extends Transfer {
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {
         return chargeTransferVisualizer.getChargeTransferEmbed(this.sender, this.receiver, amount, comment);
     }
+
+    protected async getAmount(): Promise<string | undefined> {
+        let amt = await super.getAmount();
+        if (amt?.charAt(0) === '$') return amt.replace('$', '');
+        return amt;
+    }
 }

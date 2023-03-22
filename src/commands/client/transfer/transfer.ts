@@ -57,10 +57,8 @@ class MonetaryTransfer extends Transfer {
     }
 
     protected async getAmount(): Promise<string | undefined> {
-        const amount = await super.getAmount();
-        if (amount?.includes('$')) {
-            return amount?.replace('$', '');
-        }
-        return amount;
+        let amt = await super.getAmount();
+        if (amt?.charAt(0) === '$') return amt.replace('$', '');
+        return amt;
     }
 }
