@@ -1,7 +1,7 @@
 import { OriginalBankUser } from '../../BankUser/OriginalBankUser';
 import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
 import images from '../../../utils/constants/images';
-import { roundNumberTwoDecimals } from '../../../utils/numberUtils';
+import { convertToCurrency, roundNumberTwoDecimals } from '../../../utils/numberUtils';
 import { BankUserCopy } from '../../BankUser/BankUserCopy';
 
 export default {
@@ -16,13 +16,13 @@ export default {
             .setThumbnail(images.CHARGE_TRANSFER_IMG)
             .setTitle(`Charge ${sender.getName()}`)
             .setDescription(
-                (amount ? `charging \`$${amount.toFixed(2)}\`` : '*no amount selected*').concat(
+                (amount ? `charging \`${convertToCurrency(amount)}\`` : '*no amount selected*').concat(
                     `${comment ? `\ncomment: ${comment}` : ''}`
                 )
             )
             .setFooter(
-                `sender's balance: $${sender.getBalance().toFixed(2)}${
-                    amount ? ` => ${roundNumberTwoDecimals(sender.getBalance() - amount).toFixed(2)}` : ''
+                `sender's balance: ${convertToCurrency(sender.getBalance())}${
+                    amount ? ` => ${convertToCurrency(roundNumberTwoDecimals(sender.getBalance() - amount))}` : ''
                 }`
             );
     },
@@ -33,7 +33,7 @@ export default {
         comment = ''
     ): EmbedBuilderLocal {
         const description = (comment ? `*${comment}*\n` : '').concat(
-            `amount: $${transferAmount.toFixed(2)}\nyour balance: $${sender.getBalance().toFixed(2)}`
+            `amount: ${convertToCurrency(transferAmount)}\nyour balance: ${convertToCurrency(sender.getBalance())}`
         );
         return new EmbedBuilderLocal()
             .setTitle(`Charged by ${receiverName}`)
@@ -43,7 +43,7 @@ export default {
     },
     getChargeReceiptEmbed(senderName: string, transferAmount: number): EmbedBuilderLocal {
         return new EmbedBuilderLocal()
-            .setDescription(`charged ${senderName} $${transferAmount.toFixed(2)}`)
+            .setDescription(`charged ${senderName} ${convertToCurrency(transferAmount)}`)
             .setColor('Blurple');
     },
 };

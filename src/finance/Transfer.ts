@@ -6,6 +6,7 @@ import reactions from '../utils/constants/reactions';
 import visualizerCommon from './visualizers/visualizerCommon';
 import { BankUserCopy } from './BankUser/BankUserCopy';
 
+const MAX_RETRY_COUNT = 3;
 export abstract class Transfer {
     readonly channel;
     readonly sender;
@@ -30,15 +31,21 @@ export abstract class Transfer {
     async processTransfer(): Promise<void> {
         let transferEmbed = this.getTransferEmbed(0, '');
         const embedMsg = await transferEmbed.send(this.channel);
-        const responseAmt = await this.getAmount();
-        if (!responseAmt || responseAmt.toLowerCase() === 'q') {
-            await this.cancelResponse();
-            embedMsg.deletable && embedMsg.delete();
-            return;
-        }
-        const transferAmount = roundNumberTwoDecimals(Number(responseAmt));
-        const isValid = await this.validateAmount(transferAmount, this.channel);
-        if (!isValid) {
+        let retries = MAX_RETRY_COUNT;
+        let transferAmount;
+        let isValid;
+        do {
+            if (!isValid && retries < MAX_RETRY_COUNT) retries--;
+            const responseAmt = await this.getAmount();
+            if (!responseAmt || responseAmt.toLowerCase() === 'q') {
+                await this.cancelResponse();
+                embedMsg.deletable && embedMsg.delete();
+                return;
+            }
+            transferAmount = roundNumberTwoDecimals(Number(responseAmt));
+            isValid = await this.validateAmount(transferAmount, this.channel);
+        } while (retries > 0 && !isValid);
+        if (!isValid || !transferAmount) {
             embedMsg.deletable && embedMsg.delete();
             return;
         }
@@ -104,11 +111,11 @@ export abstract class Transfer {
 
     protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
         if (!Number.isFinite(transferAmount)) {
-            await channel.send('*cancelled transfer: `invalid input`*');
+            await channel.send('*error: `invalid input`*');
             return false;
         }
         if (transferAmount <= 0) {
-            await channel.send('*cancelled transfer: `amount must be greater than 0`*');
+            await channel.send('*error: `amount must be greater than 0`*');
             return false;
         }
         return true;

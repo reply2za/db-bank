@@ -65,7 +65,7 @@ class TransferIOU extends Transfer {
             (await super.validateAmount(transferAmount, channel)) &&
             (() => {
                 if (transferAmount > MAX_IOU_COUNT_PER_REQ) {
-                    channel.send(`*cancelled: \`cannot send more than ${MAX_IOU_COUNT_PER_REQ} IOUs\`*`);
+                    channel.send(`*error: \`cannot send more than ${MAX_IOU_COUNT_PER_REQ} IOUs\`*`);
                     return false;
                 }
                 return true;

@@ -4,6 +4,7 @@ import { bot } from '../../utils/constants/constants';
 import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import images from '../../utils/constants/images';
 import { BankUserCopy } from '../BankUser/BankUserCopy';
+import { convertToCurrency } from '../../utils/numberUtils';
 
 export default {
     async showBalance(
@@ -24,7 +25,7 @@ export default {
             .setTitle(`${user.getName()}'s Bank`)
             .setColor('Green')
             .setDescription(
-                `\`$${user.getBalance().toFixed(2)}\`\n${
+                `\`${convertToCurrency(user.getBalance())}\`\n${
                     iouDescription.length ? `\n- **Received IOUs** -\n${iouDescription}` : ''
                 }`
             )

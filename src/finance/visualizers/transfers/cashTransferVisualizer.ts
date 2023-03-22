@@ -1,6 +1,6 @@
 import { OriginalBankUser } from '../../BankUser/OriginalBankUser';
 import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
-import { roundNumberTwoDecimals } from '../../../utils/numberUtils';
+import { convertToCurrency, roundNumberTwoDecimals } from '../../../utils/numberUtils';
 import visualizerCommon from '../visualizerCommon';
 import images from '../../../utils/constants/images';
 import { BankUserCopy } from '../../BankUser/BankUserCopy';
@@ -16,13 +16,13 @@ export default {
         return e
             .setTitle(`Transfer to ${receiver.getName()}`)
             .setDescription(
-                (amount ? `sending \`$${amount.toFixed(2)}\`` : '*no amount selected*').concat(
+                (amount ? `sending \`${convertToCurrency(amount)}\`` : '*no amount selected*').concat(
                     `${comment ? `\ncomment: ${comment}` : ''}`
                 )
             )
             .setFooter(
-                `your balance: $${sender.getBalance().toFixed(2)}${
-                    amount ? ` => ${roundNumberTwoDecimals(sender.getBalance() - amount).toFixed(2)}` : ''
+                `your balance: ${convertToCurrency(sender.getBalance())}${
+                    amount ? ` => ${convertToCurrency(roundNumberTwoDecimals(sender.getBalance() - amount))}` : ''
                 }`
             );
     },
@@ -33,7 +33,7 @@ export default {
         comment = ''
     ): EmbedBuilderLocal {
         const description = (comment ? `comment: *${comment}*\n` : '').concat(
-            `amount: $${transferAmount.toFixed(2)}\nyour balance: $${receiver.getBalance().toFixed(2)}`
+            `amount: ${convertToCurrency(transferAmount)}\nyour balance: ${convertToCurrency(receiver.getBalance())}`
         );
         return new EmbedBuilderLocal()
             .setTitle(`${senderName} sent you money`)
@@ -43,7 +43,7 @@ export default {
     },
     getTransferReceiptEmbed(receiverName: string, transferAmount: number): EmbedBuilderLocal {
         return new EmbedBuilderLocal()
-            .setDescription(`sent $${transferAmount.toFixed(2)} to ${receiverName}`)
+            .setDescription(`sent ${convertToCurrency(transferAmount)} to ${receiverName}`)
             .setColor('Blurple');
     },
 };

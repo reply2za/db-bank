@@ -58,7 +58,19 @@ class MonetaryTransfer extends Transfer {
 
     protected async getAmount(): Promise<string | undefined> {
         let amt = await super.getAmount();
-        if (amt?.charAt(0) === '$') return amt.replace('$', '');
+        if (amt) {
+            if (amt.charAt(0) === '$') amt = amt.replace('$', '');
+            amt = amt.replaceAll(',', '');
+        }
         return amt;
+    }
+
+    protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
+        if (!(await super.validateAmount(transferAmount, channel))) return false;
+        if (this.sender.getBalance() < transferAmount) {
+            this.channel.send('error: `balance is too low`');
+            return false;
+        }
+        return true;
     }
 }
