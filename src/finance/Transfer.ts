@@ -57,11 +57,11 @@ export abstract class Transfer {
             embedMsg.react(reactions.X);
             return;
         }
-        if (comment.trim() !== '') {
+        if (comment !== '') {
             transferEmbed = this.getTransferEmbed(transferAmount, comment);
-            await embedMsg.delete();
-            embedMsg = await transferEmbed.send(this.channel);
         }
+        await embedMsg.delete();
+        embedMsg = await transferEmbed.send(this.channel);
         const confirmationResponse = await this.getFinalConfirmation();
         if (confirmationResponse) {
             const txnResponse = await this.approvedTransactionAction(transferAmount, comment);
