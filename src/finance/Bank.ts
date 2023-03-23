@@ -152,14 +152,18 @@ class Bank {
         return matches;
     }
 
-    async redeemIOU(id: string): Promise<boolean> {
+    async redeemIOU(id: string, quantity: number): Promise<boolean> {
         const iouToRedeemIndex = this.#iOUList.findIndex((value) => value.id == id);
         if (!iouToRedeemIndex) {
             return false;
         }
         const iouToRedeem = this.#iOUList[iouToRedeemIndex];
-        if (iouToRedeem.quantity > 1) {
-            this.#iOUList[iouToRedeemIndex] = iouToRedeem.cloneWithNewQuantity(iouToRedeem.quantity - 1);
+        const newQuantity = iouToRedeem.quantity - quantity;
+        if (newQuantity < 0) {
+            return false;
+        }
+        if (newQuantity > 0) {
+            this.#iOUList[iouToRedeemIndex] = iouToRedeem.cloneWithNewQuantity(newQuantity);
         } else {
             this.#iOUList.splice(iouToRedeemIndex, 1);
         }

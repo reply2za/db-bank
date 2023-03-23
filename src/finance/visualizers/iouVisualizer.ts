@@ -55,21 +55,34 @@ export default {
     /**
      * Informs the user that redeemed the IOU that the redemption is complete.
      * @param origIOUSender The name of the user that originally sent the IOU.
+     * @param quantity The number of IOUs being redeemed.
      */
-    iouRedemptionReceipt(origIOUSender: string) {
-        return new EmbedBuilderLocal().setDescription(`redeemed IOU with ${origIOUSender}!`).setColor('Blue');
+    iouRedemptionReceipt(origIOUSender: string, quantity: number) {
+        return new EmbedBuilderLocal()
+            .setDescription(`redeemed ${quantity > 1 ? `${quantity} IOUs` : 'IOU'} with ${origIOUSender}!`)
+            .setColor('Blue');
     },
     /**
      * Notifies the original IOU sender that their IOU has been redeemed.
      * @param iouRecipientName The name user that redeemed the IOU.
      * @param iouComment The reason for the IOU.
+     * @param quantity The number of IOUs that are being redeemed.
      */
-    iouRedeemedNotifEmbed(iouRecipientName: string, iouComment?: string) {
+    iouRedeemedNotifEmbed(iouRecipientName: string, iouComment = '', quantity: number) {
+        let title;
+        let description;
+        if (quantity > 1) {
+            title = `${iouRecipientName} redeemed ${quantity} IOUs`;
+            description = `${quantity} IOUs that you gave to ${iouRecipientName} have been redeemed.\nCongratulations!`;
+        } else {
+            title = `${iouRecipientName} redeemed an IOU`;
+            description = `An IOU that you gave to ${iouRecipientName} has been redeemed.\nCongratulations!`;
+        }
         return new EmbedBuilderLocal()
-            .setTitle(`${iouRecipientName} redeemed your IOU`)
+            .setTitle(title)
             .setColor('Aqua')
             .setThumbnail(images.REDEEMED_IOU_NOTIF_IMG)
-            .setDescription(`The IOU you gave to ${iouRecipientName} has been redeemed\nCongratulations!`)
+            .setDescription(description)
             .setFooter(`IOU reason: ${iouComment || 'none'}`);
     },
 };

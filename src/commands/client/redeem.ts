@@ -6,6 +6,7 @@ import { bot } from '../../utils/constants/constants';
 import { EventDataNames, MessageEventLocal } from '../../utils/types';
 import Logger from '../../utils/Logger';
 import visualizerCommon from '../../finance/visualizers/visualizerCommon';
+import { TextChannel } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.getUserId());
@@ -31,27 +32,68 @@ exports.run = async (event: MessageEventLocal) => {
     }
     await iouVisualizer.getRedeemableIOUEmbed(ious, iouIndex).edit(sentIOUEmbed);
     const iou = ious[iouIndex];
-    await visualizerCommon.getConfirmationEmbed('1 IOU redemption').send(event.message.channel);
+    // the number of IOUs to redeem
+    let quantity = 1;
+    if (iou.quantity > 1) {
+        quantity = await getIOURedeemQty(<TextChannel>event.message.channel, iou.quantity, event.bankUser.getUserId());
+        if (quantity < 1) return;
+    }
+    // whether to append an s to text based on the IOU quantity
+    const appendS = quantity > 1 ? 's' : '';
+    await visualizerCommon.getConfirmationEmbed(`redemption of ${quantity} IOU${appendS}`).send(event.message.channel);
     const response = (await getUserResponse(event.message.channel, event.bankUser.getUserId()))?.content;
     if (response?.toLowerCase() === 'yes') {
-        const isSuccessful = await bank.redeemIOU(iou.id);
+        const isSuccessful = await bank.redeemIOU(iou.id, quantity);
         if (isSuccessful) {
             const iouSender = await bot.users.fetch(iou.sender.id);
-            await iouVisualizer.iouRedemptionReceipt(iou.sender.name).send(event.message.channel);
+            await iouVisualizer.iouRedemptionReceipt(iou.sender.name, quantity).send(event.message.channel);
             if (iouSender) {
-                const iouRedeemedNotifEmbed = iouVisualizer.iouRedeemedNotifEmbed(iou.receiver.name, iou.comment);
+                const iouRedeemedNotifEmbed = iouVisualizer.iouRedeemedNotifEmbed(
+                    iou.receiver.name,
+                    iou.comment,
+                    quantity
+                );
                 await iouSender.send({
                     embeds: [iouRedeemedNotifEmbed.build()],
                 });
                 await Logger.transactionLog(
-                    `[iou redemption] ${iou.receiver.name} redeemed an IOU from ${iou.sender.name} \n` +
+                    `[iou redemption] ${iou.receiver.name} redeemed ${quantity} IOU${appendS} from ${iou.sender.name} \n` +
                         `IOU reason: ${iou.comment || 'N/A'}`
                 );
             } else {
                 Logger.errorLog(new Error(`could not find iou sender with the id ${iou.sender.id}`));
             }
+        } else {
+            event.message.channel.send('*error: could not complete redemption*');
         }
     } else {
         event.message.channel.send('*cancelled*');
     }
 };
+
+/**
+ * Asks the user for the number of IOUs to redeem.
+ * @param channel The channel to prompt the user in.
+ * @param qty The available IOU quantity.
+ * @param userId The id of the user to ask.
+ * @returns The number of IOUs to redeem, or -1 if unsuccessful.
+ */
+async function getIOURedeemQty(channel: TextChannel, qty: number, userId: string): Promise<number> {
+    let quantity;
+    await channel.send(`*There are ${qty} of these IOUs, how many would you like to redeem?*`);
+    const response = (await getUserResponse(channel, userId))?.content;
+    if (!response) {
+        await channel.send('*cancelled: no response provided*');
+        return -1;
+    }
+    quantity = parseInt(response);
+    if (!quantity || quantity < 1) {
+        await channel.send('*cancelled: invalid response*');
+        return -1;
+    }
+    if (quantity > qty) {
+        await channel.send('*cancelled: given value is greater than the IOU quantity*');
+        return -1;
+    }
+    return quantity;
+}
