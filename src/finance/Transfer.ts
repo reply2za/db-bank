@@ -64,7 +64,7 @@ export abstract class Transfer {
      * Process of getting the amount.
      * @returns The transfer amount if successful or undefined if unsuccessful.
      */
-    async getAmount(): Promise<number | undefined> {
+    protected async getAmount(): Promise<number | undefined> {
         let retries = MAX_RETRY_COUNT;
         let transferAmount;
         let isValid;
