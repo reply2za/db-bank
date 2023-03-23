@@ -14,7 +14,7 @@ exports.run = async (event: MessageEventLocal) => {
         bank.getUserIOUs(event.bankUser.getUserId())
     );
     const reactionsList = [reactions.MONEY, reactions.TICKET];
-    const userIOUs = bank.getUserIOUs(event.message.author.id);
+    const userIOUs = bank.getUserIOUs(event.bankUser.getUserId());
     if (userIOUs.length) reactionsList.push(reactions.PAGE_C);
     const balanceReactionCallback = async (reaction: MessageReaction) => {
         reaction.users.remove(event.message.author).catch();
