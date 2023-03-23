@@ -31,21 +31,9 @@ export abstract class Transfer {
     async processTransfer(): Promise<void> {
         let transferEmbed = this.getTransferEmbed(0, '');
         let embedMsg = await transferEmbed.send(this.channel);
-        let retries = MAX_RETRY_COUNT;
-        let transferAmount;
-        let isValid;
-        do {
-            const responseAmt = await this.getAmount();
-            if (!responseAmt || responseAmt.toLowerCase() === 'q') {
-                await this.cancelResponse();
-                embedMsg.deletable && embedMsg.delete();
-                return;
-            }
-            transferAmount = roundNumberTwoDecimals(Number(responseAmt));
-            isValid = await this.validateAmount(transferAmount, this.channel);
-            retries--;
-        } while (retries > 0 && !isValid);
-        if (!isValid || !transferAmount) {
+        let transferAmount = await this.getAmount();
+        if (!transferAmount) {
+            await this.cancelResponse();
             embedMsg.deletable && embedMsg.delete();
             return;
         }
@@ -73,10 +61,28 @@ export abstract class Transfer {
     }
 
     /**
+     * Process of getting the amount.
+     * @returns The transfer amount if successful or undefined if unsuccessful.
+     */
+    async getAmount(): Promise<number | undefined> {
+        let retries = MAX_RETRY_COUNT;
+        let transferAmount;
+        let isValid;
+        do {
+            const responseAmt = await this.promptForAmount();
+            if (!responseAmt || responseAmt.toLowerCase() === 'q') return;
+            transferAmount = roundNumberTwoDecimals(Number(responseAmt));
+            isValid = await this.validateAmount(transferAmount, this.channel);
+            retries--;
+        } while (retries > 0 && !isValid);
+        return transferAmount;
+    }
+
+    /**
      * Prompts the user to enter an amount.
      * @protected
      */
-    protected async getAmount(): Promise<string | undefined> {
+    protected async promptForAmount(): Promise<string | undefined> {
         const enterAmountMsg = await new EmbedBuilderLocal()
             .setDescription(`enter the amount you would like to ${this.actionName}`)
             .setFooter('or `q` to quit')

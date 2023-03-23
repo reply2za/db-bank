@@ -46,8 +46,8 @@ class Charge extends Transfer {
         return chargeTransferVisualizer.getChargeTransferEmbed(this.sender, this.receiver, amount, comment);
     }
 
-    protected async getAmount(): Promise<string | undefined> {
-        let amt = await super.getAmount();
+    protected async promptForAmount(): Promise<string | undefined> {
+        let amt = await super.promptForAmount();
         if (amt) {
             if (amt.charAt(0) === '$') amt = amt.replace('$', '');
             amt = amt.replaceAll(',', '');
