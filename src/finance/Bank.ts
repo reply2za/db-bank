@@ -154,7 +154,7 @@ class Bank {
 
     async redeemIOU(id: string, quantity: number): Promise<boolean> {
         const iouToRedeemIndex = this.#iOUList.findIndex((value) => value.id == id);
-        if (!iouToRedeemIndex) {
+        if (iouToRedeemIndex === undefined) {
             return false;
         }
         const iouToRedeem = this.#iOUList[iouToRedeemIndex];
