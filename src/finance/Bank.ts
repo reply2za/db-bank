@@ -11,6 +11,7 @@ import cashTransferVisualizer from './visualizers/transfers/cashTransferVisualiz
 import visualizerCommon from './visualizers/visualizerCommon';
 import { BankUserCopy } from './BankUser/BankUserCopy';
 import { MAX_IOU_COUNT_PER_REQ } from '../utils/constants/constants';
+import { ABankUser } from './BankUser/ABankUser';
 
 class Bank {
     #users: Map<string, OriginalBankUser> = new Map();
@@ -141,11 +142,13 @@ class Bank {
         }
     }
 
-    async findUser(name: string): Promise<Array<BankUserCopy>> {
+    findUser(name: string): Array<BankUserCopy> {
         const matches = [];
+        const addDiscriminator = (user: ABankUser) =>
+            name.includes('#') ? `#${user.getDiscordUser().discriminator}` : '';
         for (const [, value] of this.#users) {
-            await value.getDiscordUser().fetch();
-            if (leven(value.getName().toLowerCase(), name.toLowerCase()) < 2) {
+            value.getDiscordUser().fetch().catch();
+            if (leven(`${value.getName().toLowerCase()}${addDiscriminator(value)}`, name.toLowerCase()) < 2) {
                 matches.push(value);
             }
         }
