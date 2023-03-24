@@ -1,7 +1,7 @@
 import { OriginalBankUser } from './BankUser/OriginalBankUser';
 import { IOUTicket } from './IOUTicket';
 import { TextBasedChannel, User, UserManager } from 'discord.js';
-import { roundNumberTwoDecimals } from '../utils/numberUtils';
+import { convertToCurrency, roundNumberTwoDecimals } from '../utils/numberUtils';
 import leven from 'leven';
 import { localStorage } from '../storage/LocalStorage';
 import Logger from '../utils/Logger';
@@ -223,11 +223,12 @@ class Bank {
                     .send(channel);
             }
             await Logger.transactionLog(
-                `[${transferType}] $${transferAmount} from ${sender.getDBName()} to ${receiver.getDBName()}\n` +
-                    `new balances:\n` +
-                    `${sender.getDBName()}: ${sender.getBalance()}\n` +
-                    `${receiver.getDBName()}: ${receiver.getBalance()}\n` +
-                    `comment: ${comment}`
+                `[${transferType}] (${sender.getUserId()} -> ${receiver.getUserId()})\n` +
+                    `$${transferAmount} from ${sender.getDBName()} to ${receiver.getDBName()}\n` +
+                    `${sender.getDBName()}: ${convertToCurrency(sender.getBalance())}\n` +
+                    `${receiver.getDBName()}: ${convertToCurrency(receiver.getBalance())}\n` +
+                    `comment: ${comment}\n` +
+                    `----------------------------------------`
             );
         } else {
             await visualizerCommon

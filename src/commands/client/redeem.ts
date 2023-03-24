@@ -56,9 +56,13 @@ exports.run = async (event: MessageEventLocal) => {
                 await iouSender.send({
                     embeds: [iouRedeemedNotifEmbed.build()],
                 });
+                const senderName = bank.getUserCopy(iou.sender.id)?.getDBName() || iou.sender.name;
+                const receiverName = bank.getUserCopy(iou.receiver.id)?.getDBName() || iou.receiver.name;
                 await Logger.transactionLog(
-                    `[iou redemption] ${iou.receiver.name} redeemed ${quantity} IOU${appendS} from ${iou.sender.name} \n` +
-                        `IOU reason: ${iou.comment || 'N/A'}`
+                    `[iou redemption] (${iou.sender.id} -> ${iou.receiver.id})\n` +
+                        `${receiverName} redeemed ${quantity} IOU${appendS} from ${senderName} \n` +
+                        `IOU reason: ${iou.comment || 'N/A'}\n` +
+                        `----------------------------------------`
                 );
             } else {
                 Logger.errorLog(new Error(`could not find iou sender with the id ${iou.sender.id}`));
