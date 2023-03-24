@@ -26,7 +26,7 @@ export abstract class ABankUser {
     }
 
     getName(): string {
-        return this.name;
+        return this.discordUser.username;
     }
 
     getSerializableData() {

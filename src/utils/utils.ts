@@ -80,10 +80,17 @@ export async function getUserToTransferTo(
         recipientBankUser = bank.getUserCopy(recipientID);
     } else if (name) {
         const matchingUsers = bank.findUser(name);
+        if (
+            matchingUsers.length > 1 &&
+            matchingUsers[0].getName().toLowerCase() === matchingUsers[1].getName().toLowerCase()
+        ) {
+            message.channel.send('*multiple users have that name, use @ mentions instead*');
+            return;
+        }
         recipientBankUser = matchingUsers[0];
     }
     if (!recipientBankUser) {
-        message.channel.send('*could not find user*');
+        message.channel.send('*could not find user, try using @ mentions instead*');
         return;
     }
     if (recipientBankUser.getUserId() === message.author.id && !ADMIN_IDS.includes(`${message.author.id} `)) {
