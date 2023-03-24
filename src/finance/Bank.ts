@@ -141,9 +141,10 @@ class Bank {
         }
     }
 
-    findUser(name: string): Array<BankUserCopy> {
+    async findUser(name: string): Promise<Array<BankUserCopy>> {
         const matches = [];
         for (const [, value] of this.#users) {
+            await value.getDiscordUser().fetch();
             if (leven(value.getName().toLowerCase(), name.toLowerCase()) < 2) {
                 matches.push(value);
             }

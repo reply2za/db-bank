@@ -79,7 +79,7 @@ export async function getUserToTransferTo(
     if (recipientID) {
         recipientBankUser = bank.getUserCopy(recipientID);
     } else if (name) {
-        const matchingUsers = bank.findUser(name);
+        const matchingUsers = await bank.findUser(name);
         if (
             matchingUsers.length > 1 &&
             matchingUsers[0].getName().toLowerCase() === matchingUsers[1].getName().toLowerCase()
