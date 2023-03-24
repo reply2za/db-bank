@@ -82,7 +82,7 @@ export async function getUserToTransferTo(
         const matchingUsers = bank.findUser(name);
         if (
             matchingUsers.length > 1 &&
-            matchingUsers[0].getName().toLowerCase() === matchingUsers[1].getName().toLowerCase()
+            matchingUsers[0].getUsername().toLowerCase() === matchingUsers[1].getUsername().toLowerCase()
         ) {
             message.channel.send('*multiple users have that name, use @ mentions instead*');
             return;
@@ -90,7 +90,8 @@ export async function getUserToTransferTo(
         recipientBankUser = matchingUsers[0];
     }
     if (!recipientBankUser) {
-        message.channel.send('*could not find user, try using @ mentions instead*');
+        const displayName = name.length < 30 ? name : `${name.substring(0, 30)}...`;
+        message.channel.send(`*could not find user **${displayName}**, try using @ mentions instead*`);
         return;
     }
     if (recipientBankUser.getUserId() === message.author.id && !ADMIN_IDS.includes(`${message.author.id} `)) {

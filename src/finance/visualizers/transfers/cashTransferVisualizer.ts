@@ -14,7 +14,7 @@ export default {
     ): EmbedBuilderLocal {
         const e = visualizerCommon.getCoreTransferEmbed();
         return e
-            .setTitle(`Transfer to ${receiver.getName()}`)
+            .setTitle(`Transfer to ${receiver.getUsername()}`)
             .setDescription(
                 (amount ? `sending \`${convertToCurrency(amount)}\`` : '*no amount selected*').concat(
                     `${comment ? `\ncomment: ${comment}` : ''}`

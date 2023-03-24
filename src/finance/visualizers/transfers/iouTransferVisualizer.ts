@@ -12,7 +12,7 @@ export default {
     ): EmbedBuilderLocal {
         return visualizerCommon
             .getCoreTransferEmbed()
-            .setTitle(`Transfer IOU to ${receiver.getName()}`)
+            .setTitle(`Transfer IOU to ${receiver.getUsername()}`)
             .setDescription(amount ? `sending ${amount} IOU${amount > 1 ? 's' : ''}` : '*no amount selected*')
             .setFooter(`${comment ? `comment: ${comment}` : ' '}`);
     },

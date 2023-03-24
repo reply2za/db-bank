@@ -43,8 +43,8 @@ class Bank {
         const date = new Date();
         const iou = new IOUTicket(
             null,
-            { id: sender.getUserId(), name: sender.getName() },
-            { id: receiver.getUserId(), name: receiver.getName() },
+            { id: sender.getUserId(), name: sender.getUsername() },
+            { id: receiver.getUserId(), name: receiver.getUsername() },
             `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().substring(2)}`,
             comment,
             quantity
@@ -100,23 +100,23 @@ class Bank {
         return this.#iOUList.filter((value: IOUTicket) => value.sender.id === id);
     }
 
-    getAllIOUs() {
+    getAllIOUs(): IOUTicket[] {
         return this.#iOUList;
     }
 
     addNewUser(author: User, username: string, balance: number): BankUserCopy {
         const bankUser = new OriginalBankUser(author, username, balance);
-        if (this.#usernames.has(bankUser.getName())) {
+        if (this.#usernames.has(bankUser.getUsername())) {
             throw new Error('name already exists');
         }
-        this.#usernames.add(bankUser.getName());
+        this.#usernames.add(bankUser.getUsername());
         this.#users.set(bankUser.getUserId(), bankUser);
         return bankUser.getBankUserCopy();
     }
 
     serializeData() {
         const userData = this.getAllUsers().map((bankUser) => bankUser.getSerializableData());
-        const iouData = this.getAllIOUs();
+        const iouData = this.getAllIOUs().map((iou) => iou.getSerializableData());
         const serializedData = {
             bank: {
                 users: userData,
@@ -148,11 +148,11 @@ class Bank {
             name.includes('#') ? `#${user.getDiscordUser().discriminator}` : '';
         for (const [, value] of this.#users) {
             value.getDiscordUser().fetch().catch();
-            if (leven(`${value.getName().toLowerCase()}${addDiscriminator(value)}`, name.toLowerCase()) < 2) {
+            if (leven(`${value.getUsername().toLowerCase()}${addDiscriminator(value)}`, name.toLowerCase()) < 2) {
                 matches.push(value);
             }
         }
-        matches.sort((a: OriginalBankUser, b: OriginalBankUser) => a.getName().length - b.getName().length);
+        matches.sort((a: OriginalBankUser, b: OriginalBankUser) => a.getUsername().length - b.getUsername().length);
         return matches;
     }
 
@@ -203,26 +203,30 @@ class Bank {
                 await sender.getDiscordUser().send({
                     embeds: [
                         chargeTransferVisualizer
-                            .getChargeNotificationEmbed(sender, receiver.getName(), transferAmount, comment)
+                            .getChargeNotificationEmbed(sender, receiver.getUsername(), transferAmount, comment)
                             .build(),
                     ],
                 });
-                await chargeTransferVisualizer.getChargeReceiptEmbed(sender.getName(), transferAmount).send(channel);
+                await chargeTransferVisualizer
+                    .getChargeReceiptEmbed(sender.getUsername(), transferAmount)
+                    .send(channel);
             } else {
                 await receiver.getDiscordUser().send({
                     embeds: [
                         cashTransferVisualizer
-                            .getTransferNotificationEmbed(sender.getName(), receiver, transferAmount, comment)
+                            .getTransferNotificationEmbed(sender.getUsername(), receiver, transferAmount, comment)
                             .build(),
                     ],
                 });
-                await cashTransferVisualizer.getTransferReceiptEmbed(receiver.getName(), transferAmount).send(channel);
+                await cashTransferVisualizer
+                    .getTransferReceiptEmbed(receiver.getUsername(), transferAmount)
+                    .send(channel);
             }
             await Logger.transactionLog(
-                `[${transferType}] $${transferAmount} from ${sender.getName()} to ${receiver.getName()}\n` +
+                `[${transferType}] $${transferAmount} from ${sender.getDBName()} to ${receiver.getDBName()}\n` +
                     `new balances:\n` +
-                    `${sender.getName()}: ${sender.getBalance()}\n` +
-                    `${receiver.getName()}: ${receiver.getBalance()}\n` +
+                    `${sender.getDBName()}: ${sender.getBalance()}\n` +
+                    `${receiver.getDBName()}: ${receiver.getBalance()}\n` +
                     `comment: ${comment}`
             );
         } else {

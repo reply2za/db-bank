@@ -25,8 +25,19 @@ export abstract class ABankUser {
         return this.discordUser;
     }
 
-    getName(): string {
+    /**
+     * The discord username.
+     */
+    getUsername(): string {
         return this.discordUser.username;
+    }
+
+    /**
+     * A name that should be used for the database / logs.
+     * This may not be their latest discord username.
+     */
+    getDBName(): string {
+        return this.name;
     }
 
     getSerializableData() {

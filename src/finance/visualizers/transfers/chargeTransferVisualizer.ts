@@ -14,7 +14,7 @@ export default {
         return new EmbedBuilderLocal()
             .setColor('DarkVividPink')
             .setThumbnail(images.CHARGE_TRANSFER_IMG)
-            .setTitle(`Charge ${sender.getName()}`)
+            .setTitle(`Charge ${sender.getUsername()}`)
             .setDescription(
                 (amount ? `charging \`${convertToCurrency(amount)}\`` : '*no amount selected*').concat(
                     `${comment ? `\ncomment: ${comment}` : ''}`

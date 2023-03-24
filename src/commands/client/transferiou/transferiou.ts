@@ -39,17 +39,22 @@ class TransferIOU extends Transfer {
             await this.receiver.getDiscordUser().send({
                 embeds: [
                     iouTransferVisualizer
-                        .getIOUTransferNotificationEmbed(this.sender.getName(), this.receiver, transferAmount, comment)
+                        .getIOUTransferNotificationEmbed(
+                            this.sender.getUsername(),
+                            this.receiver,
+                            transferAmount,
+                            comment
+                        )
                         .build(),
                 ],
             });
             await Logger.transactionLog(
                 `[IOU transfer] ${transferAmount} IOU${
                     transferAmount === 1 ? '' : 's'
-                } from ${this.sender.getName()} to ${this.receiver.getName()}\n` + `comment: ${comment || 'N/A'}`
+                } from ${this.sender.getDBName()} to ${this.receiver.getDBName()}\n` + `comment: ${comment || 'N/A'}`
             );
             await iouTransferVisualizer
-                .getIOUTransferReceiptEmbed(this.receiver.getName(), transferAmount)
+                .getIOUTransferReceiptEmbed(this.receiver.getUsername(), transferAmount)
                 .send(this.channel);
             return true;
         } else {

@@ -22,7 +22,7 @@ export default {
             iouDescription += `${sender.username}: ${value}\n`;
         }
         return new EmbedBuilderLocal()
-            .setTitle(`${user.getName()}'s Bank`)
+            .setTitle(`${user.getUsername()}'s Bank`)
             .setColor('Green')
             .setDescription(
                 `\`${convertToCurrency(user.getBalance())}\`\n${

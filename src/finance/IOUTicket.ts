@@ -35,6 +35,17 @@ class IOUTicket {
     cloneWithNewQuantity(quantity: number) {
         return new IOUTicket(this.id, this.sender, this.receiver, this.date, this.comment, quantity);
     }
+
+    getSerializableData() {
+        return {
+            id: this.id,
+            sender: this.sender,
+            receiver: this.receiver,
+            date: this.date,
+            comment: this.comment,
+            quantity: this.quantity,
+        };
+    }
 }
 
 export { IOUTicket };

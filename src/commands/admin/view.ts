@@ -6,7 +6,7 @@ exports.run = async (event: MessageEventLocal) => {
     let finalString = '';
     bank.getAllUsers().forEach((user) => {
         if (user.getBalance() > 0) {
-            finalString += `**${user.getName()}**: $${user.getBalance()}\n`;
+            finalString += `**${user.getUsername()}**: $${user.getBalance()}\n`;
         }
     });
     finalString += '\n---IOUs---\n';
