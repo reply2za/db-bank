@@ -24,15 +24,11 @@ export default {
             descriptionText += '\n';
             i++;
         }
-        const embed = new EmbedBuilderLocal()
+        return new EmbedBuilderLocal()
             .setTitle(`Your redeemable IOU tickets`)
             .setDescription(descriptionText)
             .setColor('Blue')
             .setThumbnail(images.REDEEM_IOU_IMG);
-        if (selectedIOU && selectedIOU.quantity > 1) {
-            embed.setFooter(`this will use 1 of your ${selectedIOU.quantity} IOUs in this pack`);
-        }
-        return embed;
     },
     /**
      * Shows sent IOUs.
