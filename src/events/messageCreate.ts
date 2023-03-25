@@ -16,8 +16,7 @@ module.exports = async (message: Message) => {
     const statement = args[0].substring(1).toLowerCase();
     const command = commandHandler.getCommand(statement, message.author.id);
     if (!command) return;
-    let bankUser;
-    bankUser = bank.getUserCopy(message.author.id);
+    let bankUser = bank.getUserCopy(message.author.id);
     if (!bankUser) {
         if (message.author.bot) return;
         if (message.content.toLowerCase() !== `${PREFIX}adduser`) return;
