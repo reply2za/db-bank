@@ -71,12 +71,20 @@ class CommandHandler {
      * @param event
      */
     async execute(event: MessageEventLocal) {
-        if (!processManager.getState() && !MULTI_PROCESS_CMDS.includes(event.statement)) return;
-        if (isAdmin(event.message.author.id)) {
-            const cmdToRun = this.adminCommands.get(event.statement) || this.clientCommands.get(event.statement);
-            await cmdToRun?.run(event);
+        await this.getCommand(event.statement, event.message.author.id)?.run(event);
+    }
+
+    /**
+     * Returns the command method for the given command name.
+     * @param statement The command name.
+     * @param authorId The id of the user who sent the command.
+     */
+    getCommand(statement: string, authorId: string): { run: (event: MessageEventLocal) => Promise<void> } | undefined {
+        if (!processManager.getState() && !MULTI_PROCESS_CMDS.includes(statement)) return;
+        if (isAdmin(authorId)) {
+            return this.adminCommands.get(statement) || this.clientCommands.get(statement);
         } else {
-            await this.clientCommands.get(event.statement)?.run(event);
+            return this.clientCommands.get(statement);
         }
     }
 }
