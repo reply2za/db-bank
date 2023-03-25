@@ -11,6 +11,11 @@ module.exports = async (message: Message) => {
     const msgPrefix = message.content.substring(0, PREFIX.length);
     if (msgPrefix !== PREFIX) return;
     if (isDevMode && !isAdmin(message.author.id)) return;
+    const args = message.content.replace(/\s+/g, ' ').split(' ');
+    // the command name, removes the prefix and any args
+    const statement = args[0].substring(1).toLowerCase();
+    const command = commandHandler.getCommand(statement, message.author.id);
+    if (!command) return;
     let bankUser;
     bankUser = bank.getUserCopy(message.author.id);
     if (!bankUser) {
@@ -29,9 +34,6 @@ module.exports = async (message: Message) => {
             return;
         }
     }
-    const args = message.content.replace(/\s+/g, ' ').split(' ');
-    // the command name, removes the prefix and any args
-    const statement = args[0].substring(1).toLowerCase();
     const event: MessageEventLocal = {
         statement,
         message,
@@ -40,5 +42,7 @@ module.exports = async (message: Message) => {
         bankUser,
         data: new Map(),
     };
-    commandHandler.execute(event).catch((error) => Logger.errorLog(error));
+    command.run(event).catch((e) => {
+        Logger.errorLog(e);
+    });
 };
