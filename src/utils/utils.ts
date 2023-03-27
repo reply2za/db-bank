@@ -155,9 +155,9 @@ export async function fixConnection(token: string): Promise<boolean> {
     let waitTimeMS = 10000;
     const retryText = (time: number) => `retrying in ${time / 1000} seconds...`;
     console.log(`no connection: ${retryText(waitTimeMS)}`);
-    let retries = 3;
+    let retries = 0;
     const connect = async () => {
-        waitTimeMS += 10000;
+        waitTimeMS *= 2;
         console.log('connecting...');
         try {
             await bot.login(token);
@@ -165,8 +165,9 @@ export async function fixConnection(token: string): Promise<boolean> {
             return true;
         } catch (e) {
             console.log(`connection failed.\n${retryText(waitTimeMS)}`);
-            retries--;
-            if (retries < 1) {
+            retries++;
+            // if the wait time is greater than 10 minutes, then exit
+            if (waitTimeMS > 60_000 * 10) {
                 console.log(`failed to connect after ${retries} tries. exiting...`);
                 process.exit(1);
             }
