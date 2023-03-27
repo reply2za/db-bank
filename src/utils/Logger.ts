@@ -2,10 +2,10 @@ import { bot, ERROR_LOG_CH_ID, INFO_LOG_CH_ID, isDevMode, TRANSACTION_LOG_CH_ID 
 import { TextChannel } from 'discord.js';
 
 export default class Logger {
-    static errorLog(error: Error) {
-        console.log(error);
+    static errorLog(error: Error, additionalInfo = '[ERROR]') {
+        console.log(additionalInfo, error);
         bot.channels.fetch(ERROR_LOG_CH_ID).then((channel) => {
-            error.stack && (<TextChannel>channel)?.send(error.stack);
+            error.stack && (<TextChannel>channel)?.send(`${additionalInfo} ${error.stack}`);
         });
     }
 
