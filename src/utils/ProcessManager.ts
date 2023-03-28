@@ -1,8 +1,8 @@
 import Logger from './Logger';
+import { bot, isDevMode } from './constants/constants';
 
 const token = process.env.CLIENT_TOKEN?.replace(/\\n/gm, '\n');
 const version = require('../../package.json').version;
-import { bot, isDevMode } from './constants/constants';
 
 if (!token) {
     throw new Error('missing params within .env');

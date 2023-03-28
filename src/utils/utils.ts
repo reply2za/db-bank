@@ -9,7 +9,7 @@ import {
     User,
 } from 'discord.js';
 import { bank } from '../finance/Bank';
-import { ADMIN_IDS, bot, isDevMode } from './constants/constants';
+import { ADMIN_IDS, isDevMode } from './constants/constants';
 import { EventDataNames } from './types';
 import { BankUserCopy } from '../finance/BankUser/BankUserCopy';
 

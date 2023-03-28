@@ -1,6 +1,6 @@
 import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js';
 import { IOUTicket } from '../IOUTicket';
-import { bot, isDevMode } from '../../utils/constants/constants';
+import { bot } from '../../utils/constants/constants';
 import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import images from '../../utils/constants/images';
 import { BankUserCopy } from '../BankUser/BankUserCopy';
