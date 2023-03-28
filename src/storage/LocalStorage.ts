@@ -1,22 +1,20 @@
 import fs from 'fs';
-import { bot, isDevMode } from '../utils/constants/constants';
+import { bot, DATA_FILE, isDevMode } from '../utils/constants/constants';
 import { Message, TextChannel } from 'discord.js';
 
 class LocalStorage {
-    FILE_NAME = 'localData.txt';
-
     async #getDataMsg(): Promise<Message | undefined> {
         const channel = await bot.channels.fetch('1065729072287715329');
         return (<TextChannel>channel)?.messages.fetch('1065733201370288138');
     }
 
     async retrieveData() {
-        return fs.readFileSync(this.FILE_NAME).toString();
+        return fs.readFileSync(DATA_FILE).toString();
     }
 
     async saveData(serializedData: string) {
         try {
-            fs.writeFileSync(this.FILE_NAME, serializedData);
+            fs.writeFileSync(DATA_FILE, serializedData);
         } catch (e) {}
         if (!isDevMode) {
             const message = await this.#getDataMsg();
@@ -25,8 +23,8 @@ class LocalStorage {
                     content: `updated: ${new Date().toString()}`,
                     files: [
                         {
-                            attachment: './localData.txt',
-                            name: 'localData.txt',
+                            attachment: `./${DATA_FILE}`,
+                            name: DATA_FILE,
                             description: 'db-bank data',
                         },
                     ],

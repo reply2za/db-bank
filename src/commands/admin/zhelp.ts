@@ -1,5 +1,6 @@
 import { MessageEventLocal } from '../../utils/types';
 import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
+import { DATA_FILE } from '../../utils/constants/constants';
 
 exports.run = async (event: MessageEventLocal) => {
     await new EmbedBuilderLocal()
@@ -12,7 +13,7 @@ exports.run = async (event: MessageEventLocal) => {
 **process commands**
 \`boot\` - see all processes
 \`update\` - update the process
-\`processdata [file.txt]\` - update a process's localData.txt
+\`processdata [file.txt]\` - update a process's ${DATA_FILE}
 \`shutdown\` - kill the process & remove it from pm2`
         )
         .send(event.message.channel);
