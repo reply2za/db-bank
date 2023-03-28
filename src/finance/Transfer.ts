@@ -75,6 +75,7 @@ export abstract class Transfer {
             isValid = await this.validateAmount(transferAmount, this.channel);
             retries--;
         } while (retries > 0 && !isValid);
+        if (!isValid) return;
         return transferAmount;
     }
 
