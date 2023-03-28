@@ -147,37 +147,3 @@ export async function attachReactionToMessage(
 export function isAdmin(id: string): boolean {
     return ADMIN_IDS.includes(`${id} `);
 }
-
-/**
- * Assuming that there was a connection error. Tries to reconnect.
- */
-export async function fixConnection(token: string): Promise<boolean> {
-    let waitTimeMS = 10000;
-    const retryText = (time: number) => `retrying in ${time / 1000} seconds...`;
-    console.log(`no connection: ${retryText(waitTimeMS)}`);
-    let retries = 0;
-    const connect = async () => {
-        waitTimeMS *= 2;
-        console.log('connecting...');
-        try {
-            await bot.login(token);
-            console.log('connected.');
-            return true;
-        } catch (e) {
-            console.log(`connection failed.\n${retryText(waitTimeMS)}`);
-            retries++;
-            // if the wait time is greater than 10 minutes, then exit
-            if (waitTimeMS > 60_000 * 10) {
-                console.log(`failed to connect after ${retries} tries. exiting...`);
-                process.exit(1);
-            }
-        }
-        return false;
-    };
-    for (let i = 0; i < retries; i++) {
-        await new Promise((resolve) => setTimeout(resolve, waitTimeMS));
-        const res = await connect();
-        if (res) return true;
-    }
-    return false;
-}

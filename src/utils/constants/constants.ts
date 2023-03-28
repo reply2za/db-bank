@@ -19,6 +19,8 @@ export const bot: Client = new Client({
 
 export const isDevMode = process.argv.includes('--dev');
 
+export const HARDWARE_TAG = process.env.HARDWARE_TAG?.replace(/\\n/gm, '\n') || `unnamed${process.pid.toString()[0]}`;
+
 let adminIDs = ['443150640823271436 '];
 if (isDevMode) {
     adminIDs.push('799524729173442620 ');
