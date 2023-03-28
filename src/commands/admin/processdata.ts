@@ -3,8 +3,8 @@ import { bank } from '../../finance/Bank';
 import { bot } from '../../utils/constants/constants';
 import { localStorage } from '../../storage/LocalStorage';
 import { Message } from 'discord.js';
-import request from 'request';
 import fs from 'fs';
+import axios from 'axios';
 
 exports.run = async (event: MessageEventLocal) => {
     const success = await processDataFile(event.message);
@@ -23,20 +23,15 @@ exports.run = async (event: MessageEventLocal) => {
  * @param message The message containing the file.
  */
 async function processDataFile(message: Message): Promise<boolean> {
-    // sets the .env file
-    return new Promise((res) => {
-        if (!message.attachments?.first() || !message.attachments.first()!.name?.includes('.txt')) {
-            res(false);
-            return false;
-        } else {
-            request
-                .get(message.attachments.first()!.url)
-                .on('error', console.error)
-                .once('complete', () => {
-                    res(true);
-                })
-                .pipe(fs.createWriteStream('localData.txt'));
-            return true;
-        }
-    });
+    if (!message.attachments?.first() || !message.attachments.first()!.name?.includes('.txt')) {
+        return false;
+    } else {
+        const response = await axios({
+            url: message.attachments.first()!.url,
+            method: 'GET',
+            responseType: 'stream',
+        });
+        response.data.pipe(fs.createWriteStream('localData.txt'));
+        return true;
+    }
 }
