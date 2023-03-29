@@ -35,14 +35,13 @@ async function main() {
     }
     commandHandler.loadAllCommands();
     eventHandler.loadAllEvents();
+    console.log(`prefix: ${PREFIX}`);
 }
 
-main().then(() => {
-    console.log(`prefix is ${PREFIX}`);
+main().finally(() => {
+    // fetch a channel every 2 hours to check the process's connection
+    const FETCH_INTERVAL = 1000 * 60 * 60 * 2;
+    setInterval(() => {
+        if (processManager.isLoggedIn()) bot.channels.fetch(INFO_LOG_CH_ID, { force: true }).then();
+    }, FETCH_INTERVAL);
 });
-
-// fetch a channel every 2 hours to check the process's connection
-const FETCH_INTERVAL = 1000 * 60 * 60 * 2;
-setInterval(() => {
-    if (processManager.isLoggedIn()) bot.channels.fetch(INFO_LOG_CH_ID, { force: true }).then();
-}, FETCH_INTERVAL);
