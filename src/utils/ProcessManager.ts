@@ -24,14 +24,14 @@ class ProcessManager {
      * Set the state of the process (active or inactive)
      * @param b True if active, false if inactive.
      */
-    setState(b: boolean) {
+    setActive(b: boolean) {
         this.#isActive = b;
     }
 
     /**
      * Whether the process is active or inactive.
      */
-    getState() {
+    isActive() {
         return this.#isActive;
     }
 
@@ -102,7 +102,7 @@ class ProcessManager {
                     process.exit(1);
                 }
                 // after 3 tries, set the state to inactive
-                if (retries > 2) this.setState(false);
+                if (retries > 2) this.setActive(false);
                 retries++;
                 waitTimeMS *= 2;
                 console.log(`connection failed.\n${retryText(waitTimeMS)}`);

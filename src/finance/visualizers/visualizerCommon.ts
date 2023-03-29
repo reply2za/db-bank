@@ -5,6 +5,7 @@ import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import images from '../../utils/constants/images';
 import { BankUserCopy } from '../BankUser/BankUserCopy';
 import { convertToCurrency } from '../../utils/numberUtils';
+import { processManager } from '../../utils/ProcessManager';
 
 export default {
     async showBalance(

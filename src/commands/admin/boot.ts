@@ -19,7 +19,7 @@ exports.run = async (event: MessageEventLocal) => {
 };
 
 function getBootStatus() {
-    return `${processManager.getState() ? '**active**' : 'inactive'}: ${process.pid} [*${HARDWARE_TAG}*] (v${
+    return `${processManager.isActive() ? '**active**' : 'inactive'}: ${process.pid} [*${HARDWARE_TAG}*] (v${
         processManager.version
     }) ${isDevMode ? '(devMode)' : ''}`;
 }
@@ -31,7 +31,7 @@ async function displayStatus(event: MessageEventLocal) {
         [event.message.author],
         [reactions.GEAR],
         (reaction: MessageReaction, reactionUser: User) => {
-            if (processManager.getState()) {
+            if (processManager.isActive()) {
                 setStateInactive();
             } else {
                 setStateActive();
@@ -43,11 +43,11 @@ async function displayStatus(event: MessageEventLocal) {
 }
 
 function setStateActive() {
-    processManager.setState(true);
+    processManager.setActive(true);
 }
 
 function setStateInactive() {
-    processManager.setState(false);
+    processManager.setActive(false);
 }
 
 /**

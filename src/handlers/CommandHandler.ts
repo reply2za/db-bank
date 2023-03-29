@@ -80,7 +80,7 @@ class CommandHandler {
      * @param authorId The id of the user who sent the command.
      */
     getCommand(statement: string, authorId: string): { run: (event: MessageEventLocal) => Promise<void> } | undefined {
-        if (!processManager.getState() && !MULTI_PROCESS_CMDS.includes(statement)) return;
+        if (!processManager.isActive() && !MULTI_PROCESS_CMDS.includes(statement)) return;
         if (isAdmin(authorId)) {
             return this.adminCommands.get(statement) || this.clientCommands.get(statement);
         } else {
