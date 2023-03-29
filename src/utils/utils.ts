@@ -104,7 +104,7 @@ export async function getUserToTransferTo(
 /**
  * Attaches a reaction with a reaction collector to a specific message.
  * @param reactMsg The message to attach the reaction to.
- * @param reactionUsers The list of users that can activate the effect of the reaction.
+ * @param reactionUserIds The list of userIds that can activate the effect of the reaction.
  * An empty list allows any user to activate the reaction. Will not be used if a custom filter is provided.
  * @param reactionsList The reactions to attach the message.
  * @param executeCallback A callback function for when any reaction is clicked.
@@ -114,7 +114,7 @@ export async function getUserToTransferTo(
  */
 export async function attachReactionToMessage(
     reactMsg: Message,
-    reactionUsers: User[],
+    reactionUserIds: string[],
     reactionsList: EmojiIdentifierResolvable[],
     executeCallback: (reaction: MessageReaction, user: User) => void,
     endCallback?: (collected: Collection<string, MessageReaction>, reason: string) => void,
@@ -128,10 +128,9 @@ export async function attachReactionToMessage(
     }
     if (!filter) {
         filter = (reaction: MessageReaction, user: User) => {
-            if (!reactionUsers.length) return true;
+            if (!reactionUserIds.length) return true;
             return !!(
-                reactionUsers.filter((rUser) => rUser.id === user.id).length &&
-                reactionsList.includes(reaction.emoji.name!)
+                reactionUserIds.filter((id) => id === user.id).length && reactionsList.includes(reaction.emoji.name!)
             );
         };
     }

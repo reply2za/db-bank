@@ -21,7 +21,7 @@ export abstract class ABankUser {
         return this.balance;
     }
 
-    getDiscordUser(): Readonly<User> {
+    getDiscordUser(): User {
         return this.discordUser;
     }
 

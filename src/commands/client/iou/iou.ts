@@ -36,5 +36,5 @@ exports.run = async (event: MessageEventLocal) => {
                 break;
         }
     };
-    await attachReactionToMessage(redeemableIOUMsg, [event.message.author], reactionsList, reactionCallback);
+    await attachReactionToMessage(redeemableIOUMsg, [event.bankUser.getUserId()], reactionsList, reactionCallback);
 };

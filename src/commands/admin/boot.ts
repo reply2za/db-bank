@@ -28,7 +28,7 @@ async function displayStatus(event: MessageEventLocal) {
     const sentMsg = await event.message.channel.send(getBootStatus());
     await attachReactionToMessage(
         sentMsg,
-        [event.message.author],
+        [event.bankUser.getUserId()],
         [reactions.GEAR],
         (reaction: MessageReaction, reactionUser: User) => {
             if (processManager.isActive()) {

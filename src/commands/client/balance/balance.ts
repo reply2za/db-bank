@@ -17,7 +17,7 @@ exports.run = async (event: MessageEventLocal) => {
     const userIOUs = bank.getUserIOUs(event.bankUser.getUserId());
     if (userIOUs.length) reactionsList.push(reactions.PAGE_C);
     const balanceReactionCallback = async (reaction: MessageReaction) => {
-        reaction.users.remove(event.message.author).catch();
+        reaction.users.remove(event.bankUser.getDiscordUser()).catch();
         let cmdName;
         switch (reaction.emoji.name) {
             case reactions.MONEY:
@@ -59,7 +59,7 @@ exports.run = async (event: MessageEventLocal) => {
     };
     await attachReactionToMessage(
         balanceMsg,
-        [event.message.author],
+        [event.bankUser.getUserId()],
         reactionsList,
         balanceReactionCallback,
         undefined,
