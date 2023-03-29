@@ -31,12 +31,6 @@ class LocalStorage {
                     ],
                 });
             }
-            const lastProcessNameMsg = await processManager.getLastProcessName();
-            if (lastProcessNameMsg) {
-                await lastProcessNameMsg.edit({
-                    content: `${HARDWARE_TAG}`,
-                });
-            }
         }
     }
 }

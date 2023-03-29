@@ -33,8 +33,10 @@ class ProcessManager {
     setActive(b: boolean) {
         this.#isActive = b;
         this.getLastProcessName().then((msg) => {
-            if (msg && msg.content !== HARDWARE_TAG)
+            if (!isDevMode && msg && msg.content !== HARDWARE_TAG) {
                 Logger.infoLog(`[WARNING] process name changed from ${msg.content} to ${HARDWARE_TAG}`);
+                msg.edit(HARDWARE_TAG);
+            }
         });
     }
 
