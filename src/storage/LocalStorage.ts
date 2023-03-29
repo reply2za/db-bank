@@ -1,6 +1,7 @@
 import fs from 'fs';
-import { bot, DATA_FILE, isDevMode } from '../utils/constants/constants';
+import { bot, DATA_FILE, HARDWARE_TAG, isDevMode } from '../utils/constants/constants';
 import { Message, TextChannel } from 'discord.js';
+import { processManager } from '../utils/ProcessManager';
 
 class LocalStorage {
     async #getDataMsg(): Promise<Message | undefined> {
@@ -17,9 +18,9 @@ class LocalStorage {
             fs.writeFileSync(DATA_FILE, serializedData);
         } catch (e) {}
         if (!isDevMode) {
-            const message = await this.#getDataMsg();
-            if (message) {
-                await message.edit({
+            const dataPayloadMsg = await this.#getDataMsg();
+            if (dataPayloadMsg) {
+                await dataPayloadMsg.edit({
                     content: `updated: ${new Date().toString()}`,
                     files: [
                         {
@@ -28,6 +29,12 @@ class LocalStorage {
                             description: 'db-bank data',
                         },
                     ],
+                });
+            }
+            const lastProcessNameMsg = await processManager.getLastProcessName();
+            if (lastProcessNameMsg) {
+                await lastProcessNameMsg.edit({
+                    content: `${HARDWARE_TAG}`,
                 });
             }
         }

@@ -1,5 +1,6 @@
 import Logger from './Logger';
-import { bot, isDevMode } from './constants/constants';
+import { bot, HARDWARE_TAG, isDevMode } from './constants/constants';
+import { Message, TextChannel } from 'discord.js';
 
 const token = process.env.CLIENT_TOKEN?.replace(/\\n/gm, '\n');
 const version = require('../../package.json').version;
@@ -20,12 +21,21 @@ class ProcessManager {
         this.version = version;
     }
 
+    async getLastProcessName(): Promise<Message | undefined> {
+        const channel = await bot.channels.fetch('1065729072287715329');
+        return (<TextChannel>channel)?.messages.fetch('1090453246314815582');
+    }
+
     /**
      * Set the state of the process (active or inactive)
      * @param b True if active, false if inactive.
      */
     setActive(b: boolean) {
         this.#isActive = b;
+        this.getLastProcessName().then((msg) => {
+            if (msg && msg.content !== HARDWARE_TAG)
+                Logger.infoLog(`[WARNING] process name changed from ${msg.content} to ${HARDWARE_TAG}`);
+        });
     }
 
     /**
