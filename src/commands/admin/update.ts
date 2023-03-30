@@ -1,7 +1,21 @@
 import { MessageEventLocal } from '../../utils/types';
 import { execSync } from 'child_process';
+import { processManager } from '../../utils/ProcessManager';
+import { isDevMode } from '../../utils/constants/constants';
+import { TextChannel } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
-    await event.message.channel.send('updating... (notice: prod process starts in a sidelined state)');
-    execSync('git stash && git pull && npm i && tsc && pm2 restart db-bank');
+    const processId = event.args[0];
+    if (processId) {
+        if (processId === process.pid.toString()) {
+            await update(<TextChannel>event.message.channel);
+        }
+    } else if (processManager.isActive() && !isDevMode) {
+        await update(<TextChannel>event.message.channel);
+    }
 };
+
+async function update(channel: TextChannel) {
+    await channel.send('updating... (notice: prod process starts in a sidelined state)');
+    execSync('git stash && git pull && npm i && tsc && pm2 restart db-bank');
+}
