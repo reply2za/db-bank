@@ -6,7 +6,7 @@ import { processManager } from '../utils/ProcessManager';
 import path from 'path';
 
 // list of commands that should not be process-specific
-const MULTI_PROCESS_CMDS = ['boot'];
+const MULTI_PROCESS_CMDS = ['boot', 'update'];
 // the output directory name where source files are generated
 const SOURCE_DIR_NAME = 'dist';
 
