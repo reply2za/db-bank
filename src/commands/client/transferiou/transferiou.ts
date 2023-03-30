@@ -1,5 +1,5 @@
 import { MessageEventLocal } from '../../../utils/types';
-import { TextChannel } from 'discord.js';
+import { Message, TextChannel } from 'discord.js';
 import { bank } from '../../../finance/Bank';
 import { localStorage } from '../../../storage/LocalStorage';
 import Logger from '../../../utils/Logger';
@@ -11,12 +11,7 @@ import { BankUserCopy } from '../../../finance/BankUser/BankUserCopy';
 import { MAX_IOU_COUNT_PER_REQ } from '../../../utils/constants/constants';
 
 exports.run = async (event: MessageEventLocal) => {
-    const recipientBankUser = await Transfer.getUserToTransferTo(
-        event.message,
-        event.args[1],
-        'transfer IOUs',
-        event.data
-    );
+    const recipientBankUser = await TransferIOU.getUserToTransferTo(event.message, event.args[1], event.data);
     if (!recipientBankUser) return;
     await new TransferIOU(<TextChannel>event.message.channel, event.bankUser, recipientBankUser).processTransfer();
 };
@@ -24,6 +19,10 @@ exports.run = async (event: MessageEventLocal) => {
 class TransferIOU extends Transfer {
     constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy) {
         super(channel, sender, receiver);
+    }
+
+    static getUserToTransferTo(message: Message, name: string, eventData: any): Promise<BankUserCopy | undefined> {
+        return super.getUserToTransferTo(message, name, 'transfer IOUs', eventData);
     }
 
     getTransferEmbed(amount: number, comment: string): EmbedBuilderLocal {

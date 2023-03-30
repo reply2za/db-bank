@@ -1,7 +1,7 @@
 import { getUserResponse } from '../../../utils/utils';
 import { commandHandler } from '../../../handlers/CommandHandler';
 import { MessageEventLocal } from '../../../utils/types';
-import { Colors, TextChannel } from 'discord.js';
+import { Colors, Message, TextChannel } from 'discord.js';
 import { bank } from '../../../finance/Bank';
 import { TransferType } from '../../../finance/types';
 import { Transfer } from '../../../finance/Transfer';
@@ -14,12 +14,7 @@ exports.run = async (event: MessageEventLocal) => {
         event.args = [event.args[0]];
         await commandHandler.execute({ ...event, statement: 'transferiou', args: [] });
     } else {
-        const recipientBankUser = await Transfer.getUserToTransferTo(
-            event.message,
-            event.args[1],
-            'transfer money',
-            event.data
-        );
+        const recipientBankUser = await MonetaryTransfer.getUserToTransferTo(event.message, event.args[1], event.data);
         if (!recipientBankUser) return;
         await new MonetaryTransfer(
             <TextChannel>event.message.channel,
@@ -32,6 +27,10 @@ exports.run = async (event: MessageEventLocal) => {
 class MonetaryTransfer extends Transfer {
     constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy) {
         super(channel, sender, receiver);
+    }
+
+    static getUserToTransferTo(message: Message, name: string, eventData: any): Promise<BankUserCopy | undefined> {
+        return super.getUserToTransferTo(message, name, 'transfer money', eventData);
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {

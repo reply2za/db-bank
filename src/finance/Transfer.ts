@@ -8,26 +8,28 @@ import { BankUserCopy } from './BankUser/BankUserCopy';
 import { EventDataNames } from '../utils/types';
 import { bank } from './Bank';
 import { ADMIN_IDS } from '../utils/constants/constants';
+import { TransferType } from './types';
 
 const MAX_RETRY_COUNT = 3;
+
 export abstract class Transfer {
     readonly channel;
     readonly sender;
     readonly receiver;
-    readonly actionName;
+    readonly transferType;
     readonly responder;
 
     protected constructor(
         channel: TextChannel,
         sender: BankUserCopy,
         receiver: BankUserCopy,
-        actionName = 'transfer',
+        transferType = TransferType.TRANSFER,
         responder = sender
     ) {
         this.channel = channel;
         this.sender = sender;
         this.receiver = receiver;
-        this.actionName = actionName;
+        this.transferType = transferType;
         this.responder = responder;
     }
 
@@ -119,7 +121,7 @@ export abstract class Transfer {
      */
     protected async promptForAmount(): Promise<string | undefined> {
         const enterAmountMsg = await new EmbedBuilderLocal()
-            .setDescription(`enter the amount you would like to ${this.actionName}`)
+            .setDescription(`enter the amount you would like to ${this.transferType}`)
             .setFooter('or `q` to quit')
             .send(this.channel);
         const response = await getUserResponse(this.channel, this.responder.getUserId());
@@ -129,7 +131,7 @@ export abstract class Transfer {
     }
 
     protected async getFinalConfirmation(): Promise<boolean> {
-        await visualizerCommon.getConfirmationEmbed(this.actionName).send(this.channel);
+        await visualizerCommon.getConfirmationEmbed(this.transferType).send(this.channel);
         const responseConfirmation = (await getUserResponse(this.channel, this.responder.getUserId()))?.content;
         return responseConfirmation?.toLowerCase() === 'yes';
     }
@@ -148,7 +150,7 @@ export abstract class Transfer {
     }
 
     protected async cancelResponse(reason = ''): Promise<void> {
-        await this.channel.send(`*cancelled ${this.actionName}${reason ? `: ${reason}` : ''}*`);
+        await this.channel.send(`*cancelled ${this.transferType}${reason ? `: ${reason}` : ''}*`);
     }
 
     protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {

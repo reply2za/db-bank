@@ -3,20 +3,24 @@ import { bank } from '../../finance/Bank';
 import { getUserResponse } from '../../utils/utils';
 import { TransferType } from '../../finance/types';
 import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
-import { Colors, TextChannel } from 'discord.js';
+import { Colors, Message, TextChannel } from 'discord.js';
 import { Transfer } from '../../finance/Transfer';
 import chargeTransferVisualizer from '../../finance/visualizers/transfers/chargeTransferVisualizer';
 import { BankUserCopy } from '../../finance/BankUser/BankUserCopy';
 
 exports.run = async (event: MessageEventLocal) => {
-    const sender = await Transfer.getUserToTransferTo(event.message, event.args[1], 'charge');
+    const sender = await Charge.getUserToTransferTo(event.message, event.args[1], event.data);
     if (!sender) return;
-    await new Charge(<TextChannel>event.message.channel, sender, event.bankUser, 'charge').processTransfer();
+    await new Charge(<TextChannel>event.message.channel, sender, event.bankUser).processTransfer();
 };
 
 class Charge extends Transfer {
-    constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy, actionName: string) {
-        super(channel, sender, receiver, actionName, receiver);
+    constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy) {
+        super(channel, sender, receiver, TransferType.CHARGE, receiver);
+    }
+
+    static getUserToTransferTo(message: Message, name: string, eventData: any): Promise<BankUserCopy | undefined> {
+        return super.getUserToTransferTo(message, name, 'charge', eventData);
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {
