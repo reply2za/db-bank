@@ -68,14 +68,14 @@ class ProcessManager {
         return this.#isLoggedIn;
     }
 
-    async handleErrors(error: Error, trace = '[ERROR]') {
+    async handleErrors(error: Error, header = '[ERROR]') {
         if (error.message.includes('getaddrinfo ENOTFOUND discord.com')) {
             this.#isLoggedIn = false;
             await this.fixConnection();
             return;
         }
         if (this.#isLoggedIn) {
-            Logger.errorLog(error);
+            Logger.errorLog(error, header);
         } else {
             console.log(error);
         }
