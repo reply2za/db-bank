@@ -11,7 +11,7 @@ import { BankUserCopy } from '../../../finance/BankUser/BankUserCopy';
 import { MAX_IOU_COUNT_PER_REQ } from '../../../utils/constants/constants';
 
 exports.run = async (event: MessageEventLocal) => {
-    const recipientBankUser = await TransferIOU.getUserToTransferTo(event.message, event.args[1], event.data);
+    const recipientBankUser = await TransferIOU.getUserToTransferTo(event.message, event.args[0], event.data);
     if (!recipientBankUser) return;
     await new TransferIOU(<TextChannel>event.message.channel, event.bankUser, recipientBankUser).processTransfer();
 };

@@ -6,7 +6,7 @@ export type MessageEventLocal = {
     statement: Readonly<string>;
     // the message object
     message: Message;
-    // the message contents in an array
+    // the message parameters in an array
     args: string[];
     // the prefix used
     prefix: string;

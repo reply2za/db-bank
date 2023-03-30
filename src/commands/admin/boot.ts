@@ -7,12 +7,12 @@ import { MessageReaction, User } from 'discord.js';
 import { attachReactionToMessage } from '../../utils/utils';
 
 exports.run = async (event: MessageEventLocal) => {
-    if (!event.args[1]) {
+    if (!event.args[0]) {
         displayStatus(event).catch((err) => Logger.debugLog(err));
-    } else if (event.args[2] && matchesHardwareTagOrPID(event.args[2])) {
-        if (event.args[1] === 'on') {
+    } else if (event.args[1] && matchesHardwareTagOrPID(event.args[1])) {
+        if (event.args[0] === 'on') {
             setStateActive();
-        } else if (event.args[1] === 'off') {
+        } else if (event.args[0] === 'off') {
             setStateInactive();
         }
     }

@@ -9,7 +9,7 @@ import chargeTransferVisualizer from '../../finance/visualizers/transfers/charge
 import { BankUserCopy } from '../../finance/BankUser/BankUserCopy';
 
 exports.run = async (event: MessageEventLocal) => {
-    const sender = await Charge.getUserToTransferTo(event.message, event.args[1], event.data);
+    const sender = await Charge.getUserToTransferTo(event.message, event.args[0], event.data);
     if (!sender) return;
     await new Charge(<TextChannel>event.message.channel, sender, event.bankUser).processTransfer();
 };

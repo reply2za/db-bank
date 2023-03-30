@@ -36,7 +36,7 @@ module.exports = async (message: Message) => {
     const event: MessageEventLocal = {
         statement,
         message,
-        args,
+        args: args.slice(1),
         prefix: PREFIX,
         bankUser,
         data: new Map(),

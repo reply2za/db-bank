@@ -8,16 +8,16 @@ const NUM_TO_FETCH = 30;
 const SENT_MSG_TXT = 'updating...';
 
 exports.run = async (event: MessageEventLocal) => {
-    if (!event.args[2]) {
+    if (!event.args[1]) {
         await event.message.channel.send('*expected arguments user-id & num-to-delete*');
         return;
     }
-    const msg = await bank.getUserCopy(event.args[1])?.getDiscordUser()?.send(SENT_MSG_TXT);
+    const msg = await bank.getUserCopy(event.args[0])?.getDiscordUser()?.send(SENT_MSG_TXT);
     if (!msg) {
         await event.message.channel.send('*could not find user*');
         return;
     }
-    const numToDelete = parseInt(event.args[2]);
+    const numToDelete = parseInt(event.args[1]);
     if (!numToDelete || numToDelete > NUM_TO_FETCH) {
         await event.message.channel.send('*invalid number*');
         return;

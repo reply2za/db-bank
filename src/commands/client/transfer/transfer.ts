@@ -10,11 +10,10 @@ import cashTransferVisualizer from '../../../finance/visualizers/transfers/cashT
 import { BankUserCopy } from '../../../finance/BankUser/BankUserCopy';
 
 exports.run = async (event: MessageEventLocal) => {
-    if (event.args[1]?.toLowerCase() === 'iou') {
-        event.args = [event.args[0]];
+    if (event.args[0]?.toLowerCase() === 'iou') {
         await commandHandler.execute({ ...event, statement: 'transferiou', args: [] });
     } else {
-        const recipientBankUser = await MonetaryTransfer.getUserToTransferTo(event.message, event.args[1], event.data);
+        const recipientBankUser = await MonetaryTransfer.getUserToTransferTo(event.message, event.args[0], event.data);
         if (!recipientBankUser) return;
         await new MonetaryTransfer(
             <TextChannel>event.message.channel,
