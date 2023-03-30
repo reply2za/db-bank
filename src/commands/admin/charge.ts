@@ -1,6 +1,6 @@
 import { MessageEventLocal } from '../../utils/types';
 import { bank } from '../../finance/Bank';
-import { getUserResponse, getUserToTransferTo } from '../../utils/utils';
+import { getUserResponse } from '../../utils/utils';
 import { TransferType } from '../../finance/types';
 import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import { Colors, TextChannel } from 'discord.js';
@@ -9,7 +9,7 @@ import chargeTransferVisualizer from '../../finance/visualizers/transfers/charge
 import { BankUserCopy } from '../../finance/BankUser/BankUserCopy';
 
 exports.run = async (event: MessageEventLocal) => {
-    const sender = await getUserToTransferTo(event.message, event.args[1], 'charge');
+    const sender = await Transfer.getUserToTransferTo(event.message, event.args[1], 'charge');
     if (!sender) return;
     await new Charge(<TextChannel>event.message.channel, sender, event.bankUser, 'charge').processTransfer();
 };

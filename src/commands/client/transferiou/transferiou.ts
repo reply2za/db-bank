@@ -1,4 +1,3 @@
-import { getUserToTransferTo } from '../../../utils/utils';
 import { MessageEventLocal } from '../../../utils/types';
 import { TextChannel } from 'discord.js';
 import { bank } from '../../../finance/Bank';
@@ -12,7 +11,12 @@ import { BankUserCopy } from '../../../finance/BankUser/BankUserCopy';
 import { MAX_IOU_COUNT_PER_REQ } from '../../../utils/constants/constants';
 
 exports.run = async (event: MessageEventLocal) => {
-    const recipientBankUser = await getUserToTransferTo(event.message, event.args[1], 'transfer IOUs', event.data);
+    const recipientBankUser = await Transfer.getUserToTransferTo(
+        event.message,
+        event.args[1],
+        'transfer IOUs',
+        event.data
+    );
     if (!recipientBankUser) return;
     await new TransferIOU(<TextChannel>event.message.channel, event.bankUser, recipientBankUser).processTransfer();
 };

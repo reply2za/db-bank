@@ -1,10 +1,13 @@
-import { Colors, TextChannel } from 'discord.js';
+import { Colors, Message, TextChannel } from 'discord.js';
 import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
 import { getUserResponse } from '../utils/utils';
 import { roundNumberTwoDecimals } from '../utils/numberUtils';
 import reactions from '../utils/constants/reactions';
 import visualizerCommon from './visualizers/visualizerCommon';
 import { BankUserCopy } from './BankUser/BankUserCopy';
+import { EventDataNames } from '../utils/types';
+import { bank } from './Bank';
+import { ADMIN_IDS } from '../utils/constants/constants';
 
 const MAX_RETRY_COUNT = 3;
 export abstract class Transfer {
@@ -28,14 +31,44 @@ export abstract class Transfer {
         this.responder = responder;
     }
 
-    async processTransfer(): Promise<void> {
+    /**
+     * Searches the message for a mention. If there is none then searches the name. If there is no name then prompts the user.
+     * @param message The user's message.
+     * @param name Optional - A name of a user to search for.
+     * @param actionName Optional - The name of the action that is being attempted
+     * @param eventData Optional - Event data
+     * @returns The BankUser to transfer to or undefined if the request failed or was cancelled.
+     */
+    static async getUserToTransferTo(
+        message: Message,
+        name = '',
+        actionName = 'transfer',
+        eventData = new Map<EventDataNames, any>()
+    ): Promise<BankUserCopy | undefined> {
+        const recipientDetails = await Transfer.promptForRecipient(message, name, actionName, eventData);
+        if (!recipientDetails) return;
+        const bankUserOrErr = await Transfer.resolveBankUser(
+            recipientDetails.recipientID,
+            recipientDetails.recipientName
+        );
+        if (typeof bankUserOrErr === 'string') {
+            message.channel.send(bankUserOrErr);
+            return;
+        }
+        if (bankUserOrErr.getUserId() === message.author.id && !ADMIN_IDS.includes(`${message.author.id} `)) {
+            message.channel.send(`you cannot make a ${actionName} to yourself`);
+        }
+        return bankUserOrErr;
+    }
+
+    async processTransfer(): Promise<Transfer> {
         let transferEmbed = this.getTransferEmbed(0, '');
         let embedMsg = await transferEmbed.send(this.channel);
         let transferAmount = await this.getAmount();
         if (!transferAmount) {
             await this.cancelResponse();
             embedMsg.deletable && embedMsg.delete();
-            return;
+            return this;
         }
         transferEmbed = this.getTransferEmbed(transferAmount, '');
         await transferEmbed.edit(embedMsg);
@@ -43,7 +76,7 @@ export abstract class Transfer {
         if (comment === undefined || comment.toLowerCase() === 'q') {
             await this.cancelResponse(comment === undefined ? 'no response provided' : '');
             embedMsg.react(reactions.X);
-            return;
+            return this;
         }
         if (comment !== '') {
             transferEmbed = this.getTransferEmbed(transferAmount, comment);
@@ -58,6 +91,7 @@ export abstract class Transfer {
             await this.cancelResponse();
             embedMsg.react(reactions.X);
         }
+        return this;
     }
 
     /**
@@ -145,4 +179,70 @@ export abstract class Transfer {
      * @returns Whether the transaction succeeded.
      */
     protected abstract approvedTransactionAction(transferAmount: number, comment: string): Promise<boolean>;
+
+    private static async promptForRecipient(
+        message: Message,
+        name = '',
+        actionName = 'transfer',
+        eventData = new Map<EventDataNames, any>()
+    ): Promise<{ recipientID?: string; recipientName?: string } | undefined> {
+        let recipientID = message.mentions?.users.first()?.id;
+        if (!name && !recipientID) {
+            const initialTransferMsg = await message.channel.send(
+                `Who you would like to ${actionName} to? *['q' = cancel]*`
+            );
+            eventData.set(EventDataNames.INITIAL_TRANSFER_MSG, initialTransferMsg);
+            const newMsg = await getUserResponse(message.channel, message.author.id);
+            // determines if abandoned, meaning that the same transfer is no longer active
+            if (initialTransferMsg.id !== eventData.get(EventDataNames.INITIAL_TRANSFER_MSG)?.id) return;
+            eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
+            if (!newMsg) {
+                message.channel.send('*no response provided*');
+                return;
+            }
+            recipientID = newMsg?.mentions?.users.first()?.id;
+            if (!recipientID) {
+                if (newMsg.content) {
+                    if (newMsg.content.toLowerCase() === 'q') {
+                        message.channel.send('*cancelled*');
+                        return;
+                    } else {
+                        name = newMsg.content.split(' ')[0];
+                    }
+                } else {
+                    message.channel.send(`must specify user to ${actionName} to`);
+                    return;
+                }
+            }
+        }
+        return { recipientID, recipientName: name };
+    }
+
+    /**
+     * Determines if a unique user can be found from the given parameters.
+     * @param recipientID
+     * @param recipientName
+     * @private
+     * @returns The user if found, otherwise a string with an error message.
+     */
+    private static async resolveBankUser(recipientID = '', recipientName = ''): Promise<BankUserCopy | string> {
+        let recipientBankUser;
+        if (recipientID) {
+            recipientBankUser = bank.getUserCopy(recipientID);
+        } else if (recipientName) {
+            const matchingUsers = bank.findUser(recipientName);
+            if (
+                matchingUsers.length > 1 &&
+                matchingUsers[0].getUsername().toLowerCase() === matchingUsers[1].getUsername().toLowerCase()
+            ) {
+                return '*multiple users have that name, use @ mentions or try again with the user id (name#1234)*';
+            }
+            recipientBankUser = matchingUsers[0];
+        }
+        if (!recipientBankUser) {
+            const displayName = recipientName.length < 30 ? recipientName : `${recipientName.substring(0, 30)}...`;
+            return `*could not find user **${displayName}**, try using @ mentions or the user id (name#1234)*`;
+        }
+        return recipientBankUser;
+    }
 }

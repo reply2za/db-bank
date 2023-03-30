@@ -8,10 +8,7 @@ import {
     TextBasedChannel,
     User,
 } from 'discord.js';
-import { bank } from '../finance/Bank';
 import { ADMIN_IDS, isDevMode } from './constants/constants';
-import { EventDataNames } from './types';
-import { BankUserCopy } from '../finance/BankUser/BankUserCopy';
 
 const getFilterForUser = (userId: string) => {
     return (m: Message) => userId === m.author.id;
@@ -30,75 +27,6 @@ export async function getUserResponse(
         });
         return messages.first();
     } catch (e) {}
-}
-
-/**
- * Searches the message for a mention. If there is none then searches the name. If there is no name then prompts the user.
- * @param message The user's message.
- * @param name Optional - A name of a user to search for.
- * @param actionName Optional - The name of the action that is being attempted
- * @param eventData Optional - Event data
- * @returns The BankUser to transfer to or undefined if the request failed or was cancelled.
- */
-export async function getUserToTransferTo(
-    message: Message,
-    name = '',
-    actionName = 'transfer',
-    eventData = new Map<EventDataNames, any>()
-): Promise<BankUserCopy | undefined> {
-    let recipientID = message.mentions?.users.first()?.id;
-    if (!name && !recipientID) {
-        const initialTransferMsg = await message.channel.send(
-            `Who you would like to ${actionName} to? *['q' = cancel]*`
-        );
-        eventData.set(EventDataNames.INITIAL_TRANSFER_MSG, initialTransferMsg);
-        const newMsg = await getUserResponse(message.channel, message.author.id);
-        // determines if abandoned, meaning that the same transfer is no longer active
-        if (initialTransferMsg.id !== eventData.get(EventDataNames.INITIAL_TRANSFER_MSG)?.id) return;
-        eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
-        if (!newMsg) {
-            message.channel.send('*no response provided*');
-            return;
-        }
-        recipientID = newMsg?.mentions?.users.first()?.id;
-        if (!recipientID) {
-            if (newMsg.content) {
-                if (newMsg.content.toLowerCase() === 'q') {
-                    message.channel.send('*cancelled*');
-                    return;
-                } else {
-                    name = newMsg.content.split(' ')[0];
-                }
-            } else {
-                message.channel.send(`must specify user to ${actionName} to`);
-                return;
-            }
-        }
-    }
-    let recipientBankUser;
-    if (recipientID) {
-        recipientBankUser = bank.getUserCopy(recipientID);
-    } else if (name) {
-        const matchingUsers = bank.findUser(name);
-        if (
-            matchingUsers.length > 1 &&
-            matchingUsers[0].getUsername().toLowerCase() === matchingUsers[1].getUsername().toLowerCase()
-        ) {
-            message.channel.send('*multiple users have that name, use @ mentions instead*');
-            return;
-        }
-        recipientBankUser = matchingUsers[0];
-    }
-    if (!recipientBankUser) {
-        const displayName = name.length < 30 ? name : `${name.substring(0, 30)}...`;
-        message.channel.send(`*could not find user **${displayName}**, try using @ mentions instead*`);
-        return;
-    }
-    if (recipientBankUser.getUserId() === message.author.id && !ADMIN_IDS.includes(`${message.author.id} `)) {
-        message.channel.send(`you cannot make a ${actionName} to yourself`);
-        return;
-    }
-    return recipientBankUser;
 }
 
 /**
