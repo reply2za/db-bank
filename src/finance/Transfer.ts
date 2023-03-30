@@ -18,6 +18,8 @@ export abstract class Transfer {
     readonly receiver;
     readonly transferType;
     readonly responder;
+    // the minimum amount that can be transferred
+    protected MINIMUM_TRANSFER_AMT = 0.01;
 
     protected constructor(
         channel: TextChannel,
@@ -158,8 +160,8 @@ export abstract class Transfer {
             await channel.send('*error: `invalid input`*');
             return false;
         }
-        if (transferAmount <= 0) {
-            await channel.send('*error: `amount must be greater than 0`*');
+        if (transferAmount < this.MINIMUM_TRANSFER_AMT) {
+            await channel.send(`*error: \`amount must greater than or equal to ${this.MINIMUM_TRANSFER_AMT}\`*`);
             return false;
         }
         return true;

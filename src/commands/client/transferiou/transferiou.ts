@@ -17,6 +17,7 @@ exports.run = async (event: MessageEventLocal) => {
 };
 
 class TransferIOU extends Transfer {
+    MINIMUM_TRANSFER_AMT = 1;
     constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy) {
         super(channel, sender, receiver);
     }
