@@ -1,7 +1,7 @@
 import { MessageEventLocal } from '../../utils/types';
 import { bot } from '../../utils/constants/constants';
 import { Collection, Message, Snowflake, TextChannel } from 'discord.js';
-import { bank } from '../../finance/Bank';
+import { bankUserLookup } from '../../finance/BankUserLookup';
 
 // the number of messages to fetch
 const NUM_TO_FETCH = 30;
@@ -12,7 +12,7 @@ exports.run = async (event: MessageEventLocal) => {
         await event.message.channel.send('*expected arguments author-id & num-to-delete*');
         return;
     }
-    const msg = await bank.getUserCopy(event.args[0])?.getDiscordUser()?.send(SENT_MSG_TXT);
+    const msg = await bankUserLookup.getUser(event.args[0])?.getDiscordUser()?.send(SENT_MSG_TXT);
     if (!msg) {
         await event.message.channel.send('*could not find author*');
         return;

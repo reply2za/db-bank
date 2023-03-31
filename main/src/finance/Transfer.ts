@@ -6,9 +6,9 @@ import reactions from '../utils/constants/reactions';
 import visualizerCommon from './visualizers/visualizerCommon';
 import { BankUserCopy } from './BankUser/BankUserCopy';
 import { EventDataNames } from '../utils/types';
-import { bank } from './Bank';
 import { config } from '../utils/constants/constants';
 import { TransferType } from './types';
+import { bankUserLookup } from './BankUserLookup';
 
 const MAX_RETRY_COUNT = 3;
 
@@ -161,7 +161,7 @@ export abstract class Transfer {
             return false;
         }
         if (transferAmount < this.MINIMUM_TRANSFER_AMT) {
-            await channel.send(`*error: \`amount must greater than or equal to ${this.MINIMUM_TRANSFER_AMT}\`*`);
+            await channel.send(`*error: \`amount must be greater than or equal to ${this.MINIMUM_TRANSFER_AMT}\`*`);
             return false;
         }
         return true;
@@ -232,9 +232,9 @@ export abstract class Transfer {
     private static async resolveBankUser(recipientID = '', recipientName = ''): Promise<BankUserCopy | string> {
         let recipientBankUser;
         if (recipientID) {
-            recipientBankUser = bank.getUserCopy(recipientID);
+            recipientBankUser = bankUserLookup.getUser(recipientID);
         } else if (recipientName) {
-            const matchingUsers = bank.findUser(recipientName);
+            const matchingUsers = bankUserLookup.findUser(recipientName);
             if (
                 matchingUsers.length > 1 &&
                 matchingUsers[0].getUsername().toLowerCase() === matchingUsers[1].getUsername().toLowerCase()
