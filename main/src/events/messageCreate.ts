@@ -24,7 +24,7 @@ module.exports = async (message: Message) => {
             bank.addNewUser(message.author, message.author.username, 0);
             await localStorage.saveData(bank.serializeData());
         } catch (e) {
-            if (e instanceof Error) Logger.errorLog(e);
+            if (e instanceof Error) Logger.errorLog(e).catch((e) => console.log(e));
             message.channel.send('*error: could not add author*');
             return;
         }
@@ -41,7 +41,5 @@ module.exports = async (message: Message) => {
         bankUser,
         data: new Map(),
     };
-    command.run(event).catch((e) => {
-        Logger.errorLog(e);
-    });
+    command.run(event).catch((e) => Logger.errorLog(e));
 };
