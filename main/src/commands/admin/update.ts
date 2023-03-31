@@ -1,7 +1,7 @@
 import { MessageEventLocal } from '../../utils/types';
 import { execSync } from 'child_process';
 import { processManager } from '../../utils/ProcessManager';
-import { isDevMode } from '../../utils/constants/constants';
+import { config } from '../../utils/constants/constants';
 import { TextChannel } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
@@ -10,7 +10,7 @@ exports.run = async (event: MessageEventLocal) => {
         if (processId === process.pid.toString()) {
             await update(<TextChannel>event.message.channel);
         }
-    } else if (processManager.isActive() && !isDevMode) {
+    } else if (processManager.isActive() && !config.isDevMode) {
         await update(<TextChannel>event.message.channel);
     }
 };

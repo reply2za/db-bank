@@ -8,7 +8,7 @@ import {
     TextBasedChannel,
     User,
 } from 'discord.js';
-import { ADMIN_IDS, isDevMode } from './constants/constants';
+import { config } from './constants/constants';
 
 const getFilterForUser = (userId: string) => {
     return (m: Message) => userId === m.author.id;
@@ -51,7 +51,7 @@ export async function attachReactionToMessage(
 ) {
     if (!endCallback) {
         endCallback = () => {
-            reactMsg.reactions.removeAll().catch((error) => isDevMode && console.log(error));
+            reactMsg.reactions.removeAll().catch((error) => config.isDevMode && console.log(error));
         };
     }
     if (!filter) {
@@ -72,5 +72,5 @@ export async function attachReactionToMessage(
 }
 
 export function isAdmin(id: string): boolean {
-    return ADMIN_IDS.includes(`${id} `);
+    return config.adminIDs.includes(`${id} `);
 }

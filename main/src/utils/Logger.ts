@@ -1,23 +1,24 @@
-import { bot, ERROR_LOG_CH_ID, INFO_LOG_CH_ID, isDevMode, TRANSACTION_LOG_CH_ID } from './constants/constants';
+import { bot, config } from './constants/constants';
 import { TextChannel } from 'discord.js';
 
 export default class Logger {
-    static errorLog(error: Error, additionalInfo = '[ERROR]') {
+    static async errorLog(error: Error, additionalInfo = '[ERROR]') {
         console.log(additionalInfo, error);
-        bot.channels.fetch(ERROR_LOG_CH_ID).then((channel) => {
-            error.stack && (<TextChannel>channel)?.send(`${additionalInfo} ${error.stack}`);
-        });
+        const channel = await bot.channels.fetch(config.errorLogChID);
+        if (channel) {
+            await (<TextChannel>channel)?.send(`${additionalInfo} ${error.stack || error.message}`);
+        }
     }
 
     static async infoLog(info: string) {
-        (<TextChannel>await bot.channels.fetch(INFO_LOG_CH_ID))?.send(info);
+        (<TextChannel>await bot.channels.fetch(config.infoLogChID))?.send(info);
     }
 
     static async transactionLog(info: string) {
-        (<TextChannel>await bot.channels.fetch(TRANSACTION_LOG_CH_ID))?.send(info);
+        (<TextChannel>await bot.channels.fetch(config.transactionLogChID))?.send(info);
     }
 
     static debugLog(error: Error) {
-        if (isDevMode) console.log(error);
+        if (config.isDevMode) console.log(error);
     }
 }

@@ -8,7 +8,7 @@ import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
 import iouTransferVisualizer from '../../../finance/visualizers/transfers/iouTransferVisualizer';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 import { BankUserCopy } from '../../../finance/BankUser/BankUserCopy';
-import { MAX_IOU_COUNT_PER_REQ } from '../../../utils/constants/constants';
+import { config } from '../../../utils/constants/constants';
 
 exports.run = async (event: MessageEventLocal) => {
     const recipientBankUser = await TransferIOU.getUserToTransferTo(event.message, event.args[0], event.data);
@@ -80,8 +80,8 @@ class TransferIOU extends Transfer {
                     channel.send('*error: `cannot send partial IOUs`*');
                     return false;
                 }
-                if (transferAmount > MAX_IOU_COUNT_PER_REQ) {
-                    channel.send(`*error: \`cannot send more than ${MAX_IOU_COUNT_PER_REQ} IOUs\`*`);
+                if (transferAmount > config.maxIOUCountPerReq) {
+                    channel.send(`*error: \`cannot send more than ${config.maxIOUCountPerReq} IOUs\`*`);
                     return false;
                 }
                 return true;

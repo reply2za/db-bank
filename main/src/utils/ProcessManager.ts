@@ -1,13 +1,8 @@
 import Logger from './Logger';
-import { bot, HARDWARE_TAG, isDevMode } from './constants/constants';
+import { bot, config } from './constants/constants';
 import { Message, TextChannel } from 'discord.js';
 
-const token = process.env.CLIENT_TOKEN?.replace(/\\n/gm, '\n');
 const version = require('../../../package.json').version;
-
-if (!token) {
-    throw new Error('missing params within .env');
-}
 
 class ProcessManager {
     #isActive;
@@ -17,7 +12,7 @@ class ProcessManager {
 
     constructor() {
         // if in devMode then we want process to be on by default
-        this.#isActive = isDevMode;
+        this.#isActive = config.isDevMode;
         this.version = version;
     }
 
@@ -33,9 +28,9 @@ class ProcessManager {
     setActive(b: boolean) {
         this.#isActive = b;
         this.getLastProcessName().then((msg) => {
-            if (!isDevMode && msg && msg.content !== HARDWARE_TAG) {
-                Logger.infoLog(`[WARNING] process name changed from ${msg.content} to ${HARDWARE_TAG}`);
-                msg.edit(HARDWARE_TAG);
+            if (!config.isDevMode && msg && msg.content !== config.hardwareTag) {
+                Logger.infoLog(`[WARNING] process name changed from ${msg.content} to ${config.hardwareTag}`);
+                msg.edit(config.hardwareTag);
             }
         });
     }
@@ -56,7 +51,7 @@ class ProcessManager {
      */
     async login(): Promise<boolean> {
         try {
-            await bot.login(token);
+            await bot.login(config.token);
             console.log('-logged in-');
             this.#isLoggedIn = true;
             return true;
@@ -68,14 +63,14 @@ class ProcessManager {
         return this.#isLoggedIn;
     }
 
-    async handleErrors(error: Error, header = '[ERROR]') {
+    async handleErrors(error: Error, additionalInfo = '[ERROR]') {
         if (error.message.includes('getaddrinfo ENOTFOUND discord.com')) {
             this.#isLoggedIn = false;
             await this.fixConnection();
             return;
         }
         if (this.#isLoggedIn) {
-            Logger.errorLog(error, header);
+            Logger.errorLog(error, additionalInfo).catch((e) => console.log(e));
         } else {
             console.log(error);
         }
@@ -103,7 +98,7 @@ class ProcessManager {
         const connect = async () => {
             console.log('connecting...');
             try {
-                await bot.login(token);
+                await bot.login(config.token);
                 this.#isLoggedIn = true;
                 console.log('connected.');
                 return true;

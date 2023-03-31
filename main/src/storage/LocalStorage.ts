@@ -1,6 +1,8 @@
 import fs from 'fs';
-import { bot, DATA_FILE, isDevMode } from '../utils/constants/constants';
+import { bot, config } from '../utils/constants/constants';
 import { Message, TextChannel } from 'discord.js';
+import Logger from '../utils/Logger';
+import { processManager } from '../utils/ProcessManager';
 
 class LocalStorage {
     async #getDataMsg(): Promise<Message | undefined> {
@@ -9,22 +11,24 @@ class LocalStorage {
     }
 
     async retrieveData() {
-        return fs.readFileSync(DATA_FILE).toString();
+        return fs.readFileSync(config.dataFile).toString();
     }
 
     async saveData(serializedData: string) {
         try {
-            fs.writeFileSync(DATA_FILE, serializedData);
-        } catch (e) {}
-        if (!isDevMode) {
+            fs.writeFileSync(config.dataFile, serializedData);
+        } catch (e: unknown) {
+            processManager.handleErrors(<Error>e, '[LocalStorage, saveData]').catch((e) => console.log(e));
+        }
+        if (!config.isDevMode) {
             const dataPayloadMsg = await this.#getDataMsg();
             if (dataPayloadMsg) {
                 await dataPayloadMsg.edit({
                     content: `updated: ${new Date().toString()}`,
                     files: [
                         {
-                            attachment: `./${DATA_FILE}`,
-                            name: DATA_FILE,
+                            attachment: `./${config.dataFile}`,
+                            name: config.dataFile,
                             description: 'db-bank data',
                         },
                     ],

@@ -1,6 +1,6 @@
 import { MessageEventLocal } from '../../utils/types';
 import { bank } from '../../finance/Bank';
-import { bot, DATA_FILE } from '../../utils/constants/constants';
+import { bot, config } from '../../utils/constants/constants';
 import { localStorage } from '../../storage/LocalStorage';
 import { Message } from 'discord.js';
 import fs from 'fs';
@@ -31,7 +31,7 @@ async function processDataFile(message: Message): Promise<boolean> {
             method: 'GET',
             responseType: 'stream',
         });
-        response.data.pipe(fs.createWriteStream(DATA_FILE));
+        response.data.pipe(fs.createWriteStream(config.dataFile));
         return true;
     }
 }

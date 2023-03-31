@@ -1,7 +1,7 @@
 import Logger from '../../utils/Logger';
 import { MessageEventLocal } from '../../utils/types';
 import { processManager } from '../../utils/ProcessManager';
-import { HARDWARE_TAG, isDevMode } from '../../utils/constants/constants';
+import { config } from '../../utils/constants/constants';
 import reactions from '../../utils/constants/reactions';
 import { MessageReaction, User } from 'discord.js';
 import { attachReactionToMessage } from '../../utils/utils';
@@ -19,9 +19,9 @@ exports.run = async (event: MessageEventLocal) => {
 };
 
 function getBootStatus() {
-    return `${processManager.isActive() ? '**active**' : 'inactive'}: ${process.pid} [*${HARDWARE_TAG}*] (v${
+    return `${processManager.isActive() ? '**active**' : 'inactive'}: ${process.pid} [*${config.hardwareTag}*] (v${
         processManager.version
-    }) ${isDevMode ? '(devMode)' : ''}`;
+    }) ${config.isDevMode ? '(devMode)' : ''}`;
 }
 
 async function displayStatus(event: MessageEventLocal) {
@@ -55,5 +55,5 @@ function setStateInactive() {
  * @param id Any string to check.
  */
 function matchesHardwareTagOrPID(id: string) {
-    return id === process.pid.toString() || id.toLowerCase() === HARDWARE_TAG?.toLowerCase();
+    return id === process.pid.toString() || id.toLowerCase() === config.hardwareTag.toLowerCase();
 }

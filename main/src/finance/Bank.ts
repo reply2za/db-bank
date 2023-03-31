@@ -10,7 +10,7 @@ import chargeTransferVisualizer from './visualizers/transfers/chargeTransferVisu
 import cashTransferVisualizer from './visualizers/transfers/cashTransferVisualizer';
 import visualizerCommon from './visualizers/visualizerCommon';
 import { BankUserCopy } from './BankUser/BankUserCopy';
-import { MAX_IOU_COUNT_PER_REQ } from '../utils/constants/constants';
+import { config } from '../utils/constants/constants';
 import { ABankUser } from './BankUser/ABankUser';
 
 class Bank {
@@ -28,10 +28,10 @@ class Bank {
         }
         const sender = <OriginalBankUser>senderAndReceiverObj.sender;
         const receiver = <OriginalBankUser>senderAndReceiverObj.receiver;
-        if (quantity > MAX_IOU_COUNT_PER_REQ) {
+        if (quantity > config.maxIOUCountPerReq) {
             return {
                 success: false,
-                failReason: `cannot send more than ${MAX_IOU_COUNT_PER_REQ} IOUs`,
+                failReason: `cannot send more than ${config.maxIOUCountPerReq} IOUs`,
             };
         }
         if (quantity < 1) {

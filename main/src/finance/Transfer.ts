@@ -7,7 +7,7 @@ import visualizerCommon from './visualizers/visualizerCommon';
 import { BankUserCopy } from './BankUser/BankUserCopy';
 import { EventDataNames } from '../utils/types';
 import { bank } from './Bank';
-import { ADMIN_IDS } from '../utils/constants/constants';
+import { config } from '../utils/constants/constants';
 import { TransferType } from './types';
 
 const MAX_RETRY_COUNT = 3;
@@ -59,7 +59,7 @@ export abstract class Transfer {
             message.channel.send(bankUserOrErr);
             return;
         }
-        if (bankUserOrErr.getUserId() === message.author.id && !ADMIN_IDS.includes(`${message.author.id} `)) {
+        if (bankUserOrErr.getUserId() === message.author.id && !config.adminIDs.includes(`${message.author.id} `)) {
             message.channel.send(`you cannot make a ${actionName} to yourself`);
         }
         return bankUserOrErr;
