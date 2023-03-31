@@ -5,10 +5,11 @@
   "main": "main/src/index.ts",
   "scripts": {
     "start": "tsc && node dist/src/index.js",
-    "dev": "tsc && node --trace-warnings -r source-map-support/register dist/src/index.js --dev",
-    "pm2": "bash scripts/pm2.bash",
-    "prod": "npm install --omit=dev && npm run pm2",
     "build": "tsc",
+    "dev": "tsc && node --trace-warnings -r source-map-support/register dist/src/index.js --dev",
+    "prod": "npm run pm2",
+    "prod:build": "npm install --omit=dev && tsc -p tsconfig.prod.json",
+    "pm2": "bash scripts/pm2.bash",
     "release": "bash scripts/release.bash",
     "test": "tsc && jest"
   },
