@@ -16,7 +16,7 @@ if (isDevMode) {
 }
 
 const DATA_FILE = process.argv.includes('--test') ? 'main/tests/testData.txt' : 'localData.txt';
-console.log(DATA_FILE);
+
 // the db bot instance
 export const bot: Client = new Client({
     intents: [
@@ -48,4 +48,5 @@ export const config = Object.freeze({
     dataFile: DATA_FILE,
     isDevMode: isDevMode,
     hardwareTag: HARDWARE_TAG,
+    sourceDirPath: 'dist/main/src',
 });

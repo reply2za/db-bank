@@ -4,11 +4,11 @@ import { Collection } from 'discord.js';
 import { MessageEventLocal } from '../utils/types';
 import { processManager } from '../utils/ProcessManager';
 import path from 'path';
+import { config } from '../utils/constants/constants';
 
 // list of commands that should not be process-specific
 const MULTI_PROCESS_CMDS = ['boot', 'update'];
 // the output directory name where source files are generated
-const SOURCE_DIR_NAME = 'dist/src';
 
 class CommandHandler {
     clientCommands = new Collection<string, { run: (event: MessageEventLocal) => Promise<void> }>();
@@ -40,7 +40,7 @@ class CommandHandler {
     }
 
     #loadSpecificCommands(innerPath: string, commandsMap: Map<string, any>) {
-        const dirPath = `./${SOURCE_DIR_NAME}/${innerPath}`;
+        const dirPath = `./${config.sourceDirPath}/${innerPath}`;
         // maps a filename to the correct relative path
         const cmdFileReference = new Map();
         let rootFiles = this.#parseRootDirectory(dirPath);
