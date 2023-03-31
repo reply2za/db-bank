@@ -4,12 +4,12 @@
       {
         "userId": "12341",
         "name": "Joe",
-        "balance": 2224
+        "balance": 2324
       },
       {
         "userId": "313132",
         "name": "Anna",
-        "balance": 231
+        "balance": 131
       }
     ],
     "ious": []
