@@ -13,7 +13,7 @@ import { BankUserCopy } from './BankUser/BankUserCopy';
 import { config } from '../utils/constants/constants';
 import { ABankUser } from './BankUser/ABankUser';
 
-class Bank {
+export class Bank {
     #users: Map<string, OriginalBankUser> = new Map();
     #iOUList: Array<IOUTicket> = [];
     #usernames: Set<string> = new Set();
@@ -288,5 +288,4 @@ class Bank {
     }
 }
 
-const bank = new Bank();
-export { bank };
+export const bank = new Bank();
