@@ -11,15 +11,12 @@ import { bank } from '../src/finance/Bank';
 
 function beforeAll() {
     commandHandler.loadAllCommands();
-    // @ts-ignore
-    global.DATA_FILE = './src/test/TestData.txt';
     const BOT_TEXT_CHANNEL = new TestTextChannel();
     BOT_TEXT_CHANNEL.messages = {
         fetch: async () => {
             return new TestMessage('', '', USER_BOT);
         },
     };
-
     Object.defineProperty(bot, 'channels', { value: { fetch: () => BOT_TEXT_CHANNEL }, writable: true });
     Object.defineProperty(bot, 'login', { value: {}, writable: true });
     processManager.setActive(true);

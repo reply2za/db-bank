@@ -1,17 +1,17 @@
- {
-      "bank": {
-        "users": [
-          {
-            "userId": "12341",
-            "name": "Joe",
-            "balance": 2324
-          },
-          {
-            "userId": "313132",
-            "name": "Anna",
-            "balance": 131
-          }
-        ],
-        "ious": []
+{
+  "bank": {
+    "users": [
+      {
+        "userId": "12341",
+        "name": "Joe",
+        "balance": 2224
+      },
+      {
+        "userId": "313132",
+        "name": "Anna",
+        "balance": 231
       }
-    }
+    ],
+    "ious": []
+  }
+}
