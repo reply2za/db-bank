@@ -7,7 +7,7 @@ import { TextChannel } from 'discord.js';
 exports.run = async (event: MessageEventLocal) => {
     const processId = event.args[0];
     if (processId) {
-        if (processId === process.pid.toString()) {
+        if (processId === process.pid.toString() || processId === 'all') {
             await update(<TextChannel>event.message.channel);
         }
     } else if (processManager.isActive() && !config.isDevMode) {
