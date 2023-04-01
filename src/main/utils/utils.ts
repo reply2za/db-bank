@@ -83,7 +83,7 @@ export function isAdmin(id: string): boolean {
 export function updateProcessLog() {
     const MINUTES = 60;
     const FETCH_INTERVAL = 1000 * 60 * MINUTES;
-    setInterval(() => {
+    const checkConnection = () => {
         if (processManager.isLoggedIn()) {
             if (processManager.isActive()) {
                 bot.channels.fetch(config.processLog).then(async (msg) => {
@@ -96,5 +96,9 @@ export function updateProcessLog() {
                 bot.channels.fetch(config.processLog, { force: true });
             }
         }
+    };
+    checkConnection();
+    setInterval(() => {
+        checkConnection();
     }, FETCH_INTERVAL);
 }
