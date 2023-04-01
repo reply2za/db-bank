@@ -5,6 +5,7 @@ import {
     If,
     Message,
     MessageReaction,
+    ReactionCollector,
     TextBasedChannel,
     TextChannel,
     User,
@@ -50,7 +51,7 @@ export async function attachReactionToMessage(
     endCallback?: (collected: Collection<string, MessageReaction>, reason: string) => void,
     filter?: (reaction: MessageReaction, user: User) => boolean,
     filterTime = 30000
-) {
+): Promise<ReactionCollector> {
     if (!endCallback) {
         endCallback = () => {
             reactMsg.reactions.removeAll().catch((error) => config.isDevMode && console.log(error));

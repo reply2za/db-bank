@@ -1,6 +1,8 @@
 import Logger from './Logger';
 import { bot, config } from './constants/constants';
-import { Message, TextChannel } from 'discord.js';
+import { Message, MessageReaction, ReactionCollector, TextChannel, User } from 'discord.js';
+import reactions from './constants/reactions';
+import { attachReactionToMessage } from './utils';
 
 const version = require('../../../package.json').version;
 
@@ -27,12 +29,17 @@ class ProcessManager {
      */
     setActive(b: boolean) {
         this.#isActive = b;
-        this.getLastProcessName().then((msg) => {
-            if (!config.isDevMode && msg && msg.content !== config.hardwareTag) {
-                Logger.infoLog(`[WARNING] process name changed from ${msg.content} to ${config.hardwareTag}`);
-                msg.edit(config.hardwareTag);
-            }
-        });
+        if (b && !config.isDevMode) {
+            this.getLastProcessName().then((msg) => {
+                // log error with reactions
+                if (msg && msg.content !== config.hardwareTag) {
+                    Logger.errorLog(
+                        `new active process PREV: (${msg.content}) NOW: (${config.hardwareTag})`,
+                        '[WARNING]'
+                    ).then((errMsg) => this.updateActiveProcessName(msg, errMsg));
+                }
+            });
+        }
     }
 
     /**
@@ -119,6 +126,31 @@ class ProcessManager {
         while (true) {
             await new Promise((resolve) => setTimeout(resolve, waitTimeMS));
             if (await connect()) return true;
+        }
+    }
+    private async updateActiveProcessName(msg: Message, errMsg?: Message) {
+        if (!errMsg) {
+            await msg.edit(config.hardwareTag);
+        } else {
+            let collector: ReactionCollector | undefined;
+            const callback = (reaction: MessageReaction, user: User) => {
+                if (reaction.emoji.name === reactions.CHECK) {
+                    msg.edit(config.hardwareTag);
+                    errMsg.channel.send(`process name changed: ${msg.content} => ${config.hardwareTag}`);
+                } else {
+                    this.setActive(false);
+                }
+                if (collector) collector.stop();
+            };
+            collector = await attachReactionToMessage(
+                errMsg,
+                config.adminIDs.map((id) => id.trim()),
+                [reactions.CHECK, reactions.X],
+                callback,
+                undefined,
+                undefined,
+                60000
+            );
         }
     }
 }
