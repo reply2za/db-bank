@@ -8,7 +8,7 @@
     "build": "tsc",
     "dev": "npm run build && node --trace-warnings -r source-map-support/register dist/src/main/index.js --dev",
     "prod": "npm run pm2",
-    "prod:build": "npm install --omit=dev && tsc -p tsconfig.prod.json",
+    "prod:build": "npm install && tsc -p tsconfig.prod.json",
     "pm2": "bash scripts/pm2.bash",
     "release": "bash scripts/release.bash",
     "test": "tsc && jest"
