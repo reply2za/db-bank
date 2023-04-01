@@ -1,5 +1,7 @@
 'use strict';
 // dotenv should be the first thing imported
+import { TextChannel } from 'discord.js';
+
 require('dotenv').config();
 import { bot, config } from './utils/constants/constants';
 import { bank } from './finance/Bank';
@@ -8,6 +10,7 @@ import { commandHandler } from './handlers/CommandHandler';
 import { eventHandler } from './handlers/EventHandler';
 import Logger from './utils/Logger';
 import { processManager } from './utils/ProcessManager';
+import { updateProcessLog } from './utils/utils';
 
 process.on('uncaughtException', async (error) => {
     await processManager.handleErrors(error, '[uncaughtException]');
@@ -41,9 +44,5 @@ async function main() {
 }
 
 main().finally(() => {
-    // fetch a channel every 2 hours to check the process's connection
-    const FETCH_INTERVAL = 1000 * 60 * 60 * 2;
-    setInterval(() => {
-        if (processManager.isLoggedIn()) bot.channels.fetch(config.infoLogChID, { force: true }).then();
-    }, FETCH_INTERVAL);
+    if (!config.isDevMode) updateProcessLog();
 });

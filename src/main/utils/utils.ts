@@ -6,9 +6,11 @@ import {
     Message,
     MessageReaction,
     TextBasedChannel,
+    TextChannel,
     User,
 } from 'discord.js';
-import { config } from './constants/constants';
+import { bot, config } from './constants/constants';
+import { processManager } from './ProcessManager';
 
 const getFilterForUser = (userId: string) => {
     return (m: Message) => userId === m.author.id;
@@ -73,4 +75,26 @@ export async function attachReactionToMessage(
 
 export function isAdmin(id: string): boolean {
     return config.adminIDs.includes(`${id} `);
+}
+
+/**
+ * If active then update the process log, otherwise fetch a channel to check connection status.
+ */
+export function updateProcessLog() {
+    const MINUTES = 60;
+    const FETCH_INTERVAL = 1000 * 60 * MINUTES;
+    setInterval(() => {
+        if (processManager.isLoggedIn()) {
+            if (processManager.isActive()) {
+                bot.channels.fetch(config.processLog).then(async (msg) => {
+                    await (<TextChannel>msg).send(
+                        `~db-bank[v${processManager.version}][${config.hardwareTag}][${process.pid}](${config.prefix})`
+                    );
+                });
+            } else {
+                // fetch to check connection
+                bot.channels.fetch(config.processLog, { force: true });
+            }
+        }
+    }, FETCH_INTERVAL);
 }
