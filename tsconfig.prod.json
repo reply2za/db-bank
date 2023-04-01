@@ -4,6 +4,6 @@
     "sourceMap": false
   },
   "exclude": [
-    "main/tests/**/*"
+    "src/tests/**/*"
   ]
 }

@@ -48,5 +48,5 @@ export const config = Object.freeze({
     dataFile: DATA_FILE,
     isDevMode: isDevMode,
     hardwareTag: HARDWARE_TAG,
-    sourceDirPath: 'dist/main/src',
+    sourceDirPath: 'dist/src/main',
 });

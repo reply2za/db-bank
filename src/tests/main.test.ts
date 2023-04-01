@@ -1,16 +1,16 @@
 import { USER_BOT } from './constants';
-import { commandHandler } from '../src/handlers/CommandHandler';
+import { commandHandler } from '../main/handlers/CommandHandler';
 import { Message, User } from 'discord.js';
-import { MessageEventLocal } from '../src/utils/types';
-import { bot } from '../src/utils/constants/constants';
+import { MessageEventLocal } from '../main/utils/types';
+import { bot } from '../main/utils/constants/constants';
 import { TestDiscordUser } from './classes/TestDiscordUser';
 import { TestMessage } from './classes/TestMessage';
 import { TestTextChannel } from './classes/TestTextChannel';
-import { processManager } from '../src/utils/ProcessManager';
-import { bank } from '../src/finance/Bank';
-import { bankUserLookup } from '../src/finance/BankUserLookup';
-import { BankUserCopy } from '../src/finance/BankUser/BankUserCopy';
-import { localStorage } from '../src/storage/LocalStorage';
+import { processManager } from '../main/utils/ProcessManager';
+import { bank } from '../main/finance/Bank';
+import { bankUserLookup } from '../main/finance/BankUserLookup';
+import { BankUserCopy } from '../main/finance/BankUser/BankUserCopy';
+import { localStorage } from '../main/storage/LocalStorage';
 
 const tempBankUserStore: BankUserCopy[] = [];
 function init() {
