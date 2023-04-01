@@ -16,7 +16,7 @@ export default {
         const date = new Date();
         let balance = user.getBalance();
         // april fools joke, randomizes balance visual
-        if (date.getMonth() === 3 && date.getDate() === 1) {
+        if ((date.getMonth() === 3 && date.getDate() === 1) || (date.getMonth() === 2 && date.getDate() === 31)) {
             const operator = Math.random() < 0.55 ? '+' : '-';
             const amount = Math.floor(Math.random() * 320_000);
             balance = operator === '+' ? balance + amount : balance - amount;
