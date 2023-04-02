@@ -11,6 +11,10 @@ class ProcessManager {
     version;
     #isFixingConnection = false;
     #isLoggedIn = false;
+    #processLogInterval: NodeJS.Timeout | undefined;
+    private static MINUTES = 60;
+    // the time to update the process log in minutes
+    private static UPDATE_LOG_INTERVAL = 1000 * 60 * ProcessManager.MINUTES;
 
     constructor() {
         // if in devMode then we want process to be on by default
@@ -38,6 +42,7 @@ class ProcessManager {
                         '[WARNING]'
                     ).then((errMsg) => this.updateActiveProcessName(msg, errMsg));
                 }
+                this.updateProcessLog();
             });
         }
     }
@@ -152,6 +157,31 @@ class ProcessManager {
                 60000
             );
         }
+    }
+
+    /**
+     * If active then update the process log, otherwise fetch a channel to check connection status.
+     */
+    updateProcessLog() {
+        const checkConnection = () => {
+            if (this.isLoggedIn()) {
+                if (this.isActive()) {
+                    bot.channels.fetch(config.processLog).then(async (msg) => {
+                        await (<TextChannel>msg).send(
+                            `~db-bank[v${this.version}][${config.hardwareTag}][${process.pid}](${config.prefix})`
+                        );
+                    });
+                } else {
+                    // fetch to check connection
+                    bot.channels.fetch(config.processLog, { force: true });
+                }
+            }
+        };
+        checkConnection();
+        if (this.#processLogInterval) clearInterval(this.#processLogInterval);
+        this.#processLogInterval = setInterval(() => {
+            checkConnection();
+        }, ProcessManager.UPDATE_LOG_INTERVAL);
     }
 }
 
