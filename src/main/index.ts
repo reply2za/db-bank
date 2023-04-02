@@ -1,7 +1,5 @@
 'use strict';
 // dotenv should be the first thing imported
-import { TextChannel } from 'discord.js';
-
 require('dotenv').config();
 import { bot, config } from './utils/constants/constants';
 import { bank } from './finance/Bank';
@@ -10,7 +8,6 @@ import { commandHandler } from './handlers/CommandHandler';
 import { eventHandler } from './handlers/EventHandler';
 import Logger from './utils/Logger';
 import { processManager } from './utils/ProcessManager';
-import { updateProcessLog } from './utils/utils';
 
 process.on('uncaughtException', async (error) => {
     await processManager.handleErrors(error, '[uncaughtException]');
@@ -44,5 +41,5 @@ async function main() {
 }
 
 main().finally(() => {
-    if (!config.isDevMode) updateProcessLog();
+    if (!config.isDevMode) processManager.updateProcessLog();
 });
