@@ -5,7 +5,6 @@ import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import images from '../../utils/constants/images';
 import { BankUserCopy } from '../BankUser/BankUserCopy';
 import { convertToCurrency } from '../../utils/numberUtils';
-import { processManager } from '../../utils/ProcessManager';
 
 export default {
     async showBalance(
@@ -13,14 +12,7 @@ export default {
         user: Readonly<BankUserCopy>,
         ious: IOUTicket[]
     ): Promise<Message> {
-        const date = new Date();
         let balance = user.getBalance();
-        // april fools joke, randomizes balance visual
-        if ((date.getMonth() === 3 && date.getDate() === 1) || (date.getMonth() === 2 && date.getDate() > 30)) {
-            const operator = Math.random() < 0.55 ? '+' : '-';
-            const amount = Math.floor(Math.random() * 320_000);
-            balance = operator === '+' ? balance + amount : balance - amount;
-        }
         let iouDescription = '';
         const iouMap = new Map<string, number>();
         for (const iou of ious) {
