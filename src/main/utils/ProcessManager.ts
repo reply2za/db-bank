@@ -3,6 +3,7 @@ import { bot, config } from './constants/constants';
 import { Message, MessageReaction, ReactionCollector, TextChannel, User } from 'discord.js';
 import reactions from './constants/reactions';
 import { attachReactionToMessage } from './utils';
+import { execSync } from 'child_process';
 
 const version = require('../../../package.json').version;
 
@@ -76,15 +77,22 @@ class ProcessManager {
     }
 
     async handleErrors(error: Error, additionalInfo = '[ERROR]') {
+        // connectivity error
         if (error.message.includes('getaddrinfo ENOTFOUND discord.com')) {
             this.#isLoggedIn = false;
             await this.fixConnection();
             return;
         }
-        if (this.#isLoggedIn) {
-            Logger.errorLog(error, additionalInfo).catch((e) => console.log(e));
-        } else {
+        // package related issues
+        if (error.message.includes('Cannot find module')) {
+            execSync('git stash && git pull && npm run pm2');
             console.log(error);
+        } else {
+            if (this.#isLoggedIn) {
+                Logger.errorLog(error, additionalInfo).catch((e) => console.log(e));
+            } else {
+                console.log(error);
+            }
         }
     }
 
