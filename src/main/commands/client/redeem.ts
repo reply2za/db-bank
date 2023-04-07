@@ -1,6 +1,6 @@
 import { bank } from '../../finance/Bank';
 import iouVisualizer from '../../finance/visualizers/iouVisualizer';
-import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { getUserResponse } from '../../utils/utils';
 import { bot } from '../../utils/constants/constants';
 import { EventDataNames, MessageEventLocal } from '../../utils/types';

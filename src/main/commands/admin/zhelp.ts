@@ -1,5 +1,5 @@
 import { MessageEventLocal } from '../../utils/types';
-import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { config } from '../../utils/constants/constants';
 
 exports.run = async (event: MessageEventLocal) => {

@@ -4,7 +4,7 @@ import { bank } from '../../../finance/Bank';
 import { localStorage } from '../../../storage/LocalStorage';
 import Logger from '../../../utils/Logger';
 import { Transfer } from '../../../finance/Transfer';
-import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import iouTransferVisualizer from '../../../finance/visualizers/transfers/iouTransferVisualizer';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 import { BankUserCopy } from '../../../finance/BankUser/BankUserCopy';

@@ -1,9 +1,9 @@
-import Logger from './Logger';
 import { bot, config } from './constants/constants';
 import { Message, MessageReaction, ReactionCollector, TextChannel, User } from 'discord.js';
 import reactions from './constants/reactions';
 import { attachReactionToMessage } from './utils';
 import { execSync } from 'child_process';
+import logger from './Logger';
 
 const version = require('../../../package.json').version;
 
@@ -38,10 +38,9 @@ class ProcessManager {
             this.getLastProcessName().then((msg) => {
                 // log error with reactions
                 if (msg && msg.content !== config.hardwareTag) {
-                    Logger.errorLog(
-                        `new active process PREV: (${msg.content}) NOW: (${config.hardwareTag})`,
-                        '[WARNING]'
-                    ).then((errMsg) => this.updateActiveProcessName(msg, errMsg));
+                    logger
+                        .errorLog(`new active process PREV: (${msg.content}) NOW: (${config.hardwareTag})`, '[WARNING]')
+                        .then((errMsg) => this.updateActiveProcessName(msg, errMsg));
                 }
                 this.updateProcessLog();
             });
@@ -89,7 +88,7 @@ class ProcessManager {
             console.log(error);
         } else {
             if (this.#isLoggedIn) {
-                Logger.errorLog(error, additionalInfo).catch((e) => console.log(e));
+                logger.errorLog(error, additionalInfo).catch((e) => console.log(e));
             } else {
                 console.log(error);
             }

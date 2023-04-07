@@ -5,7 +5,7 @@ import { Colors, Message, TextChannel } from 'discord.js';
 import { bank } from '../../../finance/Bank';
 import { TransferType } from '../../../finance/types';
 import { Transfer } from '../../../finance/Transfer';
-import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import cashTransferVisualizer from '../../../finance/visualizers/transfers/cashTransferVisualizer';
 import { BankUserCopy } from '../../../finance/BankUser/BankUserCopy';
 

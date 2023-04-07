@@ -1,7 +1,6 @@
 import fs from 'fs';
 import { bot, config } from '../utils/constants/constants';
 import { Message, TextChannel } from 'discord.js';
-import Logger from '../utils/Logger';
 import { processManager } from '../utils/ProcessManager';
 
 class LocalStorage {

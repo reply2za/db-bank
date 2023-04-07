@@ -1,5 +1,5 @@
 const { version } = require('../../../../package.json');
-import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { MessageEventLocal } from '../../utils/types';
 
 exports.run = async (event: MessageEventLocal) => {

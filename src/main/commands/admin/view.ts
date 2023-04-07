@@ -1,6 +1,6 @@
 import { bank } from '../../finance/Bank';
 import { MessageEventLocal } from '../../utils/types';
-import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 
 exports.run = async (event: MessageEventLocal) => {
     let finalString = '';

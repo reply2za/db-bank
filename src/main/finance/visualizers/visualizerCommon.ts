@@ -1,11 +1,10 @@
 import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js';
 import { IOUTicket } from '../IOUTicket';
 import { bot } from '../../utils/constants/constants';
-import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import images from '../../utils/constants/images';
 import { BankUserCopy } from '../BankUser/BankUserCopy';
 import { convertToCurrency } from '../../utils/numberUtils';
-
 export default {
     async showBalance(
         channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>,

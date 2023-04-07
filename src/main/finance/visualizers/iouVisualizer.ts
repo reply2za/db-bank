@@ -1,6 +1,6 @@
 import { IOUTicket } from '../IOUTicket';
-import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
 import images from '../../utils/constants/images';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 
 export default {
     /**

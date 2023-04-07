@@ -1,4 +1,4 @@
-import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import visualizerCommon from '../visualizerCommon';
 import images from '../../../utils/constants/images';
 import { BankUserCopy } from '../../BankUser/BankUserCopy';

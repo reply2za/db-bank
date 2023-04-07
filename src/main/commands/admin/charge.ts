@@ -2,7 +2,7 @@ import { MessageEventLocal } from '../../utils/types';
 import { bank } from '../../finance/Bank';
 import { getUserResponse } from '../../utils/utils';
 import { TransferType } from '../../finance/types';
-import EmbedBuilderLocal from '../../utils/EmbedBuilderLocal';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { Colors, Message, TextChannel } from 'discord.js';
 import { Transfer } from '../../finance/Transfer';
 import chargeTransferVisualizer from '../../finance/visualizers/transfers/chargeTransferVisualizer';

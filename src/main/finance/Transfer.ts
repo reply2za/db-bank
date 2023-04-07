@@ -1,5 +1,5 @@
 import { Colors, Message, TextChannel } from 'discord.js';
-import EmbedBuilderLocal from '../utils/EmbedBuilderLocal';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { getUserResponse } from '../utils/utils';
 import { roundNumberTwoDecimals } from '../utils/numberUtils';
 import reactions from '../utils/constants/reactions';

@@ -6,7 +6,7 @@ import { bank } from './finance/Bank';
 import { localStorage } from './storage/LocalStorage';
 import { commandHandler } from './handlers/CommandHandler';
 import { eventHandler } from './handlers/EventHandler';
-import Logger from './utils/Logger';
+import logger from './utils/Logger';
 import { processManager } from './utils/ProcessManager';
 
 process.on('uncaughtException', async (error) => {
@@ -23,7 +23,7 @@ async function main() {
         console.log('-devMode-');
     } else {
         console.log('-PROD-');
-        await Logger.infoLog(
+        await logger.infoLog(
             `starting ${process.pid} [${config.hardwareTag}]: v${processManager.version} (${config.prefix})`
         );
     }

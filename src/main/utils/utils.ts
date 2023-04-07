@@ -7,15 +7,9 @@ import {
     MessageReaction,
     ReactionCollector,
     TextBasedChannel,
-    TextChannel,
     User,
 } from 'discord.js';
-import { bot, config } from './constants/constants';
-import { processManager } from './ProcessManager';
-
-const getFilterForUser = (userId: string) => {
-    return (m: Message) => userId === m.author.id;
-};
+import { config } from './constants/constants';
 
 export async function getUserResponse(
     channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>,
@@ -23,7 +17,7 @@ export async function getUserResponse(
 ): Promise<Message | undefined> {
     try {
         const messages = await channel.awaitMessages({
-            filter: getFilterForUser(userId),
+            filter: (m: Message) => userId === m.author.id,
             time: 60000,
             max: 1,
             errors: ['time'],

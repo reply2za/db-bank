@@ -4,7 +4,7 @@ import { TextBasedChannel, User, UserManager } from 'discord.js';
 import { convertToCurrency, roundNumberTwoDecimals } from '../utils/numberUtils';
 import leven from 'leven';
 import { localStorage } from '../storage/LocalStorage';
-import Logger from '../utils/Logger';
+import logger from '../utils/Logger';
 import { StatusWithErrorResponse, TransferType } from './types';
 import chargeTransferVisualizer from './visualizers/transfers/chargeTransferVisualizer';
 import cashTransferVisualizer from './visualizers/transfers/cashTransferVisualizer';
@@ -222,7 +222,7 @@ export class Bank {
                     .getTransferReceiptEmbed(receiver.getUsername(), transferAmount)
                     .send(channel);
             }
-            await Logger.transactionLog(
+            await logger.transactionLog(
                 `[${transferType}] (${sender.getUserId()} -> ${receiver.getUserId()})\n` +
                     `$${transferAmount} from ${sender.getDBName()} to ${receiver.getDBName()}\n` +
                     `${sender.getDBName()}: ${convertToCurrency(sender.getBalance())}\n` +

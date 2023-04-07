@@ -1,5 +1,5 @@
 import { OriginalBankUser } from '../../BankUser/OriginalBankUser';
-import EmbedBuilderLocal from '../../../utils/EmbedBuilderLocal';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { convertToCurrency, roundNumberTwoDecimals } from '../../../utils/numberUtils';
 import visualizerCommon from '../visualizerCommon';
 import images from '../../../utils/constants/images';
