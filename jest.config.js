@@ -3,5 +3,5 @@ module.exports = {
     testEnvironment: 'node',
     testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).js?(x)'],
     moduleFileExtensions: ['js', 'jsx', 'json', 'node'],
-    setupFiles: ['./main/tests/test-setup.ts'],
+    setupFiles: ['./src/tests/test-setup.ts'],
 };

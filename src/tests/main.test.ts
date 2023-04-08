@@ -17,7 +17,8 @@ function init() {
     commandHandler.loadAllCommands();
     const BOT_TEXT_CHANNEL = new TestTextChannel();
     BOT_TEXT_CHANNEL.messages = {
-        fetch: async () => {
+        fetch: async (id: string) => {
+            if (id === '1090453246314815582') return undefined;
             return new TestMessage('', '', USER_BOT);
         },
     };

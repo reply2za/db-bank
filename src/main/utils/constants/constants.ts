@@ -15,7 +15,7 @@ if (isDevMode) {
     adminIDs.push('799524729173442620 ');
 }
 
-const DATA_FILE = process.argv.includes('--test') ? 'main/tests/testData.txt' : 'localData.txt';
+const DATA_FILE = process.argv.includes('--test') ? 'src/tests/testData.txt' : 'localData.txt';
 
 // the db bot instance
 export const bot: Client = new Client({

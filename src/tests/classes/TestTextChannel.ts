@@ -6,7 +6,7 @@ export class TestTextChannel {
     receivedMessages: string[] = [];
     id: string;
     name: string;
-    messages: { fetch: () => Promise<TestMessage> } | undefined;
+    messages: { fetch: (id: string) => Promise<TestMessage | undefined> } | undefined;
     awaitMessagesList: TestMessage[][] | undefined;
     constructor(id?: string, name = '') {
         if (!id) {
@@ -40,5 +40,9 @@ export class TestTextChannel {
             c.set(message.id, message);
         }
         return c;
+    }
+
+    createReactionCollector(...args: any[]) {
+        return false;
     }
 }
