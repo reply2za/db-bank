@@ -1,22 +1,10 @@
-import { Message } from 'discord.js';
 import { BankUserCopy } from '../finance/BankUser/BankUserCopy';
+import { MessageEventCore } from '@hoursofza/djs-common';
 
-export type MessageEventLocal = {
-    // the command name, removes the prefix and any args
-    statement: Readonly<string>;
-    // the message object
-    message: Message;
-    // the message parameters in an array
-    args: string[];
-    // the prefix used
-    prefix: string;
+export type MessageEventLocal = MessageEventCore<EventDataNames> & {
     // the bank author initiating the event
     bankUser: BankUserCopy;
-    // additional data that can be added to the event
-    data: EventData;
 };
-
-export type EventData = Map<EventDataNames, any>;
 
 export enum EventDataNames {
     /*

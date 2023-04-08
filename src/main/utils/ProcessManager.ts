@@ -76,6 +76,10 @@ class ProcessManager {
     }
 
     async handleErrors(error: Error, additionalInfo = '[ERROR]') {
+        if (config.isDevMode) {
+            console.log(error);
+            return;
+        }
         // connectivity error
         if (error.message.includes('getaddrinfo ENOTFOUND discord.com')) {
             this.#isLoggedIn = false;
