@@ -151,6 +151,7 @@ class ProcessManager {
                     errMsg.channel.send(`process name changed: ${msg.content} => ${config.hardwareTag}`);
                 } else {
                     this.setActive(false);
+                    errMsg.channel.send(`process name will remain as ${msg.content}`);
                 }
                 if (collector) collector.stop();
             };
