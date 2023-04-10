@@ -1,17 +1,19 @@
 import fs from 'fs';
-import { bot, config } from '../utils/constants/constants';
+import { config } from '../utils/constants/constants';
+import { EventHandler } from '@hoursofza/djs-common';
 
-class EventHandler {
-    loadAllEvents() {
-        const files = fs.readdirSync(`./${config.sourceDirPath}/events`).filter((file) => file.endsWith('.js'));
-        for (const file of files) {
-            const eventName = file.split('.')[0];
-            const event = require(`../events/${file}`);
-            bot.on(eventName, event);
-        }
-        console.log('-loaded events-');
+class EventHandlerLocal extends EventHandler {
+    constructor() {
+        super(`./${config.sourceDirPath}/events`, '../events');
+    }
+    protected requireModule(): NodeJS.Require {
+        return require;
+    }
+
+    protected fsModule(): typeof import('fs') {
+        return fs;
     }
 }
 
-const eventHandler = new EventHandler();
+const eventHandler = new EventHandlerLocal();
 export { eventHandler };

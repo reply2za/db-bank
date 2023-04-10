@@ -36,7 +36,7 @@ async function main() {
         console.log('[WARN] No local data!');
     }
     commandHandler.loadAllCommands();
-    eventHandler.loadAllEvents();
+    eventHandler.loadAllEvents((eventName, listener) => bot.on(eventName, listener));
     console.log(`prefix: ${config.prefix}`);
 }
 

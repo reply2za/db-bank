@@ -10,8 +10,8 @@ const MULTI_PROCESS_CMDS = ['boot', 'update'];
 // the output directory name where source files are generated
 
 class CommandHandlerLocal extends CommandHandler<EventDataNames> {
-    constructor(isAdmin: (userID: string) => boolean, sourceDirPath: string) {
-        super(isAdmin, sourceDirPath);
+    constructor() {
+        super(isAdmin, `./${config.sourceDirPath}/commands`, '../commands');
     }
 
     getCommand(statement: string, userID: string) {
@@ -28,5 +28,5 @@ class CommandHandlerLocal extends CommandHandler<EventDataNames> {
     }
 }
 
-const commandHandler = new CommandHandlerLocal(isAdmin, config.sourceDirPath);
+const commandHandler = new CommandHandlerLocal();
 export { commandHandler };
