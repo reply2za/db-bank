@@ -95,16 +95,36 @@ describe('monetary transfer', () => {
         expect(s1.channel1.receivedMessages[s1.channel1.receivedMessages.length - 1]).toBe('*cancelled transfer*');
     });
 
-    test('transfer sending $100', async () => {
+    test('joe to send $100 to anna', async () => {
         s1.channel1.receivedMessages.length = 0;
         const amountToSend = 100;
+        const amountToSendTxt = `$${amountToSend}`;
         s1.channel1.awaitMessagesList = [
-            [new TestMessage('', `${amountToSend}`, s1.userJoe, s1.channel1)],
+            [new TestMessage('', `${amountToSendTxt}`, s1.userJoe, s1.channel1)],
             [new TestMessage('', 'b', s1.userJoe, s1.channel1)],
             [new TestMessage('', 'yes', s1.userJoe, s1.channel1)],
         ];
-        const prevBalanceAnna = s1.bankUserAnna.getBalance();
-        const prevBalanceJoe = s1.bankUserJoe.getBalance();
+        const prevBalanceJoe = bank.findUser('Joe')[0].getBalance();
+        const prevBalanceAnna = bank.findUser('Anna')[0].getBalance();
+        await commandHandler.execute(eventTransferJoe);
+        expect(s1.channel1.receivedMessages.length).toBeGreaterThan(0);
+        expect(s1.channel1.receivedMessages[s1.channel1.receivedMessages.length - 1]).toBe('sent $100.00 to Anna');
+        expect(bankUserLookup.getUser(s1.bankUserAnna.getUserId())?.getBalance()).toBe(prevBalanceAnna + amountToSend);
+        expect(bankUserLookup.getUser(s1.bankUserJoe.getUserId())?.getBalance()).toBe(prevBalanceJoe - amountToSend);
+    });
+
+    test('transfer using plus sign', async () => {
+        s1.channel1.receivedMessages.length = 0;
+        const amountToSend = 100;
+        // spacing should make a difference
+        const amountToSendTxt = '25+25+25 + 25';
+        s1.channel1.awaitMessagesList = [
+            [new TestMessage('', `${amountToSendTxt}`, s1.userJoe, s1.channel1)],
+            [new TestMessage('', 'b', s1.userJoe, s1.channel1)],
+            [new TestMessage('', 'yes', s1.userJoe, s1.channel1)],
+        ];
+        const prevBalanceJoe = bank.findUser('Joe')[0].getBalance();
+        const prevBalanceAnna = bank.findUser('Anna')[0].getBalance();
         await commandHandler.execute(eventTransferJoe);
         expect(s1.channel1.receivedMessages.length).toBeGreaterThan(0);
         expect(s1.channel1.receivedMessages[s1.channel1.receivedMessages.length - 1]).toBe('sent $100.00 to Anna');
@@ -137,5 +157,12 @@ describe('ensure state was reset', () => {
     test('view balances', async () => {
         expect(bankUserLookup.getUser(s1.bankUserJoe.getUserId())?.getBalance()).toBe(2324);
         expect(bankUserLookup.getUser(s1.bankUserAnna.getUserId())?.getBalance()).toBe(131);
+    });
+});
+
+describe('end tests', () => {
+    it('destroy bot', async () => {
+        await bot.destroy();
+        expect(bot.isReady()).toBeFalsy();
     });
 });
