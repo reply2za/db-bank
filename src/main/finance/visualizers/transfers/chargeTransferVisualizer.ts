@@ -17,7 +17,7 @@ export default {
             .setTitle(`Charge ${sender.getUsername()}`)
             .setDescription(
                 (amount ? `charging \`${convertToCurrency(amount)}\`` : '*no amount selected*').concat(
-                    `${comment ? `\ncomment: ${comment}` : ''}`
+                    `${comment ? `\ncomment: *${comment}*` : ''}`
                 )
             )
             .setFooter(

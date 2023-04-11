@@ -13,8 +13,11 @@ export default {
         return visualizerCommon
             .getCoreTransferEmbed()
             .setTitle(`Transfer IOU to ${receiver.getUsername()}`)
-            .setDescription(amount ? `sending ${amount} IOU${amount > 1 ? 's' : ''}` : '*no amount selected*')
-            .setFooter(`${comment ? `comment: ${comment}` : ' '}`);
+            .setDescription(
+                (amount ? `sending ${amount} IOU${amount > 1 ? 's' : ''}` : '*no amount selected*').concat(
+                    `${comment ? `\ncomment: *${comment}*` : ' '}`
+                )
+            );
     },
     getIOUTransferNotificationEmbed(
         senderName: string,

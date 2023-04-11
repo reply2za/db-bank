@@ -17,7 +17,7 @@ export default {
             .setTitle(`Transfer to ${receiver.getUsername()}`)
             .setDescription(
                 (amount ? `sending \`${convertToCurrency(amount)}\`` : '*no amount selected*').concat(
-                    `${comment ? `\ncomment: ${comment}` : ''}`
+                    `${comment ? `\ncomment: *${comment}*` : ''}`
                 )
             )
             .setFooter(
