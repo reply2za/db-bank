@@ -64,6 +64,15 @@ class MonetaryTransfer extends Transfer {
         if (amt) {
             if (amt.charAt(0) === '$') amt = amt.replace('$', '');
             amt = amt.replaceAll(',', '');
+            if (amt.includes('+')) {
+                let total = 0;
+                const split = amt.split('+');
+                total = Number(split[0]);
+                for (let i = 1; i < split.length; i++) {
+                    total += Number(split[i]);
+                }
+                amt = total.toString();
+            }
         }
         return amt;
     }
