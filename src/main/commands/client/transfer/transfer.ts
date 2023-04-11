@@ -4,10 +4,10 @@ import { MessageEventLocal } from '../../../utils/types';
 import { Colors, Message, TextChannel } from 'discord.js';
 import { bank } from '../../../finance/Bank';
 import { TransferType } from '../../../finance/types';
-import { Transfer } from '../../../finance/Transfer';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import cashTransferVisualizer from '../../../finance/visualizers/transfers/cashTransferVisualizer';
 import { BankUserCopy } from '../../../finance/BankUser/BankUserCopy';
+import { ACashTransfer } from '../../../finance/Transfer/ACashTransfer';
 
 exports.run = async (event: MessageEventLocal) => {
     if (event.args[0]?.toLowerCase() === 'iou') {
@@ -23,7 +23,7 @@ exports.run = async (event: MessageEventLocal) => {
     }
 };
 
-class MonetaryTransfer extends Transfer {
+class MonetaryTransfer extends ACashTransfer {
     constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy) {
         super(channel, sender, receiver);
     }
@@ -57,24 +57,6 @@ class MonetaryTransfer extends Transfer {
 
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {
         return cashTransferVisualizer.getCashTransferEmbed(this.sender, this.receiver, amount, comment);
-    }
-
-    protected async promptForAmount(): Promise<string | undefined> {
-        let amt = await super.promptForAmount();
-        if (amt) {
-            if (amt.charAt(0) === '$') amt = amt.replace('$', '');
-            amt = amt.replaceAll(',', '');
-            if (amt.includes('+')) {
-                let total = 0;
-                const split = amt.split('+');
-                total = Number(split[0]);
-                for (let i = 1; i < split.length; i++) {
-                    total += Number(split[i]);
-                }
-                amt = total.toString();
-            }
-        }
-        return amt;
     }
 
     protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {

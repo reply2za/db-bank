@@ -1,14 +1,14 @@
 import { Colors, Message, TextChannel } from 'discord.js';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
-import { getUserResponse } from '../utils/utils';
-import { roundNumberTwoDecimals } from '../utils/numberUtils';
-import reactions from '../utils/constants/reactions';
-import visualizerCommon from './visualizers/visualizerCommon';
-import { BankUserCopy } from './BankUser/BankUserCopy';
-import { EventDataNames } from '../utils/types';
-import { config } from '../utils/constants/constants';
-import { TransferType } from './types';
-import { bankUserLookup } from './BankUserLookup';
+import { getUserResponse } from '../../utils/utils';
+import { roundNumberTwoDecimals } from '../../utils/numberUtils';
+import reactions from '../../utils/constants/reactions';
+import visualizerCommon from '../visualizers/visualizerCommon';
+import { BankUserCopy } from '../BankUser/BankUserCopy';
+import { EventDataNames } from '../../utils/types';
+import { config } from '../../utils/constants/constants';
+import { TransferType } from '../types';
+import { bankUserLookup } from '../BankUserLookup';
 
 const MAX_RETRY_COUNT = 3;
 

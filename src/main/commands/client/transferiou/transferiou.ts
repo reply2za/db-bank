@@ -3,7 +3,7 @@ import { Message, TextChannel } from 'discord.js';
 import { bank } from '../../../finance/Bank';
 import { localStorage } from '../../../storage/LocalStorage';
 import Logger from '../../../utils/Logger';
-import { Transfer } from '../../../finance/Transfer';
+import { Transfer } from '../../../finance/Transfer/Transfer';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import iouTransferVisualizer from '../../../finance/visualizers/transfers/iouTransferVisualizer';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';

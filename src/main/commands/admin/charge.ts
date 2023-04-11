@@ -4,9 +4,9 @@ import { getUserResponse } from '../../utils/utils';
 import { TransferType } from '../../finance/types';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { Colors, Message, TextChannel } from 'discord.js';
-import { Transfer } from '../../finance/Transfer';
 import chargeTransferVisualizer from '../../finance/visualizers/transfers/chargeTransferVisualizer';
 import { BankUserCopy } from '../../finance/BankUser/BankUserCopy';
+import { ACashTransfer } from '../../finance/Transfer/ACashTransfer';
 
 exports.run = async (event: MessageEventLocal) => {
     const sender = await Charge.getUserToTransferTo(event.message, event.args[0], event.data);
@@ -14,7 +14,7 @@ exports.run = async (event: MessageEventLocal) => {
     await new Charge(<TextChannel>event.message.channel, sender, event.bankUser).processTransfer();
 };
 
-class Charge extends Transfer {
+class Charge extends ACashTransfer {
     constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy) {
         super(channel, sender, receiver, TransferType.CHARGE, receiver);
     }
@@ -48,14 +48,5 @@ class Charge extends Transfer {
 
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {
         return chargeTransferVisualizer.getChargeTransferEmbed(this.sender, this.receiver, amount, comment);
-    }
-
-    protected async promptForAmount(): Promise<string | undefined> {
-        let amt = await super.promptForAmount();
-        if (amt) {
-            if (amt.charAt(0) === '$') amt = amt.replace('$', '');
-            amt = amt.replaceAll(',', '');
-        }
-        return amt;
     }
 }
