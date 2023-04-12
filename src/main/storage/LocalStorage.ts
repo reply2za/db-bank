@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { bot, config } from '../utils/constants/constants';
 import { Message, TextChannel } from 'discord.js';
-import { processManager } from '../utils/ProcessManager';
+import logger from '../utils/Logger';
 
 class LocalStorage {
     async #getDataMsg(): Promise<Message | undefined> {
@@ -9,7 +9,20 @@ class LocalStorage {
         return (<TextChannel>channel)?.messages.fetch('1065733201370288138');
     }
 
-    async retrieveData() {
+    async retrieveData(): Promise<string> {
+        if (!config.isDevMode) {
+            // get data from discord
+            const message = await this.#getDataMsg();
+            const url = message?.attachments.first()?.url;
+            if (url) {
+                const res = await fetch(url);
+                const bankData = await res.json();
+                if (bankData) {
+                    return JSON.stringify(bankData);
+                }
+            }
+            await logger.warnLog('could not retrieve discord data, using local data');
+        }
         return fs.readFileSync(config.dataFile).toString();
     }
 
@@ -17,21 +30,29 @@ class LocalStorage {
         try {
             fs.writeFileSync(config.dataFile, serializedData);
         } catch (e: unknown) {
-            processManager.handleErrors(<Error>e, '[LocalStorage, saveData]').catch((e) => console.log(e));
+            console.log(serializedData);
+            await logger.errorLog(<Error>e, '[LocalStorage:saveData, failed local save]');
         }
         if (!config.isDevMode) {
             const dataPayloadMsg = await this.#getDataMsg();
             if (dataPayloadMsg) {
-                await dataPayloadMsg.edit({
-                    content: `updated: ${new Date().toString()}`,
-                    files: [
-                        {
-                            attachment: `./${config.dataFile}`,
-                            name: config.dataFile,
-                            description: 'db-bank data',
-                        },
-                    ],
-                });
+                await dataPayloadMsg
+                    .edit({
+                        content: `updated: ${new Date().toString()}`,
+                        files: [
+                            {
+                                attachment: `./${config.dataFile}`,
+                                name: config.dataFile,
+                                description: 'db-bank data',
+                            },
+                        ],
+                    })
+                    .catch((e) => logger.errorLog(e, '[LocalStorage:saveData, failed discord save]'));
+            } else {
+                await logger.errorLog(
+                    'failed to find data payload message',
+                    '[LocalStorage:saveData, failed discord save]'
+                );
             }
         }
     }

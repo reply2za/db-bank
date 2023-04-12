@@ -15,7 +15,7 @@ if (isDevMode) {
     adminIDs.push('799524729173442620 ');
 }
 
-const DATA_FILE = process.argv.includes('--test') ? 'src/tests/testData.txt' : 'localData.txt';
+const DATA_FILE = process.argv.includes('--test') ? 'src/tests/resources/testData.txt' : 'localData.txt';
 
 // the db bot instance
 export const bot: Client = new Client({
@@ -44,6 +44,7 @@ export const config = Object.freeze({
     infoLogChID: isDevMode ? '1081761590292009041' : '1070859598627610746',
     errorLogChID: '1064628593772220488',
     processLog: '1091525626281857045',
+    warnLogChID: '1095733636873076807',
     maxIOUCountPerReq: 99,
     // the name of the data file with the extension
     dataFile: DATA_FILE,

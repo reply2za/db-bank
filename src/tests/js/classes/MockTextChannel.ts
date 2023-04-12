@@ -1,13 +1,14 @@
-import { TestMessage } from './TestMessage';
-import { USER_BOT } from '../constants';
+import { MockMessage } from './MockMessage';
 import { Collection, EmbedBuilder } from 'discord.js';
+import { BOT_ID } from '../../resources/constants';
+import { MockDiscordUser } from './MockDiscordUser';
 
-export class TestTextChannel {
+export class MockTextChannel {
     receivedMessages: string[] = [];
     id: string;
     name: string;
-    messages: { fetch: (id: string) => Promise<TestMessage | undefined> } | undefined;
-    awaitMessagesList: TestMessage[][] | undefined;
+    messages: { fetch: (id: string) => Promise<MockMessage | undefined> } | undefined;
+    awaitMessagesList: MockMessage[][] | undefined;
     constructor(id?: string, name = '') {
         if (!id) {
             this.id = (Math.random() * 100000 + 1).toString();
@@ -26,7 +27,7 @@ export class TestTextChannel {
             messageText = message;
         }
         const randomId = Math.floor(Math.random() * 1000000);
-        return new TestMessage(randomId.toString(), messageText, USER_BOT, this);
+        return new MockMessage(randomId.toString(), messageText, new MockDiscordUser(BOT_ID, 'db-bank'), this);
     }
 
     async awaitMessages(...args: any[]) {

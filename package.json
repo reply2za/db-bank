@@ -10,13 +10,13 @@
     "prod": "npm run pm2",
     "prod:build": "npm install && tsc -p tsconfig.prod.json",
     "pm2": "bash scripts/pm2.bash",
-    "release": "bash scripts/release.bash",
-    "test": "tsc && jest"
+    "release": "npm run test && bash scripts/release.bash",
+    "test": "tsc && jest --detectOpenHandles --forceExit"
   },
   "author": "Reply2za",
   "license": "ISC",
   "dependencies": {
-    "@hoursofza/djs-common": "~1.1.0",
+    "@hoursofza/djs-common": "~1.1.1",
     "@types/uuid": "^9.0.0",
     "axios": "^1.3.4",
     "discord.js": "^14.9.0",

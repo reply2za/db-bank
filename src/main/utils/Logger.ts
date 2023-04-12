@@ -2,7 +2,7 @@ import { bot, config } from './constants/constants';
 import { Message, TextChannel } from 'discord.js';
 import { ILogger } from '@hoursofza/djs-common';
 
-export class Logger implements ILogger {
+class Logger implements ILogger {
     async errorLog(error: Error | string, additionalInfo = '[ERROR]') {
         console.log(additionalInfo, error);
         const body = typeof error === 'string' ? error : `${error.stack || error.message}`;
@@ -22,6 +22,16 @@ export class Logger implements ILogger {
 
     async debugLog(error: Error): Promise<Message | undefined> {
         if (config.isDevMode) console.log(error);
+        return;
+    }
+
+    async warnLog(warning: string): Promise<Message | undefined> {
+        try {
+            return await (<TextChannel>await bot.channels.fetch(config.warnLogChID))?.send(warning);
+        } catch (e: any) {
+            console.error(e.message);
+            console.log(`[WARN] ${warning}`);
+        }
         return;
     }
 }

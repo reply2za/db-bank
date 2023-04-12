@@ -1,14 +1,14 @@
-import { TestDiscordUser } from './TestDiscordUser';
-import { TestTextChannel } from './TestTextChannel';
+import { MockDiscordUser } from './MockDiscordUser';
+import { MockTextChannel } from './MockTextChannel';
 
-export class TestMessage {
+export class MockMessage {
     receivedMessages: string[] = [];
     content: string;
-    author: TestDiscordUser;
+    author: MockDiscordUser;
     deleteable = true;
     id: string;
-    channel: TestTextChannel;
-    constructor(id = '', content = '', author: TestDiscordUser, channel?: TestTextChannel) {
+    channel: MockTextChannel;
+    constructor(id = '', content = '', author: MockDiscordUser, channel?: MockTextChannel) {
         if (!id) {
             this.id = (Math.random() * 1000000 + 1).toString();
         } else {
@@ -16,10 +16,10 @@ export class TestMessage {
         }
         this.content = content;
         this.author = author;
-        this.channel = channel || new TestTextChannel();
+        this.channel = channel || new MockTextChannel();
     }
-    static getBuilder(): TestMessageBuilder {
-        return new TestMessageBuilder();
+    static getBuilder(): MockMessageBuilder {
+        return new MockMessageBuilder();
     }
     async edit(message: string) {
         this.content = message;
@@ -35,28 +35,28 @@ export class TestMessage {
     }
 }
 
-class TestMessageBuilder {
+class MockMessageBuilder {
     id: string;
     content: string;
-    user: TestDiscordUser | undefined;
+    user: MockDiscordUser | undefined;
     constructor(id = '', content = '') {
         this.id = id;
         this.content = content;
     }
-    build(): TestMessage {
+    build(): MockMessage {
         if (!this.user) throw new Error('User not set');
-        return new TestMessage(this.id, this.content, this.user);
+        return new MockMessage(this.id, this.content, this.user);
     }
 
-    setId(id: string): TestMessageBuilder {
+    setId(id: string): MockMessageBuilder {
         this.id = id;
         return this;
     }
-    setContent(content: string): TestMessageBuilder {
+    setContent(content: string): MockMessageBuilder {
         this.content = content;
         return this;
     }
-    setAuthor(user: TestDiscordUser): TestMessageBuilder {
+    setAuthor(user: MockDiscordUser): MockMessageBuilder {
         this.user = user;
         return this;
     }
