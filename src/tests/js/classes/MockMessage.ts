@@ -33,6 +33,16 @@ export class MockMessage {
     async react(...args: any[]) {
         return;
     }
+    createReactionCollector(...args: any[]) {
+        return {
+            on: (...args: any[]) => {
+                return;
+            },
+            stop: (reason?: string) => {
+                return;
+            },
+        };
+    }
 }
 
 class MockMessageBuilder {
