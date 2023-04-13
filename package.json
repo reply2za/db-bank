@@ -11,6 +11,7 @@
     "prod:build": "npm install && tsc -p tsconfig.prod.json",
     "pm2": "bash scripts/pm2.bash",
     "release:patch": "npm run test && npm version patch -m \"chore(release): %s\"",
+    "release:minor": "npm run test && npm version minor -m \"chore(release): %s\"",
     "test": "tsc && jest --detectOpenHandles --forceExit"
   },
   "author": "Reply2za",
