@@ -1,4 +1,4 @@
-import { Colors, Message, MessageReaction, ReactionCollector, TextChannel, User } from 'discord.js';
+import { Colors, Message, TextChannel } from 'discord.js';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { attachReactionToMessage, getUserResponse } from '../../utils/utils';
 import { roundNumberTwoDecimals } from '../../utils/numberUtils';
@@ -21,6 +21,7 @@ export abstract class Transfer {
     readonly responder;
     // the minimum amount that can be transferred
     protected MINIMUM_TRANSFER_AMT = 0.01;
+    // the comment prompt sent to the user
     private commentMsg: Message | undefined;
 
     protected constructor(
