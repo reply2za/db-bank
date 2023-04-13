@@ -1,4 +1,4 @@
-import { Colors, Message, TextChannel } from 'discord.js';
+import { Colors, Message, MessageReaction, ReactionCollector, TextChannel, User } from 'discord.js';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { attachReactionToMessage, getUserResponse } from '../../utils/utils';
 import { roundNumberTwoDecimals } from '../../utils/numberUtils';
@@ -81,21 +81,13 @@ export abstract class Transfer {
         transferEmbed = this.getTransferEmbed(transferAmount, '');
         await transferEmbed.edit(embedMsg);
         let newTransfer;
-        const reactionCollector = await attachReactionToMessage(
-            embedMsg,
-            [this.responder.getUserId()],
-            [reactions.ARROW_CCW],
-            (react, user, collector) => {
-                collector.stop();
-                if (react.emoji.name === reactions.ARROW_CCW) {
-                    this.channel.send('*resetting transfer*');
-                    newTransfer = this.processTransfer();
-                    if (this.commentMsg && this.commentMsg.deletable) this.commentMsg.delete();
-                    if (embedMsg.deletable) embedMsg.delete();
-                }
-            }
-        );
         if (!comment) {
+            const reactionCollector = await this.attachUndoReaction(embedMsg, () => {
+                this.channel.send('*resetting amount*');
+                newTransfer = this.processTransfer();
+                if (this.commentMsg && this.commentMsg.deletable) this.commentMsg.delete();
+                if (embedMsg.deletable) embedMsg.delete();
+            });
             comment = await this.getComment();
             if (newTransfer) return newTransfer;
             reactionCollector.stop();
@@ -110,7 +102,15 @@ export abstract class Transfer {
         }
         await embedMsg.delete();
         embedMsg = await transferEmbed.send(this.channel);
+        const reactionCollector = await this.attachUndoReaction(embedMsg, () => {
+            this.channel.send('*resetting comment*');
+            newTransfer = this.processTransfer(transferAmount);
+            if (this.commentMsg && this.commentMsg.deletable) this.commentMsg.delete();
+            if (embedMsg.deletable) embedMsg.delete();
+        });
         const confirmationResponse = await this.getFinalConfirmation();
+        if (newTransfer) return newTransfer;
+        reactionCollector.stop();
         if (confirmationResponse) {
             const txnResponse = await this.approvedTransactionAction(transferAmount, comment);
             embedMsg.react(txnResponse ? reactions.CHECK : reactions.X).catch((e) => logger.debugLog(e));
@@ -290,4 +290,18 @@ export abstract class Transfer {
         this.commentMsg = await this.sendCommentPrompt();
         return await this.getUserComment();
     }
+
+    private attachUndoReaction = async (msg: Message, callback: () => void) => {
+        return await attachReactionToMessage(
+            msg,
+            [this.responder.getUserId()],
+            [reactions.ARROW_L],
+            (react, user, collector) => {
+                collector.stop();
+                if (react.emoji.name === reactions.ARROW_L) {
+                    callback();
+                }
+            }
+        );
+    };
 }
