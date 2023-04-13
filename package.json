@@ -10,7 +10,7 @@
     "prod": "npm run pm2",
     "prod:build": "npm install && tsc -p tsconfig.prod.json",
     "pm2": "bash scripts/pm2.bash",
-    "release": "npm run test && bash scripts/release.bash",
+    "release:patch": "npm run test && npm version patch -m \"chore(release): %s\"",
     "test": "tsc && jest --detectOpenHandles --forceExit"
   },
   "author": "Reply2za",

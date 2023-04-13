@@ -42,4 +42,8 @@ export default {
     TICKET: '🎫',
     // cash
     MONEY: '💵',
+    // pencil
+    PENCIL: '✏️',
+    // arrow counter-clockwise
+    ARROW_CCW: '🔄',
 };

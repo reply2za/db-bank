@@ -41,7 +41,7 @@ export async function attachReactionToMessage(
     reactMsg: Message,
     reactionUserIds: string[],
     reactionsList: EmojiIdentifierResolvable[],
-    executeCallback: (reaction: MessageReaction, user: User) => void,
+    executeCallback: (reaction: MessageReaction, user: User, collector: ReactionCollector) => void,
     endCallback?: (collected: Collection<string, MessageReaction>, reason: string) => void,
     filter?: (reaction: MessageReaction, user: User) => boolean,
     filterTime = 30000
@@ -60,7 +60,7 @@ export async function attachReactionToMessage(
         };
     }
     const collector = reactMsg.createReactionCollector({ filter, time: filterTime, dispose: true });
-    collector.on('collect', executeCallback);
+    collector.on('collect', (reaction, user) => executeCallback(reaction, user, collector));
     collector.on('end', endCallback);
     for (const r of reactionsList) {
         await reactMsg.react(r);

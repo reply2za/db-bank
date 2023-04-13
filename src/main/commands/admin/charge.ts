@@ -35,17 +35,6 @@ class Charge extends ACashTransfer {
         return status.success;
     }
 
-    protected async getComment(): Promise<string | undefined> {
-        await new EmbedBuilderLocal()
-            .setDescription("type a short comment/description ['b' = blank, 'q' = cancel]")
-            .setColor(Colors.Orange)
-            .send(this.channel);
-
-        const commentResponse = (await getUserResponse(this.channel, this.receiver.getUserId()))?.content;
-        if (commentResponse?.toLowerCase() === 'b') return '';
-        return commentResponse;
-    }
-
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {
         return chargeTransferVisualizer.getChargeTransferEmbed(this.sender, this.receiver, amount, comment);
     }

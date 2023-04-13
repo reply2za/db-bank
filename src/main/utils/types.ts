@@ -8,7 +8,7 @@ export type MessageEventLocal = MessageEventCore<EventDataNames> & {
 
 export enum EventDataNames {
     /*
-    Message - active message object from the bot when starting a transfer
+    {Message} - active message object from the bot when starting a transfer
     - is created when a transfer message/request from the bot is sent
     - is deleted when a response is provided or timeouts
     */
@@ -20,8 +20,12 @@ export enum EventDataNames {
      */
     REACTION_TSFR_REQ,
     /*
-    Message - The message that contains the Redeemable IOU Embed
+    {Message} - The message that contains the Redeemable IOU Embed
     - is created when a redeem request is initiated from a reaction
      */
     REDEEM_IOU_EMBED_MSG,
+    /*
+    {id: string} - the request for the amount to transfer
+     */
+    TRANSFER_AMOUNT_REQ,
 }

@@ -1,6 +1,6 @@
 import { Colors, Message, TextChannel } from 'discord.js';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
-import { getUserResponse } from '../../utils/utils';
+import { attachReactionToMessage, getUserResponse } from '../../utils/utils';
 import { roundNumberTwoDecimals } from '../../utils/numberUtils';
 import reactions from '../../utils/constants/reactions';
 import visualizerCommon from '../visualizers/visualizerCommon';
@@ -9,6 +9,7 @@ import { EventDataNames } from '../../utils/types';
 import { config } from '../../utils/constants/constants';
 import { TransferType } from '../types';
 import { bankUserLookup } from '../BankUserLookup';
+import logger from '../../utils/Logger';
 
 const MAX_RETRY_COUNT = 3;
 
@@ -20,6 +21,7 @@ export abstract class Transfer {
     readonly responder;
     // the minimum amount that can be transferred
     protected MINIMUM_TRANSFER_AMT = 0.01;
+    private commentMsg: Message | undefined;
 
     protected constructor(
         channel: TextChannel,
@@ -65,35 +67,56 @@ export abstract class Transfer {
         return bankUserOrErr;
     }
 
-    async processTransfer(): Promise<Transfer> {
-        let transferEmbed = this.getTransferEmbed(0, '');
+    async processTransfer(transferAmount: number | undefined = 0, comment: string | undefined = ''): Promise<Transfer> {
+        let transferEmbed = this.getTransferEmbed(transferAmount, comment);
         let embedMsg = await transferEmbed.send(this.channel);
-        let transferAmount = await this.getAmount();
         if (!transferAmount) {
-            await this.cancelResponse();
-            embedMsg.deletable && embedMsg.delete();
-            return this;
+            transferAmount = await this.getAmount();
+            if (!transferAmount) {
+                await this.cancelResponse();
+                if (embedMsg.deletable) await embedMsg.delete();
+                return this;
+            }
         }
         transferEmbed = this.getTransferEmbed(transferAmount, '');
         await transferEmbed.edit(embedMsg);
-        const comment = await this.getComment();
-        if (comment === undefined || comment.toLowerCase() === 'q') {
-            await this.cancelResponse(comment === undefined ? 'no response provided' : '');
-            embedMsg.react(reactions.X);
-            return this;
-        }
-        if (comment !== '') {
-            transferEmbed = this.getTransferEmbed(transferAmount, comment);
+        let newTransfer;
+        const reactionCollector = await attachReactionToMessage(
+            embedMsg,
+            [this.responder.getUserId()],
+            [reactions.ARROW_CCW],
+            (react, user, collector) => {
+                collector.stop();
+                if (react.emoji.name === reactions.ARROW_CCW) {
+                    this.channel.send('*resetting transfer*');
+                    newTransfer = this.processTransfer();
+                    if (this.commentMsg && this.commentMsg.deletable) this.commentMsg.delete();
+                    if (embedMsg.deletable) embedMsg.delete();
+                }
+            }
+        );
+        if (!comment) {
+            comment = await this.getComment();
+            if (newTransfer) return newTransfer;
+            reactionCollector.stop();
+            if (comment === undefined || comment.toLowerCase() === 'q') {
+                await this.cancelResponse(comment === undefined ? 'no response provided' : '');
+                embedMsg.react(reactions.X).catch((e) => logger.debugLog(e));
+                return this;
+            }
+            if (comment !== '') {
+                transferEmbed = this.getTransferEmbed(transferAmount, comment);
+            }
         }
         await embedMsg.delete();
         embedMsg = await transferEmbed.send(this.channel);
         const confirmationResponse = await this.getFinalConfirmation();
         if (confirmationResponse) {
             const txnResponse = await this.approvedTransactionAction(transferAmount, comment);
-            embedMsg.react(txnResponse ? reactions.CHECK : reactions.X);
+            embedMsg.react(txnResponse ? reactions.CHECK : reactions.X).catch((e) => logger.debugLog(e));
         } else {
             await this.cancelResponse();
-            embedMsg.react(reactions.X);
+            embedMsg.react(reactions.X).catch((e) => logger.debugLog(e));
         }
         return this;
     }
@@ -128,7 +151,7 @@ export abstract class Transfer {
             .send(this.channel);
         const response = await getUserResponse(this.channel, this.responder.getUserId());
         if (!response) this.channel.send('*no response provided*');
-        enterAmountMsg.deletable && enterAmountMsg.delete();
+        if (enterAmountMsg.deletable) await enterAmountMsg.delete();
         return response?.content;
     }
 
@@ -139,15 +162,23 @@ export abstract class Transfer {
     }
 
     /**
+     * Sends the comment prompt to the author.
+     * @protected
+     */
+    protected sendCommentPrompt(): Promise<Message> {
+        return new EmbedBuilderLocal()
+            .setDescription("type a short comment/description ['q' = cancel]")
+            .setColor(Colors.Orange)
+            .send(this.channel);
+    }
+
+    /**
+     * Gets the response message from the author and returns the comment.
      * Returning a 'q' (case-insensitive) allows users to cancel the transfer flow.
      * Returning undefined means author-abandoned and will also cancel the flow.
      * @protected
      */
-    protected async getComment(): Promise<string | undefined> {
-        await new EmbedBuilderLocal()
-            .setDescription("type a short comment/description ['q' = cancel]")
-            .setColor(Colors.Orange)
-            .send(this.channel);
+    protected async getUserComment(): Promise<string | undefined> {
         return (await getUserResponse(this.channel, this.sender.getUserId()))?.content;
     }
 
@@ -248,5 +279,15 @@ export abstract class Transfer {
             return `*could not find user **${displayName}**, try using @ mentions or the user id (name#1234)*`;
         }
         return recipientBankUser;
+    }
+
+    /**
+     * Returning a 'q' (case-insensitive) allows users to cancel the transfer flow.
+     * Returning undefined means author-abandoned and will also cancel the flow.
+     * @protected
+     */
+    private async getComment(): Promise<string | undefined> {
+        this.commentMsg = await this.sendCommentPrompt();
+        return await this.getUserComment();
     }
 }

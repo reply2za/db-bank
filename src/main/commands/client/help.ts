@@ -5,8 +5,10 @@ exports.run = async (event: MessageEventLocal) => {
     await new EmbedBuilderLocal()
         .setTitle('Help List')
         .setDescription(
-            `**bank** - view balance
+            `
+**bank** - view balance
 **transfer** [name] - initiate transfer process
+**calculate** [expression] - calculate an expression
 
 -- IOU commands -- 
 **transferIOU** - transfer an IOU
