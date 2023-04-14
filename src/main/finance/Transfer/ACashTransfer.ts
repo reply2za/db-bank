@@ -20,14 +20,11 @@ export abstract class ACashTransfer extends Transfer {
         return amt;
     }
 
-    protected async sendCommentPrompt() {
-        return new EmbedBuilderLocal()
+    protected async getComment(): Promise<string | undefined> {
+        await new EmbedBuilderLocal()
             .setDescription("type a short comment/description ['b' = blank, 'q' = cancel]")
             .setColor(Colors.Orange)
             .send(this.channel);
-    }
-
-    protected async getUserComment(): Promise<string | undefined> {
         const commentResponse = (await getUserResponse(this.channel, this.sender.getUserId()))?.content;
         if (commentResponse?.toLowerCase() === 'b') return '';
         return commentResponse;

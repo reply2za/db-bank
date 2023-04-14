@@ -83,11 +83,11 @@ export abstract class Transfer {
         await transferEmbed.edit(embedMsg);
         let newTransfer;
         if (!comment) {
-            const reactionCollector = await this.attachUndoReaction(embedMsg, () => {
-                this.channel.send('*resetting amount*');
+            const reactionCollector = await this.attachUndoReaction(embedMsg, async () => {
+                await this.channel.send('*resetting amount*');
                 newTransfer = this.processTransfer();
-                if (this.commentMsg && this.commentMsg.deletable) this.commentMsg.delete();
-                if (embedMsg.deletable) embedMsg.delete();
+                if (this.commentMsg && this.commentMsg.deletable) await this.commentMsg.delete();
+                if (embedMsg.deletable) await embedMsg.delete();
             });
             comment = await this.getComment();
             if (newTransfer) return newTransfer;
@@ -103,11 +103,11 @@ export abstract class Transfer {
         }
         await embedMsg.delete();
         embedMsg = await transferEmbed.send(this.channel);
-        const reactionCollector = await this.attachUndoReaction(embedMsg, () => {
-            this.channel.send('*resetting comment*');
+        const reactionCollector = await this.attachUndoReaction(embedMsg, async () => {
+            await this.channel.send('*resetting comment*');
             newTransfer = this.processTransfer(transferAmount);
-            if (this.commentMsg && this.commentMsg.deletable) this.commentMsg.delete();
-            if (embedMsg.deletable) embedMsg.delete();
+            if (this.commentMsg && this.commentMsg.deletable) await this.commentMsg.delete();
+            if (embedMsg.deletable) await embedMsg.delete();
         });
         const confirmationResponse = await this.getFinalConfirmation();
         if (newTransfer) return newTransfer;
@@ -163,23 +163,15 @@ export abstract class Transfer {
     }
 
     /**
-     * Sends the comment prompt to the author.
-     * @protected
-     */
-    protected sendCommentPrompt(): Promise<Message> {
-        return new EmbedBuilderLocal()
-            .setDescription("type a short comment/description ['q' = cancel]")
-            .setColor(Colors.Orange)
-            .send(this.channel);
-    }
-
-    /**
-     * Gets the response message from the author and returns the comment.
      * Returning a 'q' (case-insensitive) allows users to cancel the transfer flow.
      * Returning undefined means author-abandoned and will also cancel the flow.
      * @protected
      */
-    protected async getUserComment(): Promise<string | undefined> {
+    protected async getComment(): Promise<string | undefined> {
+        this.commentMsg = await new EmbedBuilderLocal()
+            .setDescription("type a short comment/description ['q' = cancel]")
+            .setColor(Colors.Orange)
+            .send(this.channel);
         return (await getUserResponse(this.channel, this.sender.getUserId()))?.content;
     }
 
@@ -282,23 +274,13 @@ export abstract class Transfer {
         return recipientBankUser;
     }
 
-    /**
-     * Returning a 'q' (case-insensitive) allows users to cancel the transfer flow.
-     * Returning undefined means author-abandoned and will also cancel the flow.
-     * @protected
-     */
-    private async getComment(): Promise<string | undefined> {
-        this.commentMsg = await this.sendCommentPrompt();
-        return await this.getUserComment();
-    }
-
     private attachUndoReaction = async (msg: Message, callback: () => void) => {
         return await attachReactionToMessage(
             msg,
             [this.responder.getUserId()],
             [reactions.ARROW_L],
-            (react, user, collector) => {
-                collector.stop();
+            async (react, user, collector) => {
+                await collector.stop();
                 if (react.emoji.name === reactions.ARROW_L) {
                     callback();
                 }
