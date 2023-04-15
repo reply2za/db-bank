@@ -4,8 +4,8 @@ import { getUserResponse } from '../../../utils/utils';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 
 exports.run = async (event: MessageEventLocal) => {
-    let totalTxt: string;
-    if (event.args.length < 1) {
+    let totalTxt = event.args.join(' ');
+    if (!totalTxt) {
         await new EmbedBuilderLocal()
             .setDescription('enter the numbers to sum up:\n*ex: `10 + 2.21 - 5`*')
             .send(event.message.channel);
@@ -17,7 +17,7 @@ exports.run = async (event: MessageEventLocal) => {
             return;
         }
     }
-    totalTxt = calculateTotal(totalTxt!);
+    totalTxt = calculateTotal(totalTxt);
     const total = Number(totalTxt);
     if (!Number.isFinite(total)) {
         event.message.channel.send('error: invalid expression');
