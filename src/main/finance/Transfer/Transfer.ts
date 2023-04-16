@@ -68,8 +68,16 @@ export abstract class Transfer {
         return bankUserOrErr;
     }
 
-    async processTransfer(transferAmount: number | undefined = 0, comment: string | undefined = ''): Promise<Transfer> {
-        let transferEmbed = this.getTransferEmbed(transferAmount, comment);
+    /**
+     * Processes a transfer.
+     * @param transferAmount The amount to transfer. If undefined or 0 then the user will be prompted for an amount.
+     * @param comment A comment for the transfer. Only an undefined comment will prompt the user for a comment.
+     */
+    async processTransfer(
+        transferAmount: number | undefined = 0,
+        comment: string | undefined = undefined
+    ): Promise<Transfer> {
+        let transferEmbed = this.getTransferEmbed(transferAmount, comment ?? '');
         let embedMsg = await transferEmbed.send(this.channel);
         if (!transferAmount) {
             transferAmount = await this.getAmount();
@@ -82,7 +90,7 @@ export abstract class Transfer {
         transferEmbed = this.getTransferEmbed(transferAmount, '');
         await transferEmbed.edit(embedMsg);
         let newTransfer;
-        if (!comment) {
+        if (comment === undefined) {
             const reactionCollector = await this.attachUndoReaction(embedMsg, async () => {
                 await this.channel.send('*resetting amount*');
                 newTransfer = this.processTransfer();
@@ -97,7 +105,7 @@ export abstract class Transfer {
                 embedMsg.react(reactions.X).catch((e) => logger.debugLog(e));
                 return this;
             }
-            if (comment !== '') {
+            if (comment) {
                 transferEmbed = this.getTransferEmbed(transferAmount, comment);
             }
         }
@@ -275,7 +283,7 @@ export abstract class Transfer {
     }
 
     private attachUndoReaction = async (msg: Message, callback: () => void) => {
-        return await attachReactionToMessage(
+        return attachReactionToMessage(
             msg,
             [this.responder.getUserId()],
             [reactions.ARROW_L],
