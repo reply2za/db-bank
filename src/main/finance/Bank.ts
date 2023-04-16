@@ -12,6 +12,7 @@ import visualizerCommon from './visualizers/visualizerCommon';
 import { BankUserCopy } from './BankUser/BankUserCopy';
 import { config } from '../utils/constants/constants';
 import { ABankUser } from './BankUser/ABankUser';
+import { BOT_ID } from '../../tests/resources/constants';
 
 export class Bank {
     #users: Map<string, OriginalBankUser> = new Map();
@@ -73,6 +74,24 @@ export class Bank {
         const receiver = <OriginalBankUser>senderAndReceiverObj.receiver;
         const transferResponse = this.#transferAmountCore(sender, receiver, amount);
         await this.#recordTransfer(transferResponse, amount, senderId, receiverId, channel, type, comment);
+        return transferResponse;
+    }
+
+    async creditAmount(
+        receiverId: string,
+        amount: number,
+        channel: TextBasedChannel,
+        comment = ''
+    ): Promise<StatusWithErrorResponse> {
+        const receiver = this.#users.get(receiverId);
+        if (!receiver) {
+            return {
+                success: false,
+                failReason: 'could not find receiver',
+            };
+        }
+        const transferResponse = this.#creditAmountCore(receiver, amount);
+        await this.#recordTransfer(transferResponse, amount, BOT_ID, receiverId, channel, TransferType.CREDIT, comment);
         return transferResponse;
     }
 
@@ -265,6 +284,11 @@ export class Bank {
         return this.#users.get(id);
     }
 
+    /**
+     * Verify that the sender and receiver exist
+     * @param senderReceiverPayload
+     * @private
+     */
     #verifySenderAndReceiver(senderReceiverPayload: {
         sender: OriginalBankUser | undefined;
         receiver: OriginalBankUser | undefined;
@@ -285,6 +309,16 @@ export class Bank {
             success: true,
             failReason: '',
         };
+    }
+
+    #creditAmountCore(receiver: OriginalBankUser, amount: number) {
+        if (!amount) return { success: false, failReason: 'input error' };
+        amount = roundNumberTwoDecimals(amount);
+        if (amount < 0) {
+            return { success: false, failReason: 'cannot credit negative balance' };
+        }
+        receiver.addBalance(amount);
+        return { success: true, failReason: '' };
     }
 }
 

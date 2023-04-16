@@ -3,38 +3,35 @@ import { bank } from '../../finance/Bank';
 import { TransferType } from '../../finance/types';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { Message, TextChannel } from 'discord.js';
-import chargeTransferVisualizer from '../../finance/visualizers/transfers/chargeTransferVisualizer';
 import { BankUserCopy } from '../../finance/BankUser/BankUserCopy';
 import { ACashTransfer } from '../../finance/Transfer/ACashTransfer';
+import cashTransferVisualizer from '../../finance/visualizers/transfers/cashTransferVisualizer';
 
 exports.run = async (event: MessageEventLocal) => {
-    const sender = await Charge.getUserToTransferTo(event.message, event.args[0], event.data);
-    if (!sender) return;
-    await new Charge(<TextChannel>event.message.channel, sender, event.bankUser).processTransfer();
+    const receiver = await Credit.getUserToTransferTo(event.message, event.args[0], event.data);
+    if (!receiver) return;
+    await new Credit(<TextChannel>event.message.channel, event.bankUser, receiver).processTransfer();
 };
 
-class Charge extends ACashTransfer {
+class Credit extends ACashTransfer {
     constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy) {
-        super(channel, sender, receiver, TransferType.CHARGE, receiver);
+        super(channel, sender, receiver, TransferType.CREDIT, sender);
     }
 
     static getUserToTransferTo(message: Message, name: string, eventData: any): Promise<BankUserCopy | undefined> {
-        return super.getUserToTransferTo(message, name, 'charge', eventData);
+        return super.getUserToTransferTo(message, name, 'credit', eventData);
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {
-        const status = await bank.transferAmount(
-            this.sender.getUserId(),
-            this.receiver.getUserId(),
-            transferAmount,
-            this.channel,
-            TransferType.CHARGE,
-            comment
-        );
+        const status = await bank.creditAmount(this.receiver.getUserId(), transferAmount, this.channel, comment);
         return status.success;
     }
 
+    protected async getComment(): Promise<string | undefined> {
+        return '';
+    }
+
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {
-        return chargeTransferVisualizer.getChargeTransferEmbed(this.sender, this.receiver, amount, comment);
+        return cashTransferVisualizer.getCreditTransferEmbed(this.receiver, amount, comment);
     }
 }

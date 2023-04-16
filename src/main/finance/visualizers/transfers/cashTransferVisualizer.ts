@@ -46,4 +46,19 @@ export default {
             .setDescription(`sent ${convertToCurrency(transferAmount)} to ${receiverName}`)
             .setColor('Blurple');
     },
+    getCreditTransferEmbed(receiver: Readonly<BankUserCopy>, amount = 0, comment?: string): EmbedBuilderLocal {
+        const e = visualizerCommon.getCoreTransferEmbed();
+        return e
+            .setTitle(`Credit ${receiver.getUsername()}`)
+            .setDescription(
+                (amount ? `sending \`${convertToCurrency(amount)}\`` : '*no amount selected*').concat(
+                    `${comment ? `\ncomment: *${comment}*` : ''}`
+                )
+            )
+            .setFooter(
+                `${receiver.getUsername()}'s balance: ${convertToCurrency(receiver.getBalance())}${
+                    amount ? ` => ${convertToCurrency(roundNumberTwoDecimals(receiver.getBalance() + amount))}` : ''
+                }`
+            );
+    },
 };
