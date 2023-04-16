@@ -25,7 +25,7 @@ export abstract class ACashTransfer extends Transfer {
             .setDescription("type a short comment/description ['b' = blank, 'q' = cancel]")
             .setColor(Colors.Orange)
             .send(this.channel);
-        const commentResponse = (await getUserResponse(this.channel, this.sender.getUserId()))?.content;
+        const commentResponse = (await getUserResponse(this.channel, this.responder.getUserId()))?.content;
         if (commentResponse?.toLowerCase() === 'b') return '';
         return commentResponse;
     }
