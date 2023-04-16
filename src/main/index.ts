@@ -38,6 +38,10 @@ async function main() {
     commandHandler.loadAllCommands();
     eventHandler.loadAllEvents((eventName, listener) => bot.on(eventName, listener));
     console.log(`prefix: ${config.prefix}`);
+    const processNameMsg = await processManager.getLastProcessName();
+    if (processNameMsg?.content === config.hardwareTag) {
+        processManager.setActive(true);
+    }
 }
 
 main().finally(() => {

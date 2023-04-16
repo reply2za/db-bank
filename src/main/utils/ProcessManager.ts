@@ -1,5 +1,5 @@
 import { bot, config } from './constants/constants';
-import { Message, MessageReaction, ReactionCollector, TextChannel, User } from 'discord.js';
+import { Message, MessageReaction, ReactionCollector, TextChannel } from 'discord.js';
 import reactions from './constants/reactions';
 import { attachReactionToMessage } from './utils';
 import { execSync } from 'child_process';
@@ -40,7 +40,7 @@ class ProcessManager {
                 if (msg && msg.content !== config.hardwareTag) {
                     logger
                         .errorLog(`new active process PREV: (${msg.content}) NOW: (${config.hardwareTag})`, '[WARNING]')
-                        .then((errMsg) => this.updateActiveProcessName(msg, errMsg));
+                        .then((logMsg) => this.updateActiveProcessName(msg, logMsg));
                 }
                 this.updateProcessLog();
             });
@@ -144,27 +144,46 @@ class ProcessManager {
             if (await connect()) return true;
         }
     }
-    private async updateActiveProcessName(msg: Message, errMsg?: Message) {
-        if (!errMsg) {
-            await msg.edit(config.hardwareTag);
+
+    /**
+     * Updates the hardware tag message with the current process name. Expects a response from the user to confirm or deny the change.
+     * No response will be the same as confirming the change.
+     * @param hardwareTagMsg The message containing the latest active hardware tag name.
+     * @param statusMsg The message that informs the admins that the active process is different.
+     * @private
+     */
+    private async updateActiveProcessName(hardwareTagMsg: Message, statusMsg?: Message) {
+        if (!statusMsg) {
+            await hardwareTagMsg.edit(config.hardwareTag);
         } else {
             let collector: ReactionCollector | undefined;
-            const callback = (reaction: MessageReaction, user: User) => {
+            let responseReceived = false;
+            const processNameChangedTxt = `process name changed: ${hardwareTagMsg.content} => ${config.hardwareTag}`;
+            const callback = (reaction: MessageReaction) => {
                 if (reaction.emoji.name === reactions.CHECK) {
-                    msg.edit(config.hardwareTag);
-                    errMsg.channel.send(`process name changed: ${msg.content} => ${config.hardwareTag}`);
-                } else {
+                    hardwareTagMsg.edit(config.hardwareTag);
+                    statusMsg.channel.send(processNameChangedTxt);
+                    responseReceived = true;
+                } else if (reaction.emoji.name === reactions.X) {
                     this.setActive(false);
-                    errMsg.channel.send(`process name will remain as ${msg.content}`);
+                    statusMsg.channel.send(`process name will remain as ${hardwareTagMsg.content}`);
+                    responseReceived = true;
                 }
                 if (collector) collector.stop();
             };
+            const endCallback = async () => {
+                statusMsg.reactions.removeAll().catch((e) => logger.debugLog(e));
+                if (!responseReceived) {
+                    await hardwareTagMsg.edit(config.hardwareTag);
+                    statusMsg.channel.send(processNameChangedTxt);
+                }
+            };
             collector = await attachReactionToMessage(
-                errMsg,
+                statusMsg,
                 config.adminIDs.map((id) => id.trim()),
                 [reactions.CHECK, reactions.X],
                 callback,
-                undefined,
+                endCallback,
                 undefined,
                 60000
             );
