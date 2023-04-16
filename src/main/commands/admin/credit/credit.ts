@@ -1,11 +1,11 @@
-import { MessageEventLocal } from '../../utils/types';
-import { bank } from '../../finance/Bank';
-import { TransferType } from '../../finance/types';
+import { MessageEventLocal } from '../../../utils/types';
+import { bank } from '../../../finance/Bank';
+import { TransferType } from '../../../finance/types';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { Message, TextChannel } from 'discord.js';
-import { BankUserCopy } from '../../finance/BankUser/BankUserCopy';
-import { ACashTransfer } from '../../finance/Transfer/ACashTransfer';
-import cashTransferVisualizer from '../../finance/visualizers/transfers/cashTransferVisualizer';
+import { BankUserCopy } from '../../../finance/BankUser/BankUserCopy';
+import { ACashTransfer } from '../../../finance/Transfer/ACashTransfer';
+import cashTransferVisualizer from '../../../finance/visualizers/transfers/cashTransferVisualizer';
 
 exports.run = async (event: MessageEventLocal) => {
     const receiver = await Credit.getUserToTransferTo(event.message, event.args[0], event.data);
@@ -25,10 +25,6 @@ class Credit extends ACashTransfer {
     protected async approvedTransactionAction(transferAmount: number, comment: string) {
         const status = await bank.creditAmount(this.receiver.getUserId(), transferAmount, this.channel, comment);
         return status.success;
-    }
-
-    protected async getComment(): Promise<string | undefined> {
-        return '';
     }
 
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {
