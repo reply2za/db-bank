@@ -9,7 +9,8 @@ exports.run = async (event: MessageEventLocal) => {
             `*note: production processes start up in an inactive state*
 **bank commands**
 \`view\` - view all bank accounts
-\`charge [user] [amt]\` - charge an account
+\`charge [user]\` - charge an account
+\`credit [user]\` - credit an account
 **process commands**
 \`boot\` - see all processes
 \`update\` - update the process
