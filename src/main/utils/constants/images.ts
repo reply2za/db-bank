@@ -1,6 +1,7 @@
 export default {
     BANK_IMG:
         'https://static.wikia.nocookie.net/spongebob/images/9/92/Goodbye%2C_Krabby_Patty_151.png/revision/latest?cb=20170310020233',
+    CREDIT_TRANSFER_IMG: 'https://thespongeclub.com/wp-content/uploads/2022/07/born-again-krabs-episode.webp',
     TRANSFER_IMG:
         'https://vignette.wikia.nocookie.net/spongebob/images/2/25/Mermaid_Man_and_Barnacle_Boy_III_092.png/revision/latest?cb=20191208224116',
     TRANSFER_IOU_IMG: 'https://i.makeagif.com/media/2-27-2016/cuk9a4.gif',

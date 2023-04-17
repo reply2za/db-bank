@@ -47,7 +47,7 @@ export default {
             .setColor('Blurple');
     },
     getCreditTransferEmbed(receiver: Readonly<BankUserCopy>, amount = 0, comment?: string): EmbedBuilderLocal {
-        const e = visualizerCommon.getCoreTransferEmbed();
+        const e = new EmbedBuilderLocal().setColor('#7eff74').setThumbnail(images.CREDIT_TRANSFER_IMG);
         return e
             .setTitle(`Credit ${receiver.getUsername()}`)
             .setDescription(
