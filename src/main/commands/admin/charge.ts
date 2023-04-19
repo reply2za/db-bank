@@ -37,4 +37,13 @@ class Charge extends ACashTransfer {
     getTransferEmbed(amount: number, comment = ''): EmbedBuilderLocal {
         return chargeTransferVisualizer.getChargeTransferEmbed(this.sender, this.receiver, amount, comment);
     }
+
+    protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
+        if (!(await super.validateAmount(transferAmount, channel))) return false;
+        if (transferAmount > this.sender.getBalance()) {
+            await channel.send("error: `cannot charge more than the sender's balance`");
+            return false;
+        }
+        return true;
+    }
 }
