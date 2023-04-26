@@ -9,6 +9,7 @@ import iouTransferVisualizer from '../../../finance/visualizers/transfers/iouTra
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 import { BankUserCopy } from '../../../finance/BankUser/BankUserCopy';
 import { config } from '../../../utils/constants/constants';
+import { formatErrorText } from '../../../utils/utils';
 
 exports.run = async (event: MessageEventLocal) => {
     const recipientBankUser = await TransferIOU.getUserToTransferTo(event.message, event.args[0], event.data);
@@ -77,11 +78,11 @@ class TransferIOU extends Transfer {
             (await super.validateAmount(transferAmount, channel)) &&
             (() => {
                 if (Math.floor(transferAmount) !== transferAmount) {
-                    channel.send('*error: `cannot send partial IOUs`*');
+                    channel.send(formatErrorText('cannot send partial IOUs'));
                     return false;
                 }
                 if (transferAmount > config.maxIOUCountPerReq) {
-                    channel.send(`*error: \`cannot send more than ${config.maxIOUCountPerReq} IOUs\`*`);
+                    channel.send(formatErrorText(`cannot send more than ${config.maxIOUCountPerReq} IOUs`));
                     return false;
                 }
                 return true;

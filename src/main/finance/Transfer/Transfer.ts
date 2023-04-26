@@ -1,6 +1,6 @@
 import { Colors, Message, TextChannel } from 'discord.js';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
-import { attachReactionToMessage, getUserResponse } from '../../utils/utils';
+import { attachReactionToMessage, formatErrorText, getUserResponse } from '../../utils/utils';
 import { roundNumberTwoDecimals } from '../../utils/numberUtils';
 import reactions from '../../utils/constants/reactions';
 import visualizerCommon from '../visualizers/visualizerCommon';
@@ -189,11 +189,11 @@ export abstract class Transfer {
 
     protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
         if (!Number.isFinite(transferAmount)) {
-            await channel.send('*error: `invalid input`*');
+            await channel.send(formatErrorText('invalid input'));
             return false;
         }
         if (transferAmount < this.MINIMUM_TRANSFER_AMT) {
-            await channel.send(`*error: \`amount must be greater than or equal to ${this.MINIMUM_TRANSFER_AMT}\`*`);
+            await channel.send(formatErrorText(`amount must be greater than or equal to ${this.MINIMUM_TRANSFER_AMT}`));
             return false;
         }
         return true;

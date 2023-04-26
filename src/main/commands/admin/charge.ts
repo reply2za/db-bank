@@ -6,6 +6,7 @@ import { Message, TextChannel } from 'discord.js';
 import chargeTransferVisualizer from '../../finance/visualizers/transfers/chargeTransferVisualizer';
 import { BankUserCopy } from '../../finance/BankUser/BankUserCopy';
 import { ACashTransfer } from '../../finance/Transfer/ACashTransfer';
+import { formatErrorText } from '../../utils/utils';
 
 exports.run = async (event: MessageEventLocal) => {
     const sender = await Charge.getUserToTransferTo(event.message, event.args[0], event.data);
@@ -41,7 +42,7 @@ class Charge extends ACashTransfer {
     protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
         if (!(await super.validateAmount(transferAmount, channel))) return false;
         if (transferAmount > this.sender.getBalance()) {
-            await channel.send("error: `cannot charge more than the sender's balance`");
+            await channel.send(formatErrorText("cannot charge more than the sender's balance"));
             return false;
         }
         return true;

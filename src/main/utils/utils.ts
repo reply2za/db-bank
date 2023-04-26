@@ -71,3 +71,7 @@ export async function attachReactionToMessage(
 export function isAdmin(id: string): boolean {
     return config.adminIDs.includes(`${id} `);
 }
+
+export function formatErrorText(text: string): string {
+    return `error: \`${text}\``;
+}

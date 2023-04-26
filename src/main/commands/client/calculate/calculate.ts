@@ -1,6 +1,6 @@
 import { MessageEventLocal } from '../../../utils/types';
 import { calculateTotal } from '../../../finance/utils';
-import { getUserResponse } from '../../../utils/utils';
+import { formatErrorText, getUserResponse } from '../../../utils/utils';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 
 exports.run = async (event: MessageEventLocal) => {
@@ -20,7 +20,7 @@ exports.run = async (event: MessageEventLocal) => {
     totalTxt = calculateTotal(totalTxt);
     const total = Number(totalTxt);
     if (!Number.isFinite(total)) {
-        event.message.channel.send('error: invalid expression');
+        event.message.channel.send(formatErrorText('invalid expression'));
         return;
     }
     event.message.channel.send(`total: \`${totalTxt}\``);

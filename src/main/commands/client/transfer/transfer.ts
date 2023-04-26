@@ -1,7 +1,7 @@
-import { getUserResponse } from '../../../utils/utils';
+import { formatErrorText } from '../../../utils/utils';
 import { commandHandler } from '../../../handlers/CommandHandler';
 import { MessageEventLocal } from '../../../utils/types';
-import { Colors, Message, TextChannel } from 'discord.js';
+import { Message, TextChannel } from 'discord.js';
 import { bank } from '../../../finance/Bank';
 import { TransferType } from '../../../finance/types';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
@@ -51,7 +51,7 @@ class MonetaryTransfer extends ACashTransfer {
     protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
         if (!(await super.validateAmount(transferAmount, channel))) return false;
         if (this.sender.getBalance() < transferAmount) {
-            this.channel.send('error: `balance is too low`');
+            this.channel.send(formatErrorText('balance is too low'));
             return false;
         }
         return true;

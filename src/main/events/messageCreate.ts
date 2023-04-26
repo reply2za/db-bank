@@ -4,7 +4,7 @@ import { bank } from '../finance/Bank';
 import { localStorage } from '../storage/LocalStorage';
 import { commandHandler } from '../handlers/CommandHandler';
 import { MessageEventLocal } from '../utils/types';
-import { isAdmin } from '../utils/utils';
+import { formatErrorText, isAdmin } from '../utils/utils';
 import Logger from '../utils/Logger';
 
 module.exports = async (message: Message) => {
@@ -25,7 +25,7 @@ module.exports = async (message: Message) => {
             await localStorage.saveData(bank.serializeData());
         } catch (e) {
             if (e instanceof Error) Logger.errorLog(e).catch((e) => console.log(e));
-            message.channel.send('*error: could not add author*');
+            message.channel.send(formatErrorText('could not add author'));
             return;
         }
         if (!bankUser) {
