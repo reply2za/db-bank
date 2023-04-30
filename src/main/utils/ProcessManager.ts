@@ -13,6 +13,11 @@ class ProcessManager {
     #isFixingConnection = false;
     #isLoggedIn = false;
     #processLogInterval: NodeJS.Timeout | undefined;
+    /*
+    If already waiting for a user response, new commands will not be executed.
+    the key is the <USER_ID>_<CHANNEL_ID> (ex: 123456789_123456789);
+    */
+    waitingForUserResponse: Map<string, { timeInMs: number }>;
     private static MINUTES = 60;
     // the time to update the process log in minutes
     private static UPDATE_LOG_INTERVAL = 1000 * 60 * ProcessManager.MINUTES;
@@ -21,6 +26,7 @@ class ProcessManager {
         // if in devMode then we want process to be on by default
         this.#isActive = config.isDevMode;
         this.version = version;
+        this.waitingForUserResponse = new Map();
     }
 
     async getLastProcessName(): Promise<Message | undefined> {

@@ -10,6 +10,7 @@ import { config } from '../../utils/constants/constants';
 import { TransferType } from '../types';
 import { bankUserLookup } from '../BankUserLookup';
 import logger from '../../utils/Logger';
+import { processManager } from '../../utils/ProcessManager';
 
 const MAX_RETRY_COUNT = 3;
 
@@ -97,7 +98,15 @@ export abstract class Transfer {
                 if (this.commentMsg && this.commentMsg.deletable) await this.commentMsg.delete();
                 if (embedMsg.deletable) await embedMsg.delete();
             });
-            comment = await this.getComment();
+            const userResponseKey = `${this.sender.getUserId()}_${this.channel.id}`;
+            processManager.waitingForUserResponse.set(userResponseKey, {
+                timeInMs: Date.now(),
+            });
+            try {
+                comment = await this.getComment();
+            } finally {
+                processManager.waitingForUserResponse.delete(userResponseKey);
+            }
             if (newTransfer) return newTransfer;
             reactionCollector.stop();
             if (comment === undefined || comment.toLowerCase() === 'q') {
