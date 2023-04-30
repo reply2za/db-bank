@@ -54,9 +54,7 @@ export abstract class Transfer {
         eventData = new Map<EventDataNames, any>()
     ): Promise<BankUserCopy | undefined> {
         const userResponseKey = `${message.author.id}_${message.channel.id}`;
-        processManager.waitingForUserResponse.set(userResponseKey, {
-            timeInMs: Date.now(),
-        });
+        processManager.waitingForUserResponse.set(userResponseKey, { timeInMs: Date.now() });
         let recipientDetails;
         try {
             recipientDetails = await Transfer.promptForRecipient(message, name, actionName, eventData);
