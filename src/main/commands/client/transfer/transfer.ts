@@ -19,7 +19,7 @@ exports.run = async (event: MessageEventLocal) => {
             <TextChannel>event.message.channel,
             event.bankUser,
             recipientBankUser
-        ).processTransfer();
+        ).processTransfer(Number(event.args[1]) ?? 0);
     }
 };
 

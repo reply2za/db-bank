@@ -10,7 +10,9 @@ import cashTransferVisualizer from '../../../finance/visualizers/transfers/cashT
 exports.run = async (event: MessageEventLocal) => {
     const receiver = await Credit.getUserToTransferTo(event.message, event.args[0], event.data);
     if (!receiver) return;
-    await new Credit(<TextChannel>event.message.channel, event.bankUser, receiver).processTransfer();
+    await new Credit(<TextChannel>event.message.channel, event.bankUser, receiver).processTransfer(
+        Number(event.args[1]) ?? 0
+    );
 };
 
 class Credit extends ACashTransfer {

@@ -14,7 +14,9 @@ import { formatErrorText } from '../../../utils/utils';
 exports.run = async (event: MessageEventLocal) => {
     const recipientBankUser = await TransferIOU.getUserToTransferTo(event.message, event.args[0], event.data);
     if (!recipientBankUser) return;
-    await new TransferIOU(<TextChannel>event.message.channel, event.bankUser, recipientBankUser).processTransfer();
+    await new TransferIOU(<TextChannel>event.message.channel, event.bankUser, recipientBankUser).processTransfer(
+        Number(event.args[1]) ?? 0
+    );
 };
 
 class TransferIOU extends Transfer {
