@@ -18,7 +18,7 @@ export class MockTextChannel {
         this.name = name;
     }
     send(message: string | { embeds: [EmbedBuilder] }) {
-        let messageText = '';
+        let messageText;
         if (typeof message === 'object') {
             messageText = message.embeds[0].data.description || 'no description';
             this.receivedMessages.push(messageText);
@@ -32,11 +32,10 @@ export class MockTextChannel {
 
     async awaitMessages(...args: any[]) {
         const messages = this.awaitMessagesList?.shift();
-        if (!messages) {
-            console.log('no messages to await');
-            throw new Error('No messages to await');
-        }
         const c = new Collection();
+        if (!messages) {
+            return c;
+        }
         for (const message of messages) {
             c.set(message.id, message);
         }
