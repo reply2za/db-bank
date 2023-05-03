@@ -258,6 +258,7 @@ export abstract class Transfer {
 
     /**
      * Determines if a unique author can be found from the given parameters.
+     * Provide either a recipientID or recipientName.
      * @param recipientID
      * @param recipientName
      * @private
