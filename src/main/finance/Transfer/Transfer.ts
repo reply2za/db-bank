@@ -86,6 +86,7 @@ export abstract class Transfer {
         comment: string | undefined = undefined
     ): Promise<Transfer> {
         let transferEmbed = this.getTransferEmbed(transferAmount, comment ?? '');
+        // the message containing the main transfer interface
         let embedMsg = await transferEmbed.send(this.channel);
         if (!transferAmount) {
             transferAmount = await this.getAmount();
@@ -140,7 +141,7 @@ export abstract class Transfer {
             const txnResponse = await this.approvedTransactionAction(transferAmount, comment);
             embedMsg.react(txnResponse ? reactions.CHECK : reactions.X).catch((e) => logger.debugLog(e));
         } else {
-            await this.cancelResponse();
+            await this.cancelResponse(undefined, embedMsg);
             embedMsg.react(reactions.X).catch((e) => logger.debugLog(e));
         }
         return this;
@@ -199,8 +200,13 @@ export abstract class Transfer {
         return (await getUserResponse(this.channel, this.sender.getUserId()))?.content;
     }
 
-    protected async cancelResponse(reason = ''): Promise<void> {
-        await this.channel.send(`*cancelled ${this.transferType}${reason ? `: ${reason}` : ''}*`);
+    protected async cancelResponse(reason = '', message?: Message): Promise<void> {
+        const responseTxt = `*cancelled ${this.transferType}${reason ? `: ${reason}` : ''}*`;
+        if (message) {
+            await message.reply(responseTxt);
+        } else {
+            await this.channel.send(responseTxt);
+        }
     }
 
     protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
