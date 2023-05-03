@@ -10,7 +10,6 @@ import { config } from '../../utils/constants/constants';
 import { TransferType } from '../types';
 import { bankUserLookup } from '../BankUserLookup';
 import logger from '../../utils/Logger';
-import { processManager } from '../../utils/ProcessManager';
 
 const MAX_RETRY_COUNT = 3;
 
@@ -42,7 +41,7 @@ export abstract class Transfer {
     /**
      * Searches the message for a mention. If there is none then searches the name. If there is no name then prompts the author.
      * @param message The author's message.
-     * @param name Optional - A name of a author to search for.
+     * @param name Optional - A name of an author to search for.
      * @param actionName Optional - The name of the action that is being attempted
      * @param eventData Optional - Event data
      * @returns The BankUser to transfer to or undefined if the request failed or was cancelled.
@@ -53,14 +52,8 @@ export abstract class Transfer {
         actionName = 'transfer',
         eventData = new Map<EventDataNames, any>()
     ): Promise<BankUserCopy | undefined> {
-        const userResponseKey = `${message.author.id}_${message.channel.id}`;
-        processManager.waitingForUserResponse.set(userResponseKey, { timeInMs: Date.now() });
         let recipientDetails;
-        try {
-            recipientDetails = await Transfer.promptForRecipient(message, name, actionName, eventData);
-        } finally {
-            processManager.waitingForUserResponse.delete(userResponseKey);
-        }
+        recipientDetails = await Transfer.promptForRecipient(message, name, actionName, eventData);
         if (!recipientDetails) return;
         const bankUserOrErr = await Transfer.resolveBankUser(
             recipientDetails.recipientID,
@@ -106,15 +99,7 @@ export abstract class Transfer {
                 if (this.commentMsg && this.commentMsg.deletable) await this.commentMsg.delete();
                 if (embedMsg.deletable) await embedMsg.delete();
             });
-            const userResponseKey = `${this.sender.getUserId()}_${this.channel.id}`;
-            processManager.waitingForUserResponse.set(userResponseKey, {
-                timeInMs: Date.now(),
-            });
-            try {
-                comment = await this.getComment();
-            } finally {
-                processManager.waitingForUserResponse.delete(userResponseKey);
-            }
+            comment = await this.getComment();
             if (newTransfer) return newTransfer;
             reactionCollector.stop();
             if (comment === undefined || comment.toLowerCase() === 'q') {
@@ -141,7 +126,7 @@ export abstract class Transfer {
             const txnResponse = await this.approvedTransactionAction(transferAmount, comment);
             embedMsg.react(txnResponse ? reactions.CHECK : reactions.X).catch((e) => logger.debugLog(e));
         } else {
-            await this.cancelResponse(undefined, embedMsg);
+            await this.cancelResponse();
             embedMsg.react(reactions.X).catch((e) => logger.debugLog(e));
         }
         return this;
@@ -200,13 +185,8 @@ export abstract class Transfer {
         return (await getUserResponse(this.channel, this.sender.getUserId()))?.content;
     }
 
-    protected async cancelResponse(reason = '', message?: Message): Promise<void> {
-        const responseTxt = `*cancelled ${this.transferType}${reason ? `: ${reason}` : ''}*`;
-        if (message) {
-            await message.reply(responseTxt);
-        } else {
-            await this.channel.send(responseTxt);
-        }
+    protected async cancelResponse(reason = ''): Promise<void> {
+        await this.channel.send(`*cancelled ${this.transferType}${reason ? `: ${reason}` : ''}*`);
     }
 
     protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {

@@ -13,11 +13,12 @@ class ProcessManager {
     #isFixingConnection = false;
     #isLoggedIn = false;
     #processLogInterval: NodeJS.Timeout | undefined;
+    #ONE_MINUTE = 60000;
     /*
     If already waiting for a user response, new commands will not be executed.
     the key is the <USER_ID>_<CHANNEL_ID> (ex: 123456789_123456789);
     */
-    waitingForUserResponse: Map<string, { timeInMs: number }>;
+    #waitingForUserResponse: Map<string, { timeInMs: number }>;
     private static MINUTES = 60;
     // the time to update the process log in minutes
     private static UPDATE_LOG_INTERVAL = 1000 * 60 * ProcessManager.MINUTES;
@@ -26,7 +27,40 @@ class ProcessManager {
         // if in devMode then we want process to be on by default
         this.#isActive = config.isDevMode;
         this.version = version;
-        this.waitingForUserResponse = new Map();
+        this.#waitingForUserResponse = new Map();
+    }
+
+    /**
+     * Apply this when waiting for a user response, new commands will not be executed.
+     * @param userId
+     * @param channelId
+     */
+    setUserResponseLock(userId: string, channelId: string) {
+        this.#waitingForUserResponse.set(`${userId}_${channelId}`, { timeInMs: Date.now() });
+    }
+
+    /**
+     * Remove the lock for a user response.
+     * @param userId
+     * @param channelId
+     */
+    removeUserResponseLock(userId: string, channelId: string) {
+        this.#waitingForUserResponse.delete(`${userId}_${channelId}`);
+    }
+
+    /**
+     * Whether the bot is waiting for a response.
+     * @param userId The user id.
+     * @param channelId The channel id.
+     */
+    isAwaitingUserResponse(userId: string, channelId: string) {
+        const lock = this.#waitingForUserResponse.get(`${userId}_${channelId}`);
+        if (!lock) return false;
+        if (Date.now() - lock.timeInMs > this.#ONE_MINUTE * 2) {
+            this.removeUserResponseLock(userId, channelId);
+            return false;
+        }
+        return true;
     }
 
     async getLastProcessName(): Promise<Message | undefined> {

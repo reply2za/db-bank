@@ -8,9 +8,6 @@ import { formatErrorText, isAdmin } from '../utils/utils';
 import Logger from '../utils/Logger';
 import { processManager } from '../utils/ProcessManager';
 
-const ONE_MINUTE_MS = 60000;
-// timeout for waiting for a response from a user
-const WAITING_FOR_RESPONSE_TIME_MS = ONE_MINUTE_MS * 2;
 module.exports = async (message: Message) => {
     const msgPrefix = message.content.substring(0, config.prefix.length);
     if (msgPrefix !== config.prefix) return;
@@ -19,7 +16,7 @@ module.exports = async (message: Message) => {
     // the command name, removes the prefix and any args
     const statement = args[0].substring(1).toLowerCase();
     const command = commandHandler.getCommand(statement, message.author.id);
-    if (!command) return;
+    if (!command || processManager.isAwaitingUserResponse(message.author.id, message.channelId)) return;
     let bankUser = bank.getUserCopy(message.author.id);
     if (!bankUser) {
         if (message.author.bot) return;
@@ -36,13 +33,6 @@ module.exports = async (message: Message) => {
             message.channel.send('*there was an error*');
             return;
         }
-    }
-    const waitingForResponse = processManager.waitingForUserResponse.get(
-        `${bankUser.getUserId()}_${message.channel.id}`
-    );
-    if (waitingForResponse) {
-        if (waitingForResponse.timeInMs < Date.now() + WAITING_FOR_RESPONSE_TIME_MS) return;
-        else processManager.waitingForUserResponse.delete(bankUser.getUserId());
     }
     const event: MessageEventLocal = {
         statement,

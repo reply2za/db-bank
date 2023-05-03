@@ -10,11 +10,13 @@ import {
     User,
 } from 'discord.js';
 import { config } from './constants/constants';
+import { processManager } from './ProcessManager';
 
 export async function getUserResponse(
     channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>,
     userId: string
 ): Promise<Message | undefined> {
+    processManager.setUserResponseLock(userId, channel.id.toString());
     try {
         const messages = await channel.awaitMessages({
             filter: (m: Message) => userId === m.author.id,
@@ -23,7 +25,9 @@ export async function getUserResponse(
             errors: ['time'],
         });
         return messages.first();
-    } catch (e) {}
+    } finally {
+        processManager.removeUserResponseLock(userId, channel.id.toString());
+    }
 }
 
 /**

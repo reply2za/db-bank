@@ -6,6 +6,7 @@ import { commandHandler } from '../../../handlers/CommandHandler';
 import { MessageReaction } from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
+import { processManager } from '../../../utils/ProcessManager';
 
 exports.run = async (event: MessageEventLocal) => {
     const balanceMsg = await visualizerCommon.showBalance(
@@ -36,6 +37,7 @@ exports.run = async (event: MessageEventLocal) => {
         if (transferMsg) {
             const activeTransferReq = event.data.get(EventDataNames.REACTION_TSFR_REQ);
             if (activeTransferReq?.cmdName !== cmdName) {
+                processManager.removeUserResponseLock(event.bankUser.getUserId(), event.message.channel.id);
                 transferMsg.delete();
                 event.data.delete(EventDataNames.INITIAL_TRANSFER_MSG);
                 event.data.delete(EventDataNames.REACTION_TSFR_REQ);
