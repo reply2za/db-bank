@@ -88,6 +88,10 @@ export abstract class Transfer {
                 if (embedMsg.deletable) await embedMsg.delete();
                 return this;
             }
+        } else if (!(await this.validateAmount(transferAmount, this.channel))) {
+            await this.cancelResponse();
+            if (embedMsg.deletable) await embedMsg.delete();
+            return this;
         }
         transferEmbed = this.getTransferEmbed(transferAmount, '');
         await transferEmbed.edit(embedMsg);
