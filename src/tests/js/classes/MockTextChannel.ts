@@ -32,10 +32,10 @@ export class MockTextChannel {
 
     async awaitMessages(...args: any[]) {
         const messages = this.awaitMessagesList?.shift();
-        const c = new Collection();
         if (!messages) {
-            return c;
+            throw new Error('no user response');
         }
+        const c = new Collection();
         for (const message of messages) {
             c.set(message.id, message);
         }
