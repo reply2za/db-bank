@@ -13,7 +13,7 @@ exports.run = async (event: MessageEventLocal) => {
 -- IOU commands -- 
 **transferIOU** - transfer an IOU
 **ious** - view your received IOUs
-**sentIOUs** - view your sent IOUs
+**sentIOU** - view your sent IOUs
 **redeem** - redeem an IOU`
         )
         .setFooter('commands are not case sensitive')
