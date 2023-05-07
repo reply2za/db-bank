@@ -53,6 +53,7 @@ exports.run = async (event: MessageEventLocal) => {
                 event.bankUser.getUserId()
             );
         }
+        if (quantity === undefined) return;
     } while (!quantity || quantity < 1);
     if (!iou) {
         event.message.channel.send(formatErrorText('could not find IOU'));
@@ -96,19 +97,24 @@ exports.run = async (event: MessageEventLocal) => {
 };
 
 /**
- * Asks the author for the number of IOUs to redeem.
+ * Asks the author once for the number of IOUs to redeem.
+ * Informs the user if the value is invalid or if flow is cancelled.
  * @param channel The channel to prompt the author in.
  * @param qty The available IOU quantity.
  * @param userId The id of the author to ask.
- * @returns The number of IOUs to redeem, or -1 if unsuccessful.
+ * @returns The number of IOUs to redeem, or -1 if unsuccessful. Returns undefined if user cancelled or abandoned.
  */
-async function getIOURedeemQty(channel: TextChannel, qty: number, userId: string): Promise<number> {
+async function getIOURedeemQty(channel: TextChannel, qty: number, userId: string): Promise<number | undefined> {
     let quantity;
-    await channel.send(`*There are ${qty} of these IOUs, how many would you like to redeem?*`);
+    await channel.send(`*There are ${qty} of these IOUs, how many would you like to redeem? ['q'=cancel]*`);
     const response = (await getUserResponse(channel, userId))?.content;
     if (!response) {
-        await channel.send(formatErrorText('no response provided'));
-        return -1;
+        await channel.send('*cancelled: no response provided*');
+        return undefined;
+    }
+    if (response === 'q') {
+        await channel.send('*cancelled*');
+        return undefined;
     }
     quantity = parseInt(response);
     if (!quantity || quantity < 1) {
