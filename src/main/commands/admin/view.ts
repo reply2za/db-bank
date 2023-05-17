@@ -1,6 +1,7 @@
 import { bank } from '../../finance/Bank';
 import { MessageEventLocal } from '../../utils/types';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
+import { bot } from '../../utils/constants/constants';
 
 exports.run = async (event: MessageEventLocal) => {
     let finalString = '';
@@ -9,11 +10,31 @@ exports.run = async (event: MessageEventLocal) => {
             finalString += `**${user.getUsername()}**: $${user.getBalance()}\n`;
         }
     });
+    // id to discord username
+    let idMap = new Map<string, string>();
+    // discord username to id
+    let nameMap = new Map<string, string>();
+    const getName = async (id: string) => {
+        if (idMap.has(id)) {
+            return idMap.get(id);
+        } else {
+            const user = await bot.users.fetch(id);
+            if (nameMap.has(user.username)) {
+                const replacementName = `${user.username}#${user.discriminator}`;
+                if (nameMap.has(replacementName)) {
+                    throw new Error(`Unexpected duplicate name ${replacementName}`);
+                }
+                idMap.set(id, replacementName);
+                nameMap.set(replacementName, id);
+            }
+            return user.username;
+        }
+    };
     finalString += '\n---IOUs---\n';
-    bank.getAllIOUs().forEach((iou) => {
-        finalString += `**from ${iou.sender.name} to ${iou.receiver.name}**${
+    for (let iou of bank.getAllIOUs()) {
+        finalString += `**from ${await getName(iou.sender.id)} to ${await getName(iou.receiver.id)}**${
             iou.quantity > 1 ? ` (x${iou.quantity})` : ''
         }\nreason: ${iou.comment}\n`;
-    });
+    }
     await new EmbedBuilderLocal().setTitle('Accounts').setDescription(finalString).send(event.message.channel);
 };
