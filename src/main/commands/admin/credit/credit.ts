@@ -8,11 +8,9 @@ import { ACashTransfer } from '../../../finance/Transfer/ACashTransfer';
 import cashTransferVisualizer from '../../../finance/visualizers/transfers/cashTransferVisualizer';
 
 exports.run = async (event: MessageEventLocal) => {
-    const receiver = await Credit.getUserToTransferTo(event.message, event.args[0], event.data);
+    const receiver = await Credit.getUserToTransferTo(event.message, event.args.join(' '), event.data);
     if (!receiver) return;
-    await new Credit(<TextChannel>event.message.channel, event.bankUser, receiver).processTransfer(
-        Number(event.args[1]) ?? 0
-    );
+    await new Credit(<TextChannel>event.message.channel, event.bankUser, receiver).processTransfer();
 };
 
 class Credit extends ACashTransfer {

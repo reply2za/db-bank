@@ -12,11 +12,9 @@ import { config } from '../../../utils/constants/constants';
 import { formatErrorText } from '../../../utils/utils';
 
 exports.run = async (event: MessageEventLocal) => {
-    const recipientBankUser = await TransferIOU.getUserToTransferTo(event.message, event.args[0], event.data);
+    const recipientBankUser = await TransferIOU.getUserToTransferTo(event.message, event.args.join(' '), event.data);
     if (!recipientBankUser) return;
-    await new TransferIOU(<TextChannel>event.message.channel, event.bankUser, recipientBankUser).processTransfer(
-        Number(event.args[1]) ?? 0
-    );
+    await new TransferIOU(<TextChannel>event.message.channel, event.bankUser, recipientBankUser).processTransfer();
 };
 
 class TransferIOU extends Transfer {

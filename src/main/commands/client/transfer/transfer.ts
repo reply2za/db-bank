@@ -11,15 +11,19 @@ import { ACashTransfer } from '../../../finance/Transfer/ACashTransfer';
 
 exports.run = async (event: MessageEventLocal) => {
     if (event.args[0]?.toLowerCase() === 'iou') {
-        await commandHandler.execute({ ...event, statement: 'transferiou', args: [] });
+        await commandHandler.execute({ ...event, statement: 'transferiou', args: event.args.slice(1) });
     } else {
-        const recipientBankUser = await MonetaryTransfer.getUserToTransferTo(event.message, event.args[0], event.data);
+        let recipientBankUser = await MonetaryTransfer.getUserToTransferTo(
+            event.message,
+            event.args.join(' '),
+            event.data
+        );
         if (!recipientBankUser) return;
         await new MonetaryTransfer(
             <TextChannel>event.message.channel,
             event.bankUser,
             recipientBankUser
-        ).processTransfer(Number(event.args[1]) ?? 0);
+        ).processTransfer();
     }
 };
 

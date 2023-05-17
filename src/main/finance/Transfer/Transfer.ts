@@ -249,7 +249,7 @@ export abstract class Transfer {
                         message.channel.send('*cancelled*');
                         return;
                     } else {
-                        name = newMsg.content.split(' ')[0];
+                        name = newMsg.content;
                     }
                 } else {
                     message.channel.send(`must specify user to ${actionName} to`);

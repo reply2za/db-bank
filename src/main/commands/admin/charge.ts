@@ -9,11 +9,9 @@ import { ACashTransfer } from '../../finance/Transfer/ACashTransfer';
 import { formatErrorText } from '../../utils/utils';
 
 exports.run = async (event: MessageEventLocal) => {
-    const sender = await Charge.getUserToTransferTo(event.message, event.args[0], event.data);
+    const sender = await Charge.getUserToTransferTo(event.message, event.args.join(' '), event.data);
     if (!sender) return;
-    await new Charge(<TextChannel>event.message.channel, sender, event.bankUser).processTransfer(
-        Number(event.args[1]) ?? 0
-    );
+    await new Charge(<TextChannel>event.message.channel, sender, event.bankUser).processTransfer();
 };
 
 class Charge extends ACashTransfer {
