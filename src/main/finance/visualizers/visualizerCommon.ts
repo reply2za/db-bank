@@ -26,7 +26,7 @@ export default {
             .setColor('Green')
             .setDescription(
                 `\`${convertToCurrency(balance)}\`\n${
-                    iouDescription.length ? `\n- **Received IOUs** -\n${iouDescription}` : ''
+                    iouDescription.length ? `\n\\- **Received IOUs** -\n${iouDescription}` : ''
                 }`
             )
             .setFooter(`transfer cash | transfer IOUs${iouDescription.length ? ' | view IOUs' : ''}`)
