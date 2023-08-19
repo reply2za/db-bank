@@ -111,9 +111,9 @@ describe('monetary transfer', () => {
 });
 
 describe('ensure state can be reset', () => {
-    afterAll(() => {
-        s1.reset();
-    });
+    // afterAll(() => {
+    //     s1.reset();
+    // });
     test('view balances', async () => {
         expect(bankUserLookup.getUser(s1.bankUserJoe.getUserId())?.getBalance()).toBe(2324);
         expect(bankUserLookup.getUser(s1.bankUserAnna.getUserId())?.getBalance()).toBe(131);
