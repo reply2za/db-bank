@@ -5,7 +5,8 @@ export abstract class ABankUser {
     protected readonly name: string;
     protected readonly discordUser: User;
     protected balance: number;
-    protected readonly history: string[] = [];
+    protected history: string[] = [];
+    private static readonly MAX_HISTORY_LENGTH = 2;
 
     public constructor(discordUser: User, name: string, balance: number, history: string[] = []) {
         this.userId = discordUser.id;
@@ -55,9 +56,11 @@ export abstract class ABankUser {
         return this.history.slice();
     }
 
-    addHistoryEntry(entry: string) {
+    addHistoryEntry(entry: string): string[] {
         let index = this.history.indexOf(entry);
         if (index !== -1) this.history.splice(index, 1);
         this.history.push(entry);
+        this.history = this.history.slice(-ABankUser.MAX_HISTORY_LENGTH);
+        return this.history;
     }
 }

@@ -77,11 +77,10 @@ export abstract class Transfer {
                     ? bankUserLookup.getUser(history[history.length - 2])?.getDiscordUser().username
                     : undefined;
             let pastUsers = [user1, user2].filter((u) => u).map((u) => `\`${u}\``);
+            let userLen = pastUsers.length;
+            let userNumDesc = userLen > 1 ? `${userLen} users` : 'user';
             await message.channel.send(
-                `The last ${pastUsers.length} user${pastUsers.length > 1 ? 's' : ''} you've transferred to:` +
-                    '\n' +
-                    pastUsers.join('\n') +
-                    '\n'
+                `The last ${userNumDesc} you've transferred to:` + '\n' + pastUsers.join('\n') + '\n'
             );
         }
     }
