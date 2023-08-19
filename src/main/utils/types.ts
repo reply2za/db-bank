@@ -30,7 +30,7 @@ export enum EventDataNames {
     TRANSFER_AMOUNT_REQ,
 
     /**
-     * @param history Optional - The history of users that the author has transferred to.
+     * {string[]} - the users that the author has transferred to. The last user is the most recent.
      */
     AUTHOR_INTERACT_HISTORY,
 }
