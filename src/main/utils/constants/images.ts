@@ -2,8 +2,9 @@ export default {
     BANK_IMG:
         'https://static.wikia.nocookie.net/spongebob/images/9/92/Goodbye%2C_Krabby_Patty_151.png/revision/latest?cb=20170310020233',
     CREDIT_TRANSFER_IMG: 'https://thespongeclub.com/wp-content/uploads/2022/07/born-again-krabs-episode.webp',
-    TRANSFER_IMG:
-        'https://vignette.wikia.nocookie.net/spongebob/images/2/25/Mermaid_Man_and_Barnacle_Boy_III_092.png/revision/latest?cb=20191208224116',
+    TRANSFER_IMG: 'https://geek-culture-corner.weebly.com/uploads/1/0/2/6/102631916/trying-to-write-a-letter.png',
+    // 'https://vignette.wikia.nocookie.net/spongebob/images/2/25/Mermaid_Man_and_Barnacle_Boy_III_092.png/revision/latest?cb=20191208224116',
+    CASH_TRANSFER_IMG: 'https://i.pinimg.com/564x/eb/90/96/eb9096b3d743c98eab72fee213c26e09--spongebob-do-you.jpg',
     TRANSFER_IOU_IMG: 'https://i.makeagif.com/media/2-27-2016/cuk9a4.gif',
     REDEEM_IOU_IMG: 'https://i.pinimg.com/originals/a1/b0/59/a1b0599a8c4e26bb279c3b7a2f23dabc.gif',
     SENT_IOU_IMG: 'https://thumbs.gfycat.com/UnlinedSoreDowitcher-size_restricted.gif',

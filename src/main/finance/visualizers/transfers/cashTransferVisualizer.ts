@@ -12,7 +12,7 @@ export default {
         amount = 0,
         comment?: string
     ): EmbedBuilderLocal {
-        const e = visualizerCommon.getCoreTransferEmbed();
+        const e = new EmbedBuilderLocal().setColor('Green').setThumbnail(images.CASH_TRANSFER_IMG);
         return e
             .setTitle(`Transfer to ${receiver.getUsername()}`)
             .setDescription(

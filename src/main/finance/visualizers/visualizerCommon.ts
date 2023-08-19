@@ -33,9 +33,6 @@ export default {
             .setThumbnail(images.BANK_IMG)
             .send(channel);
     },
-    getCoreTransferEmbed(): EmbedBuilderLocal {
-        return new EmbedBuilderLocal().setColor('Purple').setThumbnail(images.TRANSFER_IMG);
-    },
     getConfirmationEmbed(actionName = ''): EmbedBuilderLocal {
         if (actionName) actionName = ` ${actionName}`;
         return new EmbedBuilderLocal().setDescription(`confirm${actionName}? Type 'yes' or 'no'`).setColor('Yellow');

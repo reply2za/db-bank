@@ -295,7 +295,7 @@ export abstract class Transfer {
             [this.responder.getUserId()],
             [reactions.ARROW_L],
             async (react, user, collector) => {
-                await collector.stop();
+                collector.stop();
                 if (react.emoji.name === reactions.ARROW_L) {
                     callback();
                 }

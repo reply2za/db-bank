@@ -10,8 +10,9 @@ export default {
         amount = 0,
         comment = ''
     ): EmbedBuilderLocal {
-        return visualizerCommon
-            .getCoreTransferEmbed()
+        return new EmbedBuilderLocal()
+            .setColor('Purple')
+            .setThumbnail(images.TRANSFER_IMG)
             .setTitle(`Transfer IOU to ${receiver.getUsername()}`)
             .setDescription(
                 (amount ? `sending ${amount} IOU${amount > 1 ? 's' : ''}` : '*no amount selected*').concat(
