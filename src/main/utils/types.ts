@@ -28,4 +28,9 @@ export enum EventDataNames {
     {id: string} - the request for the amount to transfer
      */
     TRANSFER_AMOUNT_REQ,
+
+    /**
+     * @param history Optional - The history of users that the author has transferred to.
+     */
+    AUTHOR_INTERACT_HISTORY,
 }

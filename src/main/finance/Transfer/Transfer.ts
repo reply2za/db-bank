@@ -246,6 +246,10 @@ export abstract class Transfer {
     ): Promise<{ recipientID?: string; recipientName?: string } | undefined> {
         let recipientID = message.mentions?.users.first()?.id;
         if (!name && !recipientID) {
+            let interactionHistory: string[] | undefined = eventData.get(EventDataNames.AUTHOR_INTERACT_HISTORY);
+            if (interactionHistory && interactionHistory.length > 0) {
+                await this.printUserHistory(message, interactionHistory);
+            }
             const initialTransferMsg = await message.channel.send(
                 `Who would you like to ${actionName} to? *['q' = cancel]*`
             );
