@@ -24,8 +24,8 @@ export class Setup1 {
         this.channel1 = new MockTextChannel('123', 'channel1');
         this.messageFromJoe = new MockMessage('131441241', `!${joeMessageContent}`, this.userJoe, this.channel1);
         this.messageFromAnna = new MockMessage('131441241', `!${annaMessageContent}`, this.userJoe, this.channel1);
-        this.bankUserJoe = bank.addNewUser(<User>(<unknown>this.userJoe), 'Joe', 2324);
-        this.bankUserAnna = bank.addNewUser(<User>(<unknown>this.userAnna), 'Anna', 131);
+        this.bankUserJoe = bank.addNewUser(<User>(<unknown>this.userJoe), 'Joe', 2324, []);
+        this.bankUserAnna = bank.addNewUser(<User>(<unknown>this.userAnna), 'Anna', 131, []);
         this.data = bank.serializeData();
     }
 

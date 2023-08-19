@@ -5,12 +5,14 @@ export abstract class ABankUser {
     protected readonly name: string;
     protected readonly discordUser: User;
     protected balance: number;
+    protected readonly history: string[] = [];
 
-    protected constructor(discordUser: User, name: string, balance: number) {
+    public constructor(discordUser: User, name: string, balance: number, history: string[] = []) {
         this.userId = discordUser.id;
         this.name = name;
         this.balance = balance;
         this.discordUser = discordUser;
+        this.history = history;
     }
 
     getUserId() {
@@ -45,6 +47,17 @@ export abstract class ABankUser {
             userId: this.userId,
             name: this.name,
             balance: this.balance,
+            history: this.history,
         };
+    }
+
+    getHistory(): string[] {
+        return this.history.slice();
+    }
+
+    addHistoryEntry(entry: string) {
+        let index = this.history.indexOf(entry);
+        if (index !== -1) this.history.splice(index, 1);
+        this.history.push(entry);
     }
 }

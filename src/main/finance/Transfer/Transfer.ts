@@ -69,6 +69,23 @@ export abstract class Transfer {
         return bankUserOrErr;
     }
 
+    static async printUserHistory(message: Message, history: string[] | undefined): Promise<void> {
+        if (history && history.length > 0) {
+            let user1 = bankUserLookup.getUser(history[history.length - 1])?.getDiscordUser().username;
+            let user2 =
+                history.length > 1
+                    ? bankUserLookup.getUser(history[history.length - 2])?.getDiscordUser().username
+                    : undefined;
+            let pastUsers = [user1, user2].filter((u) => u).map((u) => `\`${u}\``);
+            await message.channel.send(
+                `The last ${pastUsers.length} user${pastUsers.length > 1 ? 's' : ''} you've transferred to:` +
+                    '\n' +
+                    pastUsers.join('\n') +
+                    '\n'
+            );
+        }
+    }
+
     /**
      * Processes a transfer.
      * @param transferAmount The amount to transfer. If undefined or 0 then the user will be prompted for an amount.

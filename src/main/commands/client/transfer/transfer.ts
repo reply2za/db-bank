@@ -8,11 +8,14 @@ import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import cashTransferVisualizer from '../../../finance/visualizers/transfers/cashTransferVisualizer';
 import { BankUserCopy } from '../../../finance/BankUser/BankUserCopy';
 import { ACashTransfer } from '../../../finance/Transfer/ACashTransfer';
+import Logger from '../../../utils/Logger';
 
 exports.run = async (event: MessageEventLocal) => {
     if (event.args[0]?.toLowerCase() === 'iou') {
         await commandHandler.execute({ ...event, statement: 'transferiou', args: event.args.slice(1) });
     } else {
+        let history = event.bankUser.getHistory();
+        await MonetaryTransfer.printUserHistory(event.message, history);
         let recipientBankUser = await MonetaryTransfer.getUserToTransferTo(
             event.message,
             event.args.join(' '),
@@ -37,6 +40,11 @@ class MonetaryTransfer extends ACashTransfer {
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {
+        try {
+            this.sender.addHistoryEntry(this.receiver.getUserId());
+        } catch (e: any) {
+            await Logger.debugLog(e);
+        }
         const status = await bank.transferAmount(
             this.sender.getUserId(),
             this.receiver.getUserId(),

@@ -123,8 +123,8 @@ export class Bank {
         return this.#iOUList;
     }
 
-    addNewUser(author: User, username: string, balance: number): BankUserCopy {
-        const bankUser = new OriginalBankUser(author, username, balance);
+    addNewUser(author: User, username: string, balance: number, history?: string[]): BankUserCopy {
+        const bankUser = new OriginalBankUser(author, username, balance, history);
         if (this.#usernames.has(bankUser.getUsername())) {
             throw new Error('name already exists');
         }
@@ -151,7 +151,10 @@ export class Bank {
         for (let userObj of parsedData.bank.users) {
             try {
                 const user = await userManager.fetch(userObj.userId);
-                this.#users.set(userObj.userId, new OriginalBankUser(user, userObj.name, userObj.balance));
+                this.#users.set(
+                    userObj.userId,
+                    new OriginalBankUser(user, userObj.name, userObj.balance, userObj.history)
+                );
             } catch (e) {
                 console.log('could not load author data\n', e);
             }
