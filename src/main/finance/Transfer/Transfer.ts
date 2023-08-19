@@ -231,7 +231,7 @@ export abstract class Transfer {
         let recipientID = message.mentions?.users.first()?.id;
         if (!name && !recipientID) {
             const initialTransferMsg = await message.channel.send(
-                `Who you would like to ${actionName} to? *['q' = cancel]*`
+                `Who would you like to ${actionName} to? *['q' = cancel]*`
             );
             eventData.set(EventDataNames.INITIAL_TRANSFER_MSG, initialTransferMsg);
             const newMsg = await getUserResponse(message.channel, message.author.id);
