@@ -42,8 +42,8 @@ export abstract class Transfer {
      * Searches the message for a mention. If there is none then searches the name. If there is no name then prompts the author.
      * @param message The author's message.
      * @param name Optional - A name of an author to search for.
-     * @param actionName Optional - The name of the action that is being attempted
-     * @param eventData Optional - Event data
+     * @param actionName Optional - The name of the action that is being attempted.
+     * @param eventData Optional - Event data.
      * @returns The BankUser to transfer to or undefined if the request failed or was cancelled.
      */
     static async getUserToTransferTo(
