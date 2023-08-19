@@ -61,7 +61,34 @@ describe('monetary transfer', () => {
         const prevBalanceAnna = bank.findUser('Anna')[0].getBalance();
         await commandHandler.execute(eventTransferJoe);
         expect(s1.channel1.receivedMessages.length).toBeGreaterThan(0);
+        expect(s1.channel1.receivedMessages[0]).toContain('*no amount selected*');
         expect(s1.channel1.receivedMessages[s1.channel1.receivedMessages.length - 1]).toBe('sent $100.00 to Anna');
+        expect(bankUserLookup.getUser(s1.bankUserAnna.getUserId())?.getBalance()).toBe(prevBalanceAnna + amountToSend);
+        expect(bankUserLookup.getUser(s1.bankUserJoe.getUserId())?.getBalance()).toBe(prevBalanceJoe - amountToSend);
+    });
+
+    test('transfer $99 from joe to anna without specifying user', async () => {
+        s1.channel1.receivedMessages.length = 0;
+        const amountToSend = 99;
+        // spacing should not make a difference
+        const amountToSendTxt = '25+25+25+24';
+        s1.channel1.awaitMessagesList = [
+            [new MockMessage('', `anna`, s1.userJoe, s1.channel1)],
+            [new MockMessage('', `${amountToSendTxt}`, s1.userJoe, s1.channel1)],
+            [new MockMessage('', 'b', s1.userJoe, s1.channel1)],
+            [new MockMessage('', 'yes', s1.userJoe, s1.channel1)],
+        ];
+        const prevBalanceJoe = bank.findUser('Joe')[0].getBalance();
+        const prevBalanceAnna = bank.findUser('Anna')[0].getBalance();
+        eventTransferJoe.message.content = '!transfer';
+        eventTransferJoe.args = [];
+        await commandHandler.execute(eventTransferJoe);
+        expect(s1.channel1.receivedMessages.length).toBeGreaterThan(0);
+        expect(s1.channel1.receivedMessages[0]).toContain("The last user you've transferred to");
+        expect(s1.channel1.receivedMessages[0]).toContain('Anna');
+        expect(s1.channel1.receivedMessages[s1.channel1.receivedMessages.length - 1]).toBe(
+            `sent $${amountToSend.toFixed(2)} to Anna`
+        );
         expect(bankUserLookup.getUser(s1.bankUserAnna.getUserId())?.getBalance()).toBe(prevBalanceAnna + amountToSend);
         expect(bankUserLookup.getUser(s1.bankUserJoe.getUserId())?.getBalance()).toBe(prevBalanceJoe - amountToSend);
     });
@@ -95,6 +122,7 @@ describe('monetary transfer', () => {
     test('transfer invalid amount x3', async () => {
         s1.channel1.receivedMessages.length = 0;
         s1.channel1.awaitMessagesList = [
+            [new MockMessage('', 'anna', s1.userJoe, s1.channel1)],
             [new MockMessage('', '-100', s1.userJoe, s1.channel1)],
             [new MockMessage('', '0', s1.userJoe, s1.channel1)],
             [new MockMessage('', '0.001', s1.userJoe, s1.channel1)],

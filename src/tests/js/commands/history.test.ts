@@ -16,8 +16,6 @@ const historyEvent: MessageEventLocal = {
     data: new Map(),
 };
 
-let joeInitialBalance = s1.bankUserJoe.getBalance();
-let annaInitialBalance = s1.bankUserAnna.getBalance();
 describe('history', () => {
     test('history standalone method', () => {
         Transfer.printUserHistory(historyEvent.message, [s1.bankUserAnna.getUserId()]);
