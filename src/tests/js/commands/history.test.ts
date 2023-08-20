@@ -5,28 +5,53 @@ import { Setup1 } from '../classes/Setup';
 import { Transfer } from '../../../main/finance/Transfer/Transfer';
 import { commandHandler } from '../../../main/handlers/CommandHandler';
 import { bankUserLookup } from '../../../main/finance/BankUserLookup';
+import { MockMessage } from '../classes/MockMessage';
+import { config } from '../../../main/utils/constants/constants';
 
 const s1 = new Setup1('', '');
 const historyEvent: MessageEventLocal = {
     statement: 'transfer',
     message: <Message>(<unknown>s1.messageFromJoe),
-    args: ['should be set per test'],
+    args: [],
+    prefix: '!',
+    bankUser: s1.bankUserJoe,
+    data: new Map(),
+};
+
+const eventTransferJoe: MessageEventLocal = {
+    statement: 'transfer',
+    message: <Message>(<unknown>s1.messageFromJoe),
+    args: ['anna'],
     prefix: '!',
     bankUser: s1.bankUserJoe,
     data: new Map(),
 };
 
 describe('history', () => {
+    afterAll(async () => {
+        await s1.reset();
+    });
     test('history standalone method', () => {
-        Transfer.printUserHistory(historyEvent.message, [s1.bankUserAnna.getUserId()]);
-        expect(s1.channel1.receivedMessages.length).toBeGreaterThan(0);
-        expect(s1.channel1.receivedMessages[s1.channel1.receivedMessages.length - 1]).toContain(
-            "The last user you've transferred to"
-        );
-        expect(s1.channel1.receivedMessages[s1.channel1.receivedMessages.length - 1]).toContain('Anna');
+        let annaHistory = Transfer.printUserHistory([s1.bankUserAnna.getUserId()]);
+        let emptyHistory = Transfer.printUserHistory([]);
+        expect(annaHistory).toContain("The last user you've transferred to");
+        expect(annaHistory).toContain('Anna');
+        expect(emptyHistory).toBe('');
     });
 
     test('history within event', async () => {
+        s1.channel1.awaitMessagesList = [
+            [new MockMessage('', `10`, s1.userJoe, s1.channel1)],
+            [new MockMessage('', 'b', s1.userJoe, s1.channel1)],
+            [new MockMessage('', 'yes', s1.userJoe, s1.channel1)],
+        ];
+        // initiate a transfer to create history
+        s1.channel1.receivedMessages.length = 0;
+        await commandHandler.execute(eventTransferJoe);
+        expect(s1.channel1.receivedMessages.length).toBeGreaterThan(0);
+        expect(s1.channel1.receivedMessages[0]).toContain(config.NO_AMT_SELECTED_TXT);
+        // validate history
+        s1.channel1.receivedMessages.length = 0;
         await commandHandler.execute(historyEvent);
         expect(s1.channel1.receivedMessages.length).toBeGreaterThan(0);
         expect(s1.channel1.receivedMessages[0]).toContain("The last user you've transferred to");

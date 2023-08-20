@@ -5,6 +5,7 @@ import { bank } from '../../../main/finance/Bank';
 import { bankUserLookup } from '../../../main/finance/BankUserLookup';
 import { MockMessage } from '../classes/MockMessage';
 import { Setup1 } from '../classes/Setup';
+import { config } from '../../../main/utils/constants/constants';
 
 const s1 = new Setup1('transfer anna', 'transfer joe');
 
@@ -30,16 +31,16 @@ describe('monetary transfer', () => {
     });
 
     test('joe to send $100 to anna', async () => {
-        s1.channel1.receivedMessages.length = 0;
         const amountToSend = 100;
         const amountToSendTxt = `$${amountToSend}`;
+        const prevBalanceJoe = bank.findUser('Joe')[0].getBalance();
+        const prevBalanceAnna = bank.findUser('Anna')[0].getBalance();
+        s1.channel1.receivedMessages.length = 0;
         s1.channel1.awaitMessagesList = [
             [new MockMessage('', `${amountToSendTxt}`, s1.userJoe, s1.channel1)],
             [new MockMessage('', 'b', s1.userJoe, s1.channel1)],
             [new MockMessage('', 'yes', s1.userJoe, s1.channel1)],
         ];
-        const prevBalanceJoe = bank.findUser('Joe')[0].getBalance();
-        const prevBalanceAnna = bank.findUser('Anna')[0].getBalance();
         await commandHandler.execute(eventTransferJoe);
         expect(s1.channel1.receivedMessages.length).toBeGreaterThan(0);
         expect(s1.channel1.receivedMessages[s1.channel1.receivedMessages.length - 1]).toBe('sent $100.00 to Anna');
@@ -61,7 +62,7 @@ describe('monetary transfer', () => {
         const prevBalanceAnna = bank.findUser('Anna')[0].getBalance();
         await commandHandler.execute(eventTransferJoe);
         expect(s1.channel1.receivedMessages.length).toBeGreaterThan(0);
-        expect(s1.channel1.receivedMessages[0]).toContain('*no amount selected*');
+        expect(s1.channel1.receivedMessages[0]).toContain(config.NO_AMT_SELECTED_TXT);
         expect(s1.channel1.receivedMessages[s1.channel1.receivedMessages.length - 1]).toBe('sent $100.00 to Anna');
         expect(bankUserLookup.getUser(s1.bankUserAnna.getUserId())?.getBalance()).toBe(prevBalanceAnna + amountToSend);
         expect(bankUserLookup.getUser(s1.bankUserJoe.getUserId())?.getBalance()).toBe(prevBalanceJoe - amountToSend);
