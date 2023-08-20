@@ -26,38 +26,15 @@ export class IOUTransfer extends Transfer {
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {
         transferAmount = Math.floor(transferAmount);
-        const transferResponse = bank.transferIOU(
+        const transferResponse = await bank.transferIOU(
             this.sender.getUserId(),
             this.receiver.getUserId(),
             transferAmount,
-            comment
+            comment,
+            this.channel
         );
         if (transferResponse.success) {
             this.sender.addHistoryEntry(this.receiver.getUserId());
-            await localStorage.saveData(bank.serializeData());
-            await this.receiver.getDiscordUser().send({
-                embeds: [
-                    iouTransferVisualizer
-                        .getIOUTransferNotificationEmbed(
-                            this.sender.getUsername(),
-                            this.receiver,
-                            transferAmount,
-                            comment
-                        )
-                        .build(),
-                ],
-            });
-            await Logger.transactionLog(
-                `[IOU transfer] (${this.sender.getUserId()} -> ${this.receiver.getUserId()})\n` +
-                    `${transferAmount} IOU${
-                        transferAmount === 1 ? '' : 's'
-                    } from ${this.sender.getDBName()} to ${this.receiver.getDBName()}\n` +
-                    `comment: ${comment || 'N/A'}\n` +
-                    `----------------------------------------`
-            );
-            await iouTransferVisualizer
-                .getIOUTransferReceiptEmbed(this.receiver.getUsername(), transferAmount)
-                .send(this.channel);
             return true;
         } else {
             await visualizerCommon

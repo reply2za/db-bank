@@ -11,6 +11,7 @@ import {
 } from 'discord.js';
 import { config } from './constants/constants';
 import { processManager } from './ProcessManager';
+import { TransferType } from '../finance/types';
 
 export async function getUserResponse(
     channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>,
@@ -79,4 +80,12 @@ export function isAdmin(id: string): boolean {
 
 export function formatErrorText(text: string): string {
     return `error: \`${text}\``;
+}
+
+export function unitFormatFactory(transferType: TransferType): (amount: number) => string {
+    if (transferType === TransferType.TRANSFER_IOU) {
+        return (amount) => `${amount} IOU${amount === 1 ? '' : 's'}`;
+    } else {
+        return (amount) => `$${amount.toLocaleString()}`;
+    }
 }

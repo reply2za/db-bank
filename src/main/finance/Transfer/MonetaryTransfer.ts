@@ -21,7 +21,7 @@ export class MonetaryTransfer extends ACashTransfer {
         try {
             this.sender.addHistoryEntry(this.receiver.getUserId());
         } catch (e: any) {
-            await Logger.debugLog(e);
+            await Logger.errorLog(e);
         }
         const status = await bank.transferAmount(
             this.sender.getUserId(),

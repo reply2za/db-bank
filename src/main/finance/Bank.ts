@@ -13,6 +13,8 @@ import { BankUserCopy } from './BankUser/BankUserCopy';
 import { config } from '../utils/constants/constants';
 import { ABankUser } from './BankUser/ABankUser';
 import { BOT_ID } from '../../tests/resources/constants';
+import iouTransferVisualizer from './visualizers/transfers/iouTransferVisualizer';
+import { unitFormatFactory } from '../utils/utils';
 
 export class Bank {
     #users: Map<string, OriginalBankUser> = new Map();
@@ -21,7 +23,13 @@ export class Bank {
 
     constructor() {}
 
-    transferIOU(senderId: string, receiverId: string, quantity: number, comment: string): StatusWithErrorResponse {
+    async transferIOU(
+        senderId: string,
+        receiverId: string,
+        quantity: number,
+        comment: string,
+        channel: TextBasedChannel
+    ): Promise<StatusWithErrorResponse> {
         const senderAndReceiverObj = this.#getSenderAndReceiver(senderId, receiverId);
         const senderAndReceiverStatus = this.#verifySenderAndReceiver(senderAndReceiverObj);
         if (!senderAndReceiverStatus.success) {
@@ -51,10 +59,20 @@ export class Bank {
             quantity
         );
         this.#iOUList.push(iou);
-        return {
+        const transferResponse = {
             success: true,
             failReason: '',
         };
+        await this.#recordTransfer(
+            transferResponse,
+            quantity,
+            sender.getUserId(),
+            receiver.getUserId(),
+            channel,
+            TransferType.TRANSFER_IOU,
+            comment
+        );
+        return transferResponse;
     }
 
     async transferAmount(
@@ -217,46 +235,75 @@ export class Bank {
         if (!senderAndReceiverStatus.success) {
             return senderAndReceiverStatus;
         }
+        let unitFormatter = unitFormatFactory(transferType);
         const sender = <OriginalBankUser>senderAndReceiverObj.sender;
         const receiver = <OriginalBankUser>senderAndReceiverObj.receiver;
+        let transferLogDescription = '';
         if (transferResponse.success) {
             await localStorage.saveData(bank.serializeData());
-            if (transferType === TransferType.CHARGE) {
-                await sender.getDiscordUser().send({
-                    embeds: [
-                        chargeTransferVisualizer
-                            .getChargeNotificationEmbed(sender, receiver.getUsername(), transferAmount, comment)
-                            .build(),
-                    ],
-                });
-                await chargeTransferVisualizer
-                    .getChargeReceiptEmbed(sender.getUsername(), transferAmount)
-                    .send(channel);
-            } else {
-                await receiver.getDiscordUser().send({
-                    embeds: [
-                        cashTransferVisualizer
-                            .getTransferNotificationEmbed(sender.getUsername(), receiver, transferAmount, comment)
-                            .build(),
-                    ],
-                });
-                await cashTransferVisualizer
-                    .getTransferReceiptEmbed(receiver.getUsername(), transferAmount)
-                    .send(channel);
+            switch (transferType) {
+                case TransferType.CHARGE:
+                    await sender.getDiscordUser().send({
+                        embeds: [
+                            chargeTransferVisualizer
+                                .getChargeNotificationEmbed(sender, receiver.getUsername(), transferAmount, comment)
+                                .build(),
+                        ],
+                    });
+                    await chargeTransferVisualizer
+                        .getChargeReceiptEmbed(sender.getUsername(), transferAmount)
+                        .send(channel);
+                    transferLogDescription += this.#printUserBalances(sender, receiver);
+                    break;
+                case TransferType.TRANSFER_IOU:
+                    await receiver.getDiscordUser().send({
+                        embeds: [
+                            iouTransferVisualizer
+                                .getIOUTransferNotificationEmbed(
+                                    sender.getUsername(),
+                                    receiver,
+                                    transferAmount,
+                                    comment
+                                )
+                                .build(),
+                        ],
+                    });
+                    await iouTransferVisualizer
+                        .getIOUTransferReceiptEmbed(receiver.getUsername(), transferAmount)
+                        .send(channel);
+                    break;
+                default:
+                    await receiver.getDiscordUser().send({
+                        embeds: [
+                            cashTransferVisualizer
+                                .getTransferNotificationEmbed(sender.getUsername(), receiver, transferAmount, comment)
+                                .build(),
+                        ],
+                    });
+                    await cashTransferVisualizer
+                        .getTransferReceiptEmbed(receiver.getUsername(), transferAmount)
+                        .send(channel);
+                    transferLogDescription += this.#printUserBalances(sender, receiver);
+                    break;
             }
-            await logger.transactionLog(
-                `[${transferType}] (${sender.getUserId()} -> ${receiver.getUserId()})\n` +
-                    `$${transferAmount} from ${sender.getDBName()} to ${receiver.getDBName()}\n` +
-                    `${sender.getDBName()}: ${convertToCurrency(sender.getBalance())}\n` +
-                    `${receiver.getDBName()}: ${convertToCurrency(receiver.getBalance())}\n` +
-                    `comment: ${comment}\n` +
-                    `----------------------------------------`
-            );
+            const logItem = `[${transferType}] (${sender.getUserId()} -> ${receiver.getUserId()})\n`
+                .concat(`${unitFormatter(transferAmount)} from ${sender.getDBName()} to ${receiver.getDBName()} \n`)
+                .concat(`comment: ${comment}\n`)
+                .concat(transferLogDescription.length ? `${transferLogDescription}\n` : '')
+                .concat(`----------------------------------------\n`);
+            await logger.transactionLog(logItem);
         } else {
             await visualizerCommon
                 .getErrorEmbed(`${transferType} failed: ${transferResponse.failReason || 'unknown reason'}`)
                 .send(channel);
         }
+    }
+
+    #printUserBalances(sender: OriginalBankUser, receiver: OriginalBankUser): string {
+        return (
+            `${sender.getDBName()}: ${convertToCurrency(sender.getBalance())}\n` +
+            `${receiver.getDBName()}: ${convertToCurrency(receiver.getBalance())}`
+        );
     }
 
     #transferAmountCore(sender: OriginalBankUser, receiver: OriginalBankUser, amount: number): StatusWithErrorResponse {
