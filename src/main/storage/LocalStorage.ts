@@ -27,9 +27,9 @@ class LocalStorage {
     async retrieveData(): Promise<string> {
         if (!config.isDevMode) {
             try {
-                return this.#retrieveDataFromDiscord();
+                return await this.#retrieveDataFromDiscord();
             } catch (e: any) {
-                await logger.errorLog(e, '[LocalStorage:retrieveData, failed discord retrieve]');
+                await logger.errorLog(e, `[LocalStorage:retrieveData, ${e.message}]`);
             }
         }
         return this.retrieveLocalData();
