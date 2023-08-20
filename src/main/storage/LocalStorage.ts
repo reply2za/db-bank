@@ -23,6 +23,10 @@ class LocalStorage {
             }
             await logger.warnLog('could not retrieve discord data, using local data');
         }
+        return this.retrieveLocalData();
+    }
+
+    retrieveLocalData(): string {
         return fs.readFileSync(config.dataFile).toString();
     }
 

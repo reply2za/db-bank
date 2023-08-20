@@ -20,8 +20,8 @@ exports.run = async (event: MessageEventLocal) => {
     }
     const success = await processDataFile(event.message);
     if (success) {
-        await new Promise((res) => setTimeout(res, 700));
-        const data = await localStorage.retrieveData();
+        await new Promise((res) => setTimeout(res, 1000));
+        const data = localStorage.retrieveLocalData();
         await localStorage.saveData(data);
         await bank.deserializeAndLoadData(data, bot.users);
         event.message.channel.send('*contents changed*');
