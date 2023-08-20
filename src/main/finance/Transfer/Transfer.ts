@@ -69,7 +69,7 @@ export abstract class Transfer {
         return bankUserOrErr;
     }
 
-    static async printUserHistory(message: Message, history: string[] | undefined): Promise<void> {
+    static printUserHistory(history: string[] | undefined): string {
         if (history && history.length > 0) {
             let user1 = bankUserLookup.getUser(history[history.length - 1])?.getDiscordUser().username;
             let user2 =
@@ -79,10 +79,9 @@ export abstract class Transfer {
             let pastUsers = [user1, user2].filter((u) => u).map((u) => `\`${u}\``);
             let userLen = pastUsers.length;
             let userNumDesc = userLen > 1 ? `${userLen} users` : 'user';
-            await message.channel.send(
-                `The last ${userNumDesc} you've transferred to:` + '\n' + pastUsers.join('\n') + '\n'
-            );
+            return `The last ${userNumDesc} you've transferred to:` + '\n' + pastUsers.join('\n') + '\n';
         }
+        return '';
     }
 
     /**
@@ -247,11 +246,9 @@ export abstract class Transfer {
         let recipientID = message.mentions?.users.first()?.id;
         if (!name && !recipientID) {
             let interactionHistory: string[] | undefined = eventData.get(EventDataNames.AUTHOR_INTERACT_HISTORY);
-            if (interactionHistory && interactionHistory.length > 0) {
-                await this.printUserHistory(message, interactionHistory);
-            }
+            let historyMsg = this.printUserHistory(interactionHistory);
             const initialTransferMsg = await message.channel.send(
-                `Who would you like to ${actionName} to? *['q' = cancel]*`
+                `${historyMsg}Who would you like to ${actionName} to? *['q' = cancel]*`
             );
             eventData.set(EventDataNames.INITIAL_TRANSFER_MSG, initialTransferMsg);
             const newMsg = await getUserResponse(message.channel, message.author.id);

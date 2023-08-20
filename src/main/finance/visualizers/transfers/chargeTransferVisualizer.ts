@@ -3,6 +3,7 @@ import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import images from '../../../utils/constants/images';
 import { convertToCurrency, roundNumberTwoDecimals } from '../../../utils/numberUtils';
 import { BankUserCopy } from '../../BankUser/BankUserCopy';
+import { config } from '../../../utils/constants/constants';
 
 export default {
     getChargeTransferEmbed(
@@ -16,7 +17,7 @@ export default {
             .setThumbnail(images.CHARGE_TRANSFER_IMG)
             .setTitle(`Charge ${sender.getUsername()}`)
             .setDescription(
-                (amount ? `charging \`${convertToCurrency(amount)}\`` : '*no amount selected*').concat(
+                (amount ? `charging \`${convertToCurrency(amount)}\`` : config.NO_AMT_SELECTED_TXT).concat(
                     `${comment ? `\ncomment: *${comment}*` : ''}`
                 )
             )

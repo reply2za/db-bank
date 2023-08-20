@@ -1,7 +1,7 @@
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
-import visualizerCommon from '../visualizerCommon';
 import images from '../../../utils/constants/images';
 import { BankUserCopy } from '../../BankUser/BankUserCopy';
+import { config } from '../../../utils/constants/constants';
 
 export default {
     getIOUTransferEmbed(
@@ -15,7 +15,7 @@ export default {
             .setThumbnail(images.TRANSFER_IMG)
             .setTitle(`Transfer IOU to ${receiver.getUsername()}`)
             .setDescription(
-                (amount ? `sending ${amount} IOU${amount > 1 ? 's' : ''}` : '*no amount selected*').concat(
+                (amount ? `sending ${amount} IOU${amount > 1 ? 's' : ''}` : config.NO_AMT_SELECTED_TXT).concat(
                     `${comment ? `\ncomment: *${comment}*` : ' '}`
                 )
             );

@@ -4,6 +4,7 @@ import { convertToCurrency, roundNumberTwoDecimals } from '../../../utils/number
 import visualizerCommon from '../visualizerCommon';
 import images from '../../../utils/constants/images';
 import { BankUserCopy } from '../../BankUser/BankUserCopy';
+import { config } from '../../../utils/constants/constants';
 
 export default {
     getCashTransferEmbed(
@@ -16,7 +17,7 @@ export default {
         return e
             .setTitle(`Transfer to ${receiver.getUsername()}`)
             .setDescription(
-                (amount ? `sending \`${convertToCurrency(amount)}\`` : '*no amount selected*').concat(
+                (amount ? `sending \`${convertToCurrency(amount)}\`` : config.NO_AMT_SELECTED_TXT).concat(
                     `${comment ? `\ncomment: *${comment}*` : ''}`
                 )
             )

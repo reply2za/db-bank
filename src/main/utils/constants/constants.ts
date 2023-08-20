@@ -51,4 +51,5 @@ export const config = Object.freeze({
     isDevMode: isDevMode,
     hardwareTag: HARDWARE_TAG,
     sourceDirPath: 'dist/src/main',
+    NO_AMT_SELECTED_TXT: '*no amount selected*',
 });
