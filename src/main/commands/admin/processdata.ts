@@ -38,12 +38,26 @@ async function processDataFile(message: Message): Promise<boolean> {
     if (!message.attachments?.first() || !message.attachments.first()!.name?.includes('.txt')) {
         return false;
     } else {
-        const response = await axios({
-            url: message.attachments.first()!.url,
-            method: 'GET',
-            responseType: 'stream',
+        return new Promise(async (res) => {
+            const response = await axios({
+                url: message.attachments.first()!.url,
+                method: 'GET',
+                responseType: 'stream',
+            });
+            let data = '';
+            response.data.on('data', (chunk: string) => {
+                data += chunk;
+            });
+            response.data.on('end', () => {
+                try {
+                    JSON.parse(data);
+                } catch (e) {
+                    res(false);
+                    return;
+                }
+                fs.writeFileSync(config.dataFile, data);
+                res(true);
+            });
         });
-        response.data.pipe(fs.createWriteStream(config.dataFile));
-        return true;
     }
 }
