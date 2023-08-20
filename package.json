@@ -1,6 +1,6 @@
 {
   "name": "db-bank",
-  "version": "1.7.9",
+  "version": "1.7.10",
   "description": "",
   "main": "src/main/index.ts",
   "scripts": {
