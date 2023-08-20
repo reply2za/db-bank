@@ -6,14 +6,11 @@ import leven from 'leven';
 import { localStorage } from '../storage/LocalStorage';
 import logger from '../utils/Logger';
 import { StatusWithErrorResponse, TransferType } from './types';
-import chargeTransferVisualizer from './visualizers/transfers/chargeTransferVisualizer';
-import cashTransferVisualizer from './visualizers/transfers/cashTransferVisualizer';
 import visualizerCommon from './visualizers/visualizerCommon';
 import { BankUserCopy } from './BankUser/BankUserCopy';
 import { config } from '../utils/constants/constants';
 import { ABankUser } from './BankUser/ABankUser';
 import { BOT_ID } from '../../tests/resources/constants';
-import iouTransferVisualizer from './visualizers/transfers/iouTransferVisualizer';
 import { unitFormatFactory } from '../utils/utils';
 
 export class Bank {
@@ -238,58 +235,12 @@ export class Bank {
         let unitFormatter = unitFormatFactory(transferType);
         const sender = <OriginalBankUser>senderAndReceiverObj.sender;
         const receiver = <OriginalBankUser>senderAndReceiverObj.receiver;
-        let transferLogDescription = '';
         if (transferResponse.success) {
             await localStorage.saveData(bank.serializeData());
-            switch (transferType) {
-                case TransferType.CHARGE:
-                    await sender.getDiscordUser().send({
-                        embeds: [
-                            chargeTransferVisualizer
-                                .getChargeNotificationEmbed(sender, receiver.getUsername(), transferAmount, comment)
-                                .build(),
-                        ],
-                    });
-                    await chargeTransferVisualizer
-                        .getChargeReceiptEmbed(sender.getUsername(), transferAmount)
-                        .send(channel);
-                    transferLogDescription += this.#printUserBalances(sender, receiver);
-                    break;
-                case TransferType.TRANSFER_IOU:
-                    await receiver.getDiscordUser().send({
-                        embeds: [
-                            iouTransferVisualizer
-                                .getIOUTransferNotificationEmbed(
-                                    sender.getUsername(),
-                                    receiver,
-                                    transferAmount,
-                                    comment
-                                )
-                                .build(),
-                        ],
-                    });
-                    await iouTransferVisualizer
-                        .getIOUTransferReceiptEmbed(receiver.getUsername(), transferAmount)
-                        .send(channel);
-                    break;
-                default:
-                    await receiver.getDiscordUser().send({
-                        embeds: [
-                            cashTransferVisualizer
-                                .getTransferNotificationEmbed(sender.getUsername(), receiver, transferAmount, comment)
-                                .build(),
-                        ],
-                    });
-                    await cashTransferVisualizer
-                        .getTransferReceiptEmbed(receiver.getUsername(), transferAmount)
-                        .send(channel);
-                    transferLogDescription += this.#printUserBalances(sender, receiver);
-                    break;
-            }
             const logItem = `[${transferType}] (${sender.getUserId()} -> ${receiver.getUserId()})\n`
                 .concat(`${unitFormatter(transferAmount)} from ${sender.getDBName()} to ${receiver.getDBName()} \n`)
                 .concat(`comment: ${comment}\n`)
-                .concat(transferLogDescription.length ? `${transferLogDescription}\n` : '')
+                .concat(`${this.#printUserBalances(sender, receiver)}\n`)
                 .concat(`----------------------------------------\n`);
             await logger.transactionLog(logItem);
         } else {

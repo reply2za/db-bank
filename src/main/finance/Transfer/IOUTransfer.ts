@@ -4,8 +4,6 @@ import { BankUserCopy } from '../BankUser/BankUserCopy';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import iouTransferVisualizer from '../visualizers/transfers/iouTransferVisualizer';
 import { bank } from '../Bank';
-import { localStorage } from '../../storage/LocalStorage';
-import Logger from '../../utils/Logger';
 import visualizerCommon from '../visualizers/visualizerCommon';
 import { formatErrorText } from '../../utils/utils';
 import { config } from '../../utils/constants/constants';
@@ -59,5 +57,22 @@ export class IOUTransfer extends Transfer {
                 return true;
             })()
         );
+    }
+
+    protected async postSuccessfulTransferAction(
+        sender: BankUserCopy,
+        receiver: BankUserCopy,
+        transferAmount: number,
+        comment: string,
+        channel: TextChannel
+    ): Promise<void> {
+        await receiver.getDiscordUser().send({
+            embeds: [
+                iouTransferVisualizer
+                    .getIOUTransferNotificationEmbed(sender.getUsername(), receiver, transferAmount, comment)
+                    .build(),
+            ],
+        });
+        await iouTransferVisualizer.getIOUTransferReceiptEmbed(receiver.getUsername(), transferAmount).send(channel);
     }
 }

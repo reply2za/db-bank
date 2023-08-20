@@ -1,7 +1,5 @@
-import { OriginalBankUser } from '../../BankUser/OriginalBankUser';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { convertToCurrency, roundNumberTwoDecimals } from '../../../utils/numberUtils';
-import visualizerCommon from '../visualizerCommon';
 import images from '../../../utils/constants/images';
 import { BankUserCopy } from '../../BankUser/BankUserCopy';
 import { config } from '../../../utils/constants/constants';
@@ -29,7 +27,7 @@ export default {
     },
     getTransferNotificationEmbed(
         senderName: string,
-        receiver: Readonly<OriginalBankUser>,
+        receiver: Readonly<BankUserCopy>,
         transferAmount: number,
         comment = ''
     ): EmbedBuilderLocal {

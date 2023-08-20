@@ -40,4 +40,21 @@ export class ChargeTransfer extends ACashTransfer {
         }
         return true;
     }
+
+    protected async postSuccessfulTransferAction(
+        sender: BankUserCopy,
+        receiver: BankUserCopy,
+        transferAmount: number,
+        comment: string,
+        channel: TextChannel
+    ) {
+        await sender.getDiscordUser().send({
+            embeds: [
+                chargeTransferVisualizer
+                    .getChargeNotificationEmbed(sender, receiver.getUsername(), transferAmount, comment)
+                    .build(),
+            ],
+        });
+        await chargeTransferVisualizer.getChargeReceiptEmbed(sender.getUsername(), transferAmount).send(channel);
+    }
 }

@@ -143,7 +143,18 @@ export abstract class Transfer {
         reactionCollector.stop();
         if (confirmationResponse) {
             const txnResponse = await this.approvedTransactionAction(transferAmount, comment);
-            embedMsg.react(txnResponse ? reactions.CHECK : reactions.X).catch((e) => logger.debugLog(e));
+            if (txnResponse) {
+                await this.postSuccessfulTransferAction(
+                    this.sender,
+                    this.receiver,
+                    transferAmount,
+                    comment,
+                    this.channel
+                );
+                await embedMsg.react(reactions.CHECK);
+            } else {
+                await embedMsg.react(reactions.X);
+            }
         } else {
             await this.cancelResponse();
             embedMsg.react(reactions.X).catch((e) => logger.debugLog(e));
@@ -236,6 +247,23 @@ export abstract class Transfer {
      * @returns Whether the transaction succeeded.
      */
     protected abstract approvedTransactionAction(transferAmount: number, comment: string): Promise<boolean>;
+
+    /**
+     * The action to perform after a successful transfer.
+     * @param sender The sender of the transfer.
+     * @param receiver The receiver of the transfer.
+     * @param transferAmount The amount transferred.
+     * @param comment A comment associated with the transfer.
+     * @param channel The channel the transfer was initiated in.
+     * @protected
+     */
+    protected abstract postSuccessfulTransferAction(
+        sender: BankUserCopy,
+        receiver: BankUserCopy,
+        transferAmount: number,
+        comment: string,
+        channel: TextChannel
+    ): Promise<void>;
 
     private static async promptForRecipient(
         message: Message,

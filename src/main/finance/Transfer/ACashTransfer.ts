@@ -1,8 +1,10 @@
 import { Transfer } from './Transfer';
 import { calculateTotal } from '../utils';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
-import { Colors } from 'discord.js';
+import { Colors, TextChannel } from 'discord.js';
 import { getUserResponse } from '../../utils/utils';
+import { BankUserCopy } from '../BankUser/BankUserCopy';
+import cashTransferVisualizer from '../visualizers/transfers/cashTransferVisualizer';
 
 /**
  * Any type of transfer that is done in cash.
@@ -28,5 +30,22 @@ export abstract class ACashTransfer extends Transfer {
         const commentResponse = (await getUserResponse(this.channel, this.responder.getUserId()))?.content;
         if (commentResponse?.toLowerCase() === 'b') return '';
         return commentResponse;
+    }
+
+    protected async postSuccessfulTransferAction(
+        sender: BankUserCopy,
+        receiver: BankUserCopy,
+        transferAmount: number,
+        comment: string,
+        channel: TextChannel
+    ): Promise<void> {
+        await receiver.getDiscordUser().send({
+            embeds: [
+                cashTransferVisualizer
+                    .getTransferNotificationEmbed(sender.getUsername(), receiver, transferAmount, comment)
+                    .build(),
+            ],
+        });
+        await cashTransferVisualizer.getTransferReceiptEmbed(receiver.getUsername(), transferAmount).send(channel);
     }
 }
