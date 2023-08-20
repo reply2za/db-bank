@@ -14,8 +14,12 @@ exports.run = async (event: MessageEventLocal) => {
 **process commands**
 \`boot\` - see all processes
 \`update\` - update the process
+\`restart\` - restart the process
+\`shutdown\` - kill the process & remove it from pm2
+**data commands**
 \`processdata [file.txt]\` - update a process's ${config.dataFile}
-\`shutdown\` - kill the process & remove it from pm2`
+\`processdata previous\` - view the previous ${config.dataFile} contents
+`
         )
         .send(event.message.channel);
 };

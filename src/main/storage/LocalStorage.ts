@@ -26,6 +26,10 @@ class LocalStorage {
         return fs.readFileSync(config.dataFile).toString();
     }
 
+    /**
+     * Saves the data to the local file and discord.
+     * @param serializedData
+     */
     async saveData(serializedData: string) {
         try {
             fs.writeFileSync(config.dataFile, serializedData);
