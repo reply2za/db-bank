@@ -6,7 +6,7 @@ import { bot } from '../../utils/constants/constants';
 import { EventDataNames, MessageEventLocal } from '../../utils/types';
 import Logger from '../../utils/Logger';
 import visualizerCommon from '../../finance/visualizers/visualizerCommon';
-import { TextChannel } from 'discord.js';
+import { Colors, TextChannel } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.getUserId());
@@ -59,9 +59,29 @@ exports.run = async (event: MessageEventLocal) => {
         event.message.channel.send(formatErrorText('could not find IOU'));
         return;
     }
+    await new EmbedBuilderLocal()
+        .setColor(Colors.Orange)
+        .setDescription("why are you redeeming this IOU ? ['b' = blank, 'q' = cancel]")
+        .send(event.message.channel);
+
+    const reasonRsp = (await getUserResponse(event.message.channel, event.bankUser.getUserId()))?.content;
+    if (!reasonRsp || reasonRsp.toLowerCase() === 'q') {
+        event.message.channel.send('*cancelled*');
+        return;
+    }
+    let redemptionComment = reasonRsp;
+    if (reasonRsp.toLowerCase() === 'b') {
+        redemptionComment = '';
+    }
     // whether to append an s to text based on the IOU quantity
     const appendS = quantity > 1 ? 's' : '';
-    await visualizerCommon.getConfirmationEmbed(`redemption of ${quantity} IOU${appendS}`).send(event.message.channel);
+    await visualizerCommon
+        .getConfirmationEmbed(`redemption of ${quantity} IOU${appendS}`)
+        .addFields(
+            { name: 'to', value: `${iou.sender.name}`, inline: true },
+            { name: 'reason', value: redemptionComment, inline: true }
+        )
+        .send(event.message.channel);
     const response = (await getUserResponse(event.message.channel, event.bankUser.getUserId()))?.content;
     if (response?.toLowerCase() === 'yes') {
         const isSuccessful = await bank.redeemIOU(iou.id, quantity);
@@ -72,7 +92,8 @@ exports.run = async (event: MessageEventLocal) => {
                 const iouRedeemedNotifEmbed = iouVisualizer.iouRedeemedNotifEmbed(
                     iou.receiver.name,
                     iou.comment,
-                    quantity
+                    quantity,
+                    redemptionComment
                 );
                 await iouSender.send({
                     embeds: [iouRedeemedNotifEmbed.build()],
@@ -83,6 +104,7 @@ exports.run = async (event: MessageEventLocal) => {
                     `[iou redemption] (${iou.sender.id} -> ${iou.receiver.id})\n` +
                         `${receiverName} redeemed ${quantity} IOU${appendS} from ${senderName} \n` +
                         `IOU reason: ${iou.comment || 'N/A'}\n` +
+                        `Redemption reason: ${redemptionComment || 'N/A'}\n` +
                         `----------------------------------------`
                 );
             } else {

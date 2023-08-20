@@ -63,8 +63,9 @@ export default {
      * @param iouRecipientName The name author that redeemed the IOU.
      * @param iouComment The reason for the IOU.
      * @param quantity The number of IOUs that are being redeemed.
+     * @param redemptionComment Optional - The reason/comment for the redemption.
      */
-    iouRedeemedNotifEmbed(iouRecipientName: string, iouComment = '', quantity: number) {
+    iouRedeemedNotifEmbed(iouRecipientName: string, iouComment = '', quantity: number, redemptionComment?: string) {
         let title;
         let description;
         if (quantity > 1) {
@@ -74,12 +75,13 @@ export default {
             title = `${iouRecipientName} redeemed an IOU`;
             description = `An IOU that you gave to ${iouRecipientName} has been redeemed.\nCongratulations!`;
         }
+        if (redemptionComment) description += `\nRedemption comment: ${redemptionComment}`;
         return new EmbedBuilderLocal()
             .setTitle(title)
             .setColor('Aqua')
             .setThumbnail(images.REDEEMED_IOU_NOTIF_IMG)
             .setDescription(description)
-            .setFooter(`IOU reason: ${iouComment || 'none'}`);
+            .setFooter(`IOU: ${iouComment || 'unnamed'}`);
     },
 };
 
