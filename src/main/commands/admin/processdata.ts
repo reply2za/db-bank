@@ -7,9 +7,11 @@ import fs from 'fs';
 import axios from 'axios';
 let previousData: string;
 exports.run = async (event: MessageEventLocal) => {
-    if (event.args[0].toLowerCase() === 'previous') {
-        if (previousData) {
-            event.message.channel.send(previousData);
+    if (event.args.length) {
+        if (event.args[0].toLowerCase() === 'previous') {
+            if (previousData) {
+                event.message.channel.send(previousData);
+            }
         }
         return;
     }
