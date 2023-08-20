@@ -9,19 +9,28 @@ class LocalStorage {
         return (<TextChannel>channel)?.messages.fetch('1065733201370288138');
     }
 
+    async #retrieveDataFromDiscord(): Promise<string> {
+        // get data from discord
+        const message = await this.#getDataMsg();
+        const url = message?.attachments.first()?.url;
+        if (url) {
+            const res = await fetch(url);
+            const bankData = await res.json();
+            if (bankData) {
+                return JSON.stringify(bankData);
+            }
+        }
+        await logger.warnLog('could not retrieve discord data, using local data');
+        throw new Error('could not retrieve discord data');
+    }
+
     async retrieveData(): Promise<string> {
         if (!config.isDevMode) {
-            // get data from discord
-            const message = await this.#getDataMsg();
-            const url = message?.attachments.first()?.url;
-            if (url) {
-                const res = await fetch(url);
-                const bankData = await res.json();
-                if (bankData) {
-                    return JSON.stringify(bankData);
-                }
+            try {
+                return this.#retrieveDataFromDiscord();
+            } catch (e: any) {
+                await logger.errorLog(e, '[LocalStorage:retrieveData, failed discord retrieve]');
             }
-            await logger.warnLog('could not retrieve discord data, using local data');
         }
         return this.retrieveLocalData();
     }
