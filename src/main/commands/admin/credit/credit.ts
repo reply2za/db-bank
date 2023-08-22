@@ -1,10 +1,12 @@
-import { EventDataNames, MessageEventLocal } from '../../../utils/types';
-import { TextChannel } from 'discord.js';
+import { MessageEventLocal } from '../../../utils/types';
+import { transferFactory } from '../../../factories/TransferFactory';
 import { CreditTransfer } from '../../../finance/Transfer/CreditTransfer';
+import { TextChannel } from 'discord.js';
+
+const initiateTransferRequest = transferFactory.add(CreditTransfer, async (event, otherUser) => {
+    await new CreditTransfer(<TextChannel>event.message.channel, event.bankUser, otherUser).processTransfer();
+});
 
 exports.run = async (event: MessageEventLocal) => {
-    event.data.set(EventDataNames.AUTHOR_INTERACT_HISTORY, event.bankUser.getHistory());
-    const receiver = await CreditTransfer.getUserToTransferTo(event.message, event.args.join(' '), event.data);
-    if (!receiver) return;
-    await new CreditTransfer(<TextChannel>event.message.channel, event.bankUser, receiver).processTransfer();
+    await initiateTransferRequest(event);
 };

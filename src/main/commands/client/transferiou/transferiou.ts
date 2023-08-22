@@ -1,12 +1,13 @@
-import { EventDataNames, MessageEventLocal } from '../../../utils/types';
+import { MessageEventLocal } from '../../../utils/types';
 import { TextChannel } from 'discord.js';
 import { IOUTransfer } from '../../../finance/Transfer/IOUTransfer';
+import { transferFactory } from '../../../factories/TransferFactory';
 
+const initiateTransferRequest = transferFactory.add(IOUTransfer, async (event, otherUser) => {
+    await new IOUTransfer(<TextChannel>event.message.channel, event.bankUser, otherUser).processTransfer();
+});
 exports.run = async (event: MessageEventLocal) => {
-    event.data.set(EventDataNames.AUTHOR_INTERACT_HISTORY, event.bankUser.getHistory());
-    const recipientBankUser = await IOUTransfer.getUserToTransferTo(event.message, event.args.join(' '), event.data);
-    if (!recipientBankUser) return;
-    await new IOUTransfer(<TextChannel>event.message.channel, event.bankUser, recipientBankUser).processTransfer();
+    await initiateTransferRequest(event);
 };
 
 export default exports;
