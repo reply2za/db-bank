@@ -12,6 +12,7 @@ import {
 import { config } from './constants/constants';
 import { processManager } from './ProcessManager';
 import { TransferType } from '../finance/types';
+import Logger from './Logger';
 
 export async function getUserResponse(
     channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>,
@@ -54,7 +55,7 @@ export async function attachReactionToMessage(
 ): Promise<ReactionCollector> {
     if (!endCallback) {
         endCallback = () => {
-            reactMsg.reactions.removeAll().catch((error) => config.isDevMode && console.log(error));
+            reactMsg.reactions.removeAll().catch((error) => Logger.debugLog(error));
         };
     }
     if (!filter) {

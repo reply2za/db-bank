@@ -17,7 +17,19 @@ exports.run = async (event: MessageEventLocal) => {
     const reactionsList = [reactions.MONEY, reactions.TICKET];
     const userIOUs = bank.getUserIOUs(event.bankUser.getUserId());
     if (userIOUs.length) reactionsList.push(reactions.PAGE_C);
-    const balanceReactionCallback = async (reaction: MessageReaction) => {
+    await attachReactionToMessage(
+        balanceMsg,
+        [event.bankUser.getUserId()],
+        reactionsList,
+        reactionCallback(event),
+        undefined,
+        undefined,
+        45000
+    );
+};
+
+function reactionCallback(event: MessageEventLocal) {
+    return async (reaction: MessageReaction) => {
         reaction.users.remove(event.bankUser.getDiscordUser()).catch();
         let cmdName;
         switch (reaction.emoji.name) {
@@ -59,13 +71,4 @@ exports.run = async (event: MessageEventLocal) => {
             event.data.delete(EventDataNames.REACTION_TSFR_REQ);
         }
     };
-    await attachReactionToMessage(
-        balanceMsg,
-        [event.bankUser.getUserId()],
-        reactionsList,
-        balanceReactionCallback,
-        undefined,
-        undefined,
-        45000
-    );
-};
+}

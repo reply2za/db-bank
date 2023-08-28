@@ -10,6 +10,7 @@ import { config } from '../../utils/constants/constants';
 import { TransferType } from '../types';
 import { bankUserLookup } from '../BankUserLookup';
 import logger from '../../utils/Logger';
+import Logger from '../../utils/Logger';
 
 const MAX_RETRY_COUNT = 3;
 
@@ -285,6 +286,7 @@ export abstract class Transfer {
                 const initialTransferMsg = await message.channel.send(
                     `${historyMsg}Who would you like to ${actionName} to? *['q' = cancel]*`
                 );
+                eventData.set(EventDataNames.INITIAL_TRANSFER_MSG, initialTransferMsg);
                 const reactList = [];
                 if (historyList) {
                     if (historyList.length > 0) {
@@ -295,28 +297,40 @@ export abstract class Transfer {
                     }
                 }
                 let collector: ReactionCollector | undefined;
+                let isStopped = false;
                 if (reactList.length) {
-                    collector = await attachReactionToMessage(
+                    attachReactionToMessage(
                         initialTransferMsg,
                         [message.author.id],
                         reactList,
                         (react) => {
                             if (!historyList) return;
+                            if (initialTransferMsg.id !== eventData.get(EventDataNames.INITIAL_TRANSFER_MSG)?.id)
+                                return;
                             if (react.emoji.name === reactions.ONE) {
                                 resolve({ recipientID: historyList[historyList.length - 1] });
-                                if (collector) collector.stop();
+                                if (collector) collector.stop('reacted');
                                 return;
                             } else if (react.emoji.name === reactions.TWO && historyList.length > 1) {
                                 resolve({ recipientID: historyList[historyList.length - 2] });
-                                if (collector) collector.stop();
+                                if (collector) collector.stop('reacted');
                                 return;
                             }
+                        },
+                        (collected, reason) => {
+                            initialTransferMsg.reactions.removeAll().catch((e) => logger.debugLog(e));
+                            if (reason === 'reacted') eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
                         }
-                    );
+                    )
+                        .then((result) => {
+                            collector = result;
+                            if (isStopped) collector.stop();
+                        })
+                        .catch((e) => Logger.debugLog(e));
                 }
-                eventData.set(EventDataNames.INITIAL_TRANSFER_MSG, initialTransferMsg);
                 const newMsg = await getUserResponse(message.channel, message.author.id);
                 collector?.stop();
+                isStopped = true;
                 // determines if abandoned, meaning that the same transfer is no longer active
                 if (initialTransferMsg.id !== eventData.get(EventDataNames.INITIAL_TRANSFER_MSG)?.id) return;
                 eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
