@@ -8,6 +8,7 @@ export class MockMessage {
     deleteable = true;
     id: string;
     channel: MockTextChannel;
+    reactionsList: any[] = [];
     constructor(id = '', content = '', author: MockDiscordUser, channel?: MockTextChannel) {
         if (!id) {
             this.id = (Math.random() * 1000000 + 1).toString();
@@ -31,6 +32,7 @@ export class MockMessage {
         return;
     }
     async react(...args: any[]) {
+        this.reactionsList.push(args[0]);
         return;
     }
     createReactionCollector(...args: any[]) {

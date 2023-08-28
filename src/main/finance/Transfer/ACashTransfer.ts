@@ -39,13 +39,17 @@ export abstract class ACashTransfer extends Transfer {
         comment: string,
         channel: TextChannel
     ): Promise<void> {
-        await receiver.getDiscordUser().send({
-            embeds: [
-                cashTransferVisualizer
-                    .getTransferNotificationEmbed(sender.getUsername(), receiver, transferAmount, comment)
-                    .build(),
-            ],
-        });
         await cashTransferVisualizer.getTransferReceiptEmbed(receiver.getUsername(), transferAmount).send(channel);
+        try {
+            await receiver.getDiscordUser().send({
+                embeds: [
+                    cashTransferVisualizer
+                        .getTransferNotificationEmbed(sender.getUsername(), receiver, transferAmount, comment)
+                        .build(),
+                ],
+            });
+        } catch (e) {
+            throw new Error('Could not send transfer notification to receiver');
+        }
     }
 }

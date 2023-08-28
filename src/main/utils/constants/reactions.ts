@@ -46,4 +46,6 @@ export default {
     PENCIL: '✏️',
     // arrow counter-clockwise
     ARROW_CCW: '🔄',
+    ONE: '1️⃣',
+    TWO: '2️⃣',
 };

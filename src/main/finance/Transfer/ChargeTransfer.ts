@@ -48,13 +48,17 @@ export class ChargeTransfer extends ACashTransfer {
         comment: string,
         channel: TextChannel
     ) {
-        await sender.getDiscordUser().send({
-            embeds: [
-                chargeTransferVisualizer
-                    .getChargeNotificationEmbed(sender, receiver.getUsername(), transferAmount, comment)
-                    .build(),
-            ],
-        });
         await chargeTransferVisualizer.getChargeReceiptEmbed(sender.getUsername(), transferAmount).send(channel);
+        try {
+            await sender.getDiscordUser().send({
+                embeds: [
+                    chargeTransferVisualizer
+                        .getChargeNotificationEmbed(sender, receiver.getUsername(), transferAmount, comment)
+                        .build(),
+                ],
+            });
+        } catch (e) {
+            throw new Error('Could not send transfer notification to sender');
+        }
     }
 }

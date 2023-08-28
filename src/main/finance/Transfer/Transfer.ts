@@ -1,4 +1,4 @@
-import { Colors, Message, TextChannel } from 'discord.js';
+import { Colors, Message, ReactionCollector, TextChannel } from 'discord.js';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { attachReactionToMessage, formatErrorText, getUserResponse } from '../../utils/utils';
 import { roundNumberTwoDecimals } from '../../utils/numberUtils';
@@ -76,7 +76,8 @@ export abstract class Transfer {
                 history.length > 1
                     ? bankUserLookup.getUser(history[history.length - 2])?.getDiscordUser().username
                     : undefined;
-            let pastUsers = [user1, user2].filter((u) => u).map((u) => `\`${u}\``);
+            let counter = 1;
+            let pastUsers = [user1, user2].filter((u) => u).map((u) => `${counter++}. \`${u}\``);
             let userLen = pastUsers.length;
             let userNumDesc = userLen > 1 ? `${userLen} users` : 'user';
             return `The last ${userNumDesc} you've transferred to:` + '\n' + pastUsers.join('\n') + '\n';
@@ -144,13 +145,18 @@ export abstract class Transfer {
         if (confirmationResponse) {
             const txnResponse = await this.approvedTransactionAction(transferAmount, comment);
             if (txnResponse) {
-                await this.postSuccessfulTransferAction(
-                    this.sender,
-                    this.receiver,
-                    transferAmount,
-                    comment,
-                    this.channel
-                );
+                try {
+                    await this.postSuccessfulTransferAction(
+                        this.sender,
+                        this.receiver,
+                        transferAmount,
+                        comment,
+                        this.channel
+                    );
+                } catch (e: any) {
+                    this.channel.send(formatErrorText(e.message));
+                    await logger.debugLog(e);
+                }
                 await embedMsg.react(reactions.CHECK);
             } else {
                 await embedMsg.react(reactions.X);
@@ -271,38 +277,70 @@ export abstract class Transfer {
         actionName = 'transfer',
         eventData = new Map<EventDataNames, any>()
     ): Promise<{ recipientID?: string; recipientName?: string } | undefined> {
-        let recipientID = message.mentions?.users.first()?.id;
-        if (!name && !recipientID) {
-            let interactionHistory: string[] | undefined = eventData.get(EventDataNames.AUTHOR_INTERACT_HISTORY);
-            let historyMsg = this.printUserHistory(interactionHistory);
-            const initialTransferMsg = await message.channel.send(
-                `${historyMsg}Who would you like to ${actionName} to? *['q' = cancel]*`
-            );
-            eventData.set(EventDataNames.INITIAL_TRANSFER_MSG, initialTransferMsg);
-            const newMsg = await getUserResponse(message.channel, message.author.id);
-            // determines if abandoned, meaning that the same transfer is no longer active
-            if (initialTransferMsg.id !== eventData.get(EventDataNames.INITIAL_TRANSFER_MSG)?.id) return;
-            eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
-            if (!newMsg) {
-                message.channel.send('*no response provided*');
-                return;
-            }
-            recipientID = newMsg?.mentions?.users.first()?.id;
-            if (!recipientID) {
-                if (newMsg.content) {
-                    if (newMsg.content.toLowerCase() === 'q') {
-                        message.channel.send('*cancelled*');
-                        return;
-                    } else {
-                        name = newMsg.content;
+        return new Promise(async (resolve) => {
+            let recipientID = message.mentions?.users.first()?.id;
+            if (!name && !recipientID) {
+                let historyList: string[] | undefined = eventData.get(EventDataNames.AUTHOR_INTERACT_HISTORY);
+                let historyMsg = this.printUserHistory(historyList);
+                const initialTransferMsg = await message.channel.send(
+                    `${historyMsg}Who would you like to ${actionName} to? *['q' = cancel]*`
+                );
+                const reactList = [];
+                if (historyList) {
+                    if (historyList.length > 0) {
+                        reactList.push(reactions.ONE);
+                        if (historyList.length > 1) {
+                            reactList.push(reactions.TWO);
+                        }
                     }
-                } else {
-                    message.channel.send(`must specify user to ${actionName} to`);
+                }
+                let collector: ReactionCollector | undefined;
+                if (reactList.length) {
+                    collector = await attachReactionToMessage(
+                        initialTransferMsg,
+                        [message.author.id],
+                        reactList,
+                        (react) => {
+                            if (!historyList) return;
+                            if (react.emoji.name === reactions.ONE) {
+                                resolve({ recipientID: historyList[historyList.length - 1] });
+                                if (collector) collector.stop();
+                                return;
+                            } else if (react.emoji.name === reactions.TWO && historyList.length > 1) {
+                                resolve({ recipientID: historyList[historyList.length - 2] });
+                                if (collector) collector.stop();
+                                return;
+                            }
+                        }
+                    );
+                }
+                eventData.set(EventDataNames.INITIAL_TRANSFER_MSG, initialTransferMsg);
+                const newMsg = await getUserResponse(message.channel, message.author.id);
+                collector?.stop();
+                // determines if abandoned, meaning that the same transfer is no longer active
+                if (initialTransferMsg.id !== eventData.get(EventDataNames.INITIAL_TRANSFER_MSG)?.id) return;
+                eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
+                if (!newMsg) {
+                    message.channel.send('*no response provided*');
                     return;
                 }
+                recipientID = newMsg?.mentions?.users.first()?.id;
+                if (!recipientID) {
+                    if (newMsg.content) {
+                        if (newMsg.content.toLowerCase() === 'q') {
+                            message.channel.send('*cancelled*');
+                            return;
+                        } else {
+                            name = newMsg.content;
+                        }
+                    } else {
+                        message.channel.send(`must specify user to ${actionName} to`);
+                        return;
+                    }
+                }
             }
-        }
-        return { recipientID, recipientName: name };
+            resolve({ recipientID, recipientName: name });
+        });
     }
 
     /**

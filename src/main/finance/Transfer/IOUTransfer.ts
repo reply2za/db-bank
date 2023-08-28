@@ -66,13 +66,17 @@ export class IOUTransfer extends Transfer {
         comment: string,
         channel: TextChannel
     ): Promise<void> {
-        await receiver.getDiscordUser().send({
-            embeds: [
-                iouTransferVisualizer
-                    .getIOUTransferNotificationEmbed(sender.getUsername(), receiver, transferAmount, comment)
-                    .build(),
-            ],
-        });
         await iouTransferVisualizer.getIOUTransferReceiptEmbed(receiver.getUsername(), transferAmount).send(channel);
+        try {
+            await receiver.getDiscordUser().send({
+                embeds: [
+                    iouTransferVisualizer
+                        .getIOUTransferNotificationEmbed(sender.getUsername(), receiver, transferAmount, comment)
+                        .build(),
+                ],
+            });
+        } catch (e) {
+            throw new Error('Could not send transfer notification to receiver');
+        }
     }
 }

@@ -52,7 +52,8 @@ describe('history', () => {
         expect(s1.channel1.receivedMessages[0]).toContain(config.NO_AMT_SELECTED_TXT);
         // validate history
         s1.channel1.receivedMessages.length = 0;
-        await commandHandler.execute(historyEvent);
+        commandHandler.execute(historyEvent);
+        await new Promise((resolve) => setTimeout(resolve, 100));
         expect(s1.channel1.receivedMessages.length).toBeGreaterThan(0);
         expect(s1.channel1.receivedMessages[0]).toContain("The last user you've transferred to");
         expect(s1.channel1.receivedMessages[0]).toContain('Anna');
