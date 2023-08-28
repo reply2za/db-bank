@@ -284,7 +284,9 @@ export abstract class Transfer {
                 let historyList: string[] | undefined = eventData.get(EventDataNames.AUTHOR_INTERACT_HISTORY);
                 let historyMsg = this.printUserHistory(historyList);
                 const initialTransferMsg = await message.channel.send(
-                    `${historyMsg}Who would you like to ${actionName} to? *['q' = cancel]*`
+                    `${historyMsg}Type a username ${
+                        historyList?.length ? '(or select a reaction)' : ''
+                    } to ${actionName} *['q' = cancel]*`
                 );
                 eventData.set(EventDataNames.INITIAL_TRANSFER_MSG, initialTransferMsg);
                 const reactList = [];
