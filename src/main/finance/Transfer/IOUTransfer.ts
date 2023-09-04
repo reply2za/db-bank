@@ -15,7 +15,7 @@ export class IOUTransfer extends Transfer {
     }
 
     static getUserToTransferTo(message: Message, name: string, eventData: any): Promise<BankUserCopy | undefined> {
-        return super.getUserToTransferTo(message, name, 'transfer IOUs', eventData);
+        return super.getUserToTransferTo(message, name, eventData, 'transfer IOUs');
     }
 
     getTransferEmbed(amount: number, comment: string): EmbedBuilderLocal {

@@ -14,7 +14,7 @@ export class MonetaryTransfer extends ACashTransfer {
     }
 
     static getUserToTransferTo(message: Message, name: string, eventData: any): Promise<BankUserCopy | undefined> {
-        return super.getUserToTransferTo(message, name, 'transfer money', eventData);
+        return super.getUserToTransferTo(message, name, eventData, 'transfer money');
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {

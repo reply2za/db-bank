@@ -13,7 +13,7 @@ export class ChargeTransfer extends ACashTransfer {
     }
 
     static getUserToTransferTo(message: Message, name: string, eventData: any): Promise<BankUserCopy | undefined> {
-        return super.getUserToTransferTo(message, name, 'charge', eventData);
+        return super.getUserToTransferTo(message, name, eventData, 'charge');
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {

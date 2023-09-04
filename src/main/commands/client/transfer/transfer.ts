@@ -2,10 +2,10 @@ import { commandHandler } from '../../../handlers/CommandHandler';
 import { MessageEventLocal } from '../../../utils/types';
 import { TextChannel } from 'discord.js';
 import { MonetaryTransfer } from '../../../finance/Transfer/MonetaryTransfer';
-import { transferFactory } from '../../../factories/TransferFactory';
+import { TransferFactory } from '../../../factories/TransferFactory';
 
-const initiateTransferRequest = transferFactory.add(MonetaryTransfer, async (event, otherUser) => {
-    await new MonetaryTransfer(<TextChannel>event.message.channel, event.bankUser, otherUser).processTransfer();
+const initiateTransferRequest = TransferFactory.get(MonetaryTransfer, (event, otherUser) => {
+    return new MonetaryTransfer(<TextChannel>event.message.channel, event.bankUser, otherUser);
 });
 
 exports.run = async (event: MessageEventLocal) => {

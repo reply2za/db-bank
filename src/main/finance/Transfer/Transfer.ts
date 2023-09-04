@@ -50,8 +50,8 @@ export abstract class Transfer {
     static async getUserToTransferTo(
         message: Message,
         name = '',
-        actionName = 'transfer',
-        eventData = new Map<EventDataNames, any>()
+        eventData = new Map<EventDataNames, any>(),
+        actionName = 'transfer'
     ): Promise<BankUserCopy | undefined> {
         let recipientDetails;
         recipientDetails = await Transfer.promptForRecipient(message, name, actionName, eventData);
