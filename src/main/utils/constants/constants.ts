@@ -45,7 +45,7 @@ export const config = Object.freeze({
     errorLogChID: '1064628593772220488',
     processLog: '1091525626281857045',
     warnLogChID: '1095733636873076807',
-    maxIOUCountPerReq: 99,
+    maxIOUCountPerReq: 999,
     // the name of the data file with the extension
     dataFile: DATA_FILE,
     isDevMode: isDevMode,
