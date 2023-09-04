@@ -6,8 +6,8 @@ class TransferFactory {
     /**
      * Returns a function that will create a transfer object and process it.
      * This is the default implementation of a transfer request.
-     * @param classType
-     * @param classBuilder
+     * @param classType The class type of the transfer object.
+     * @param classBuilder A function that returns a transfer object.
      */
     static get(
         classType: typeof Transfer,
