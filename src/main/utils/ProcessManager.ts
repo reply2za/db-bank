@@ -128,7 +128,7 @@ class ProcessManager {
         }
         // package related issues
         if (error.message.includes('Cannot find module')) {
-            execSync('git stash && git pull && npm run pm2');
+            execSync('git stash && git pull && npm run prod');
             console.log(error);
         } else {
             if (this.#isLoggedIn) {
