@@ -2,7 +2,7 @@
 
 echo "[NOTICE] Ensure localData.txt is up to date"
 echo "building js..."
-npm run prod:build
+npm install && tsc -p tsconfig.prod.json
 
 echo "running pm2 script..."
 NAME=${1:-db-bank}
