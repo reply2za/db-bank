@@ -11,6 +11,6 @@ if pm2 restart $NAME ; then
   pm2 reset $NAME
   echo restarted $NAME
 else
-  pm2 start ./dist/src/main/index.js --name $NAME
+  pm2 start npm --name $NAME -- start
 fi
 

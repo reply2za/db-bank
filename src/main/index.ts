@@ -1,6 +1,4 @@
 'use strict';
-// dotenv should be the first thing imported
-require('dotenv').config();
 import { bot, config } from './utils/constants/constants';
 import { bank } from './finance/Bank';
 import { localStorage } from './storage/LocalStorage';
