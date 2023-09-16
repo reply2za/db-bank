@@ -17,5 +17,5 @@ exports.run = async (event: MessageEventLocal) => {
 
 async function update(channel: TextChannel) {
     await channel.send('updating... (notice: prod process starts in a sidelined state)');
-    execSync('git stash && git pull && npm run prod:build && pm2 restart db-bank');
+    execSync('git stash && git pull && npm run prod');
 }
