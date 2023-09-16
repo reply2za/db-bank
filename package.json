@@ -4,11 +4,12 @@
   "description": "",
   "main": "src/main/index.ts",
   "scripts": {
-    "start": "tsc && node dist/src/main/index.js",
-    "build": "tsc",
-    "prod:build": "npm install && tsc -p tsconfig.prod.json",
-    "dev": "tsc && node --trace-warnings -r source-map-support/register dist/src/main/index.js --dev",
+    "dev": "npm run build:dev && npm run start:dev",
     "prod": "bash scripts/pm2.bash",
+    "build:dev": "tsc",
+    "build:prod": "npm install && tsc -p tsconfig.prod.json",
+    "start:dev": "node --trace-warnings -r source-map-support/register dist/src/main/index.js --dev",
+    "start:prod": "tsc && node dist/src/main/index.js",
     "release:patch": "npm run test && npm version patch -m \"chore(release): %s\"",
     "release:minor": "npm run test && npm version minor -m \"chore(release): %s\"",
     "test": "tsc && jest --detectOpenHandles --forceExit"

@@ -2,7 +2,7 @@
 
 echo "[NOTICE] Ensure localData.txt is up to date"
 echo "building js..."
-npm run prod:build
+npm run build:prod
 
 echo "running pm2 script..."
 NAME=${1:-db-bank}
@@ -11,6 +11,6 @@ if pm2 restart $NAME ; then
   pm2 reset $NAME
   echo restarted $NAME
 else
-  pm2 start ./dist/src/main/index.js --name $NAME
+  pm2 start npm --name $NAME -- start:prod
 fi
 
