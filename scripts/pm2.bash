@@ -11,6 +11,6 @@ if pm2 restart $NAME ; then
   pm2 reset $NAME
   echo restarted $NAME
 else
-  pm2 start npm --name $NAME -- start:prod
+  pm2 start npm --name $NAME -- run start:prod
 fi
 
