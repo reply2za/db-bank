@@ -8,6 +8,8 @@ import { formatErrorText, isAdmin } from '../utils/utils';
 import Logger from '../utils/Logger';
 import { processManager } from '../utils/ProcessManager';
 
+const BID_CH = '1177097674495905842';
+
 module.exports = async (message: Message) => {
     const msgPrefix = message.content.substring(0, config.prefix.length);
     if (msgPrefix !== config.prefix) return;
@@ -42,5 +44,15 @@ module.exports = async (message: Message) => {
         bankUser,
         data: new Map(),
     };
+    if (event.message.channel.id === BID_CH) {
+        const now = new Date();
+        const midnight = new Date();
+        midnight.setHours(0, 0, 0, 0);
+        const oneAm = new Date();
+        oneAm.setHours(1, 0, 0, 0);
+        if (now >= midnight && now < oneAm) {
+            await event.message.reply('*This message was sent after 11:59:59. Bidding is closed*');
+        }
+    }
     command.run(event).catch((e) => Logger.errorLog(e));
 };
