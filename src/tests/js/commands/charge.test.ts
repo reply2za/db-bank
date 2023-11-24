@@ -49,6 +49,7 @@ describe('monetary charge', () => {
         s1.channel1.receivedMessages.length = 0;
         // spacing should not make a difference
         const amountToSendTxt = '25+25+25 + 25';
+        const amountToSend = 100;
         s1.channel1.awaitMessagesList = [
             [new MockMessage('', `${amountToSendTxt}`, s1.userJoe, s1.channel1)],
             [new MockMessage('', 'b', s1.userJoe, s1.channel1)],
@@ -58,9 +59,11 @@ describe('monetary charge', () => {
         await charge.run(eventTransferJoe);
         expect(s1.channel1.receivedMessages.length).toBeGreaterThan(0);
         console.log(s1.channel1.receivedMessages.length);
-        expect(s1.channel1.receivedMessages[2]).toContain("cannot charge more than the sender's balance");
-        expect(s1.channel1.receivedMessages[s1.channel1.receivedMessages.length - 1]).toContain('cancelled charge');
-        expect(bankUserLookup.getUser(s1.bankUserAnna.getUserId())?.getBalance()).toBe(prevBalanceAnna);
+        expect(s1.channel1.receivedMessages[2]).toContain(
+            "type a short comment/description ['b' = blank, 'q' = cancel]"
+        );
+        expect(s1.channel1.receivedMessages[s1.channel1.receivedMessages.length - 1]).toContain('charged Anna $100.00');
+        expect(bankUserLookup.getUser(s1.bankUserAnna.getUserId())?.getBalance()).toBe(prevBalanceAnna - amountToSend);
     });
 
     test('charge joe $50 using multiple signs', async () => {
