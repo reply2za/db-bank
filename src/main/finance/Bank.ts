@@ -92,6 +92,32 @@ export class Bank {
         return transferResponse;
     }
 
+    async chargeAmount(
+        senderId: string,
+        receiverId: string,
+        amount: number,
+        channel: TextBasedChannel,
+        comment = ''
+    ): Promise<StatusWithErrorResponse> {
+        const senderAndReceiverObj = this.#getSenderAndReceiver(senderId, receiverId);
+        const senderAndReceiverStatus = this.#verifySenderAndReceiver(senderAndReceiverObj);
+        if (!senderAndReceiverStatus.success) {
+            return senderAndReceiverStatus;
+        }
+        const sender = <OriginalBankUser>senderAndReceiverObj.sender;
+        const transferResponse = this.#chargeAmountCore(sender, amount);
+        await this.#recordTransfer(
+            transferResponse,
+            amount,
+            senderId,
+            receiverId,
+            channel,
+            TransferType.CHARGE,
+            comment
+        );
+        return transferResponse;
+    }
+
     async creditAmount(
         receiverId: string,
         amount: number,
@@ -255,6 +281,16 @@ export class Bank {
             `${sender.getDBName()}: ${convertToCurrency(sender.getBalance())}\n` +
             `${receiver.getDBName()}: ${convertToCurrency(receiver.getBalance())}`
         );
+    }
+
+    #chargeAmountCore(bankUser: OriginalBankUser, amount: number): StatusWithErrorResponse {
+        if (!amount) return { success: false, failReason: 'input error' };
+        amount = roundNumberTwoDecimals(amount);
+        if (amount < 0) {
+            return { success: false, failReason: 'cannot deduct a negative balance' };
+        }
+        bankUser.subtractBalance(amount);
+        return { success: true, failReason: '' };
     }
 
     #transferAmountCore(sender: OriginalBankUser, receiver: OriginalBankUser, amount: number): StatusWithErrorResponse {

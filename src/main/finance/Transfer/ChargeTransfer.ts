@@ -5,7 +5,6 @@ import { TransferType } from '../types';
 import { bank } from '../Bank';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import chargeTransferVisualizer from '../visualizers/transfers/chargeTransferVisualizer';
-import { formatErrorText } from '../../utils/utils';
 
 export class ChargeTransfer extends ACashTransfer {
     constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy) {
@@ -17,12 +16,11 @@ export class ChargeTransfer extends ACashTransfer {
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {
-        const status = await bank.transferAmount(
+        const status = await bank.chargeAmount(
             this.sender.getUserId(),
             this.receiver.getUserId(),
             transferAmount,
             this.channel,
-            TransferType.CHARGE,
             comment
         );
         return status.success;
@@ -33,12 +31,7 @@ export class ChargeTransfer extends ACashTransfer {
     }
 
     protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
-        if (!(await super.validateAmount(transferAmount, channel))) return false;
-        if (transferAmount > this.sender.getBalance()) {
-            await channel.send(formatErrorText("cannot charge more than the sender's balance"));
-            return false;
-        }
-        return true;
+        return await super.validateAmount(transferAmount, channel);
     }
 
     protected async postSuccessfulTransferAction(
