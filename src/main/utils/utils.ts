@@ -9,7 +9,7 @@ import {
     TextBasedChannel,
     User,
 } from 'discord.js';
-import { config } from './constants/constants';
+import { bot, config } from './constants/constants';
 import { processManager } from './ProcessManager';
 import { TransferType } from '../finance/types';
 import Logger from './Logger';
@@ -62,7 +62,9 @@ export async function attachReactionToMessage(
         filter = (reaction: MessageReaction, user: User) => {
             if (!reactionUserIds.length) return true;
             return !!(
-                reactionUserIds.filter((id) => id === user.id).length && reactionsList.includes(reaction.emoji.name!)
+                reactionUserIds.filter((id) => id === user.id).length &&
+                reactionsList.includes(reaction.emoji.name!) &&
+                user.id !== bot.user!.id
             );
         };
     }

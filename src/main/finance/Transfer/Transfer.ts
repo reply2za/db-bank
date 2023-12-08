@@ -110,7 +110,7 @@ export abstract class Transfer {
             if (embedMsg.deletable) await embedMsg.delete();
             return this;
         }
-        transferEmbed = this.getTransferEmbed(transferAmount, '');
+        transferEmbed = this.getTransferEmbed(transferAmount, comment || '');
         await transferEmbed.edit(embedMsg);
         let newTransfer;
         if (comment === undefined) {
