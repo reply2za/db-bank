@@ -23,7 +23,7 @@ export class BidEvent {
 
     private static defaultDateTime(): Date {
         const date = new Date();
-        date.setHours(20, 59, 59, 999);
+        date.setHours(17, 29, 59, 999);
         return date;
     }
 
