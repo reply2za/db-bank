@@ -15,6 +15,7 @@ export class BidEvent {
     private maxBidAmount = 50;
     private static readonly FAILED_CHARGE_TXT = 'charge failed, could not find user in the database';
     private description: string;
+    private bidTimeout: NodeJS.Timeout | null = null;
 
     public constructor(textChannel: TextChannel, description = 'bid') {
         this.textChannel = textChannel;
@@ -81,9 +82,10 @@ export class BidEvent {
     }
 
     public reset(): void {
+        if (this.bidTimeout) clearTimeout(this.bidTimeout);
+        this.endDateTime = null;
         this.highestBidder = null;
         this.currentBidAmount = 0;
-        this.endDateTime = null;
     }
 
     public hasEnded() {
@@ -95,7 +97,7 @@ export class BidEvent {
         if (!this.endDateTime || this.endDateTime < new Date()) {
             this.endDateTime = BidEvent.defaultDateTime();
         }
-        setTimeout(() => {
+        this.bidTimeout = setTimeout(() => {
             if (processManager.isActive()) this.endBidding();
             else this.reset();
         }, this.endDateTime.getTime() - Date.now());
@@ -129,5 +131,11 @@ export class BidEvent {
             );
         }
         this.reset();
+    }
+
+    public async cancelBidding(): Promise<void> {
+        if (this.bidTimeout) clearTimeout(this.bidTimeout);
+        this.reset();
+        await this.textChannel.send('Bidding has been cancelled');
     }
 }
