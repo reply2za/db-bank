@@ -9,6 +9,7 @@ exports.run = async (event: MessageEventLocal) => {
 **bank** - view balance
 **transfer** [name] - initiate transfer process
 **calculate** [expression] - calculate an expression
+**bid [amount]** - bid in a bidding channel
 
 -- IOU commands -- 
 **transferIOU** - transfer an IOU
