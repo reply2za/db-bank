@@ -52,5 +52,5 @@ export const config = Object.freeze({
     hardwareTag: HARDWARE_TAG,
     sourceDirPath: 'dist/src/main',
     NO_AMT_SELECTED_TXT: '*no amount selected*',
-    TV_BID_CH: '1177097674495905842',
+    TV_BID_CH: '1091548846775095336', //todo - change
 });

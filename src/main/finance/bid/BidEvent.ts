@@ -7,16 +7,16 @@ import { ApprovedChargeTransfer } from '../Transfer/ApprovedChargeTransfer';
 
 export class BidEvent {
     private highestBidder: BankUserCopy | null;
+    private currentBidAmount = 0;
+    private endDateTime: Date | null = BidEvent.defaultDateTime();
     private minBidAmount = 0.5;
     private minBidIncrement = 0.5;
     private textChannel: TextChannel;
-    private currentBidAmount = 0;
     private maxBidAmount = 50;
-    private endDateTime: Date | null = BidEvent.defaultDateTime();
     private static readonly FAILED_CHARGE_TXT = 'charge failed, could not find user in the database';
-    private description: string | undefined;
+    private description: string;
 
-    public constructor(textChannel: TextChannel, description?: string) {
+    public constructor(textChannel: TextChannel, description = 'bid') {
         this.textChannel = textChannel;
         this.description = description;
     }
@@ -72,10 +72,22 @@ export class BidEvent {
         await this.textChannel.send(`Bid of ${bidAmount} has been placed by $${bidder.getUsername()}`);
     }
 
+    public setDescription(description: string): void {
+        this.description = description;
+    }
+
+    public getDescription(): string {
+        return this.description;
+    }
+
     public reset(): void {
         this.highestBidder = null;
         this.currentBidAmount = 0;
         this.endDateTime = null;
+    }
+
+    public hasEnded() {
+        return this.endDateTime && this.endDateTime < new Date();
     }
 
     public async startBidding(date?: Date): Promise<void> {
