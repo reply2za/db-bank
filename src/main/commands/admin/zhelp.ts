@@ -11,6 +11,8 @@ exports.run = async (event: MessageEventLocal) => {
 \`view\` - view all bank accounts
 \`charge [user]\` - charge an account
 \`credit [user]\` - credit an account
+\`createbid [date] [time] [description]\` - create a bid
+\`cancelbid\` - cancel a bid
 **process commands**
 \`boot\` - see all processes
 \`update\` - update the process
