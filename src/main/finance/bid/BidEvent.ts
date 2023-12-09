@@ -23,7 +23,7 @@ export class BidEvent {
 
     private static defaultDateTime(): Date {
         const date = new Date();
-        date.setHours(17, 29, 59, 999);
+        date.setHours(23, 59, 59, 999);
         return date;
     }
 
@@ -52,7 +52,7 @@ export class BidEvent {
 
     public async addBid(bidder: BankUserCopy, bidAmount: number): Promise<void> {
         if (this.highestBidder?.getUserId() === bidder.getUserId()) {
-            await this.textChannel.send(`You are already the highest bidder with a bid of ${this.currentBidAmount}`);
+            await this.textChannel.send(`You are already the highest bidder with a bid of $${this.currentBidAmount}`);
             return;
         }
         if (bidAmount < this.minBidAmount) {
@@ -69,7 +69,7 @@ export class BidEvent {
         }
         this.highestBidder = bidder;
         this.currentBidAmount = bidAmount;
-        await this.textChannel.send(`Bid of ${bidAmount} has been placed by ${bidder.getUsername()}`);
+        await this.textChannel.send(`Bid of ${bidAmount} has been placed by $${bidder.getUsername()}`);
     }
 
     public reset(): void {
