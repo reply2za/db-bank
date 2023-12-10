@@ -3,6 +3,8 @@ import { BidEvent } from '../../finance/bid/BidEvent';
 import { TextChannel } from 'discord.js';
 import { config } from '../../utils/constants/constants';
 import { bidManager } from '../../finance/bid/BidManager';
+import { DayOfTheWeek } from '../../utils/enums';
+
 function getNextDay(date: Date): string {
     return `${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()}`;
 }
@@ -16,6 +18,9 @@ exports.run = async (event: MessageEventLocal) => {
     if (event.message.channel.id === config.TV_BID_CH) {
         if (!bidEvent) {
             bidEvent = new BidEvent(<TextChannel>event.message.channel, getTvBidDescription(currentDate));
+            const weekendBidAmounts = { minBidAmount: 0.5, minBidIncrement: 0.5 };
+            bidEvent.setDailyBidConfig(DayOfTheWeek.Friday, weekendBidAmounts);
+            bidEvent.setDailyBidConfig(DayOfTheWeek.Saturday, weekendBidAmounts);
             bidManager.addBidEvent(event.message.channel.id, bidEvent);
             await bidEvent.startBidding();
         } else if (bidEvent.hasEnded()) {
@@ -32,7 +37,7 @@ exports.run = async (event: MessageEventLocal) => {
                     `Current bid: $${bidEvent.getCurrentBidAmount()} by ${bidEvent.getHighestBidder()?.getUsername()}`
                 );
             } else {
-                event.message.channel.send('There are no bids yet');
+                event.message.channel.send('*There are no bids as of yet*');
             }
             return;
         }

@@ -4,18 +4,24 @@ import { processManager } from '../../utils/ProcessManager';
 import { BankUserCopy } from '../BankUser/BankUserCopy';
 import { bank } from '../Bank';
 import { ApprovedChargeTransfer } from '../Transfer/ApprovedChargeTransfer';
+import { DayOfTheWeek } from '../../utils/enums';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 
 export class BidEvent {
     private highestBidder: BankUserCopy | null;
     private currentBidAmount = 0;
     private endDateTime: Date | null = BidEvent.defaultDateTime();
-    private minBidAmount = 0.5;
-    private minBidIncrement = 0.5;
+    private static readonly DEFAULT_MIN_BID_AMOUNT = 0.25;
+    private static readonly DEFAULT_MIN_BID_INCREMENT = 0.25;
+    private minBidAmount = BidEvent.DEFAULT_MIN_BID_AMOUNT;
+    private minBidIncrement = BidEvent.DEFAULT_MIN_BID_INCREMENT;
     private textChannel: TextChannel;
     private maxBidAmount = 50;
     private static readonly FAILED_CHARGE_TXT = 'charge failed, could not find user in the database';
     private description: string;
     private bidTimeout: NodeJS.Timeout | null = null;
+    private dailyBidConfigs: Map<DayOfTheWeek, DailyBidConfig> = new Map();
+    private cooldown_minutes = 5;
 
     public constructor(textChannel: TextChannel, description = 'bid') {
         this.textChannel = textChannel;
@@ -94,14 +100,41 @@ export class BidEvent {
 
     public async startBidding(date?: Date): Promise<void> {
         if (date) this.endDateTime = date;
-        if (!this.endDateTime || this.endDateTime < new Date()) {
+        const currentDate = new Date();
+        if (this.endDateTime && this.endDateTime < currentDate) {
+            // create a new date with the cooldown time added
+            const cooldownExpiryDate = new Date(this.endDateTime.getTime());
+            cooldownExpiryDate.setMinutes(cooldownExpiryDate.getMinutes() + this.cooldown_minutes);
+            if (cooldownExpiryDate > currentDate) {
+                await this.textChannel.send(
+                    `Bidding has ended, bidding will be available again at ${cooldownExpiryDate.toLocaleString()}`
+                );
+                return;
+            }
+        }
+        if (!this.endDateTime || this.endDateTime < currentDate) {
             this.endDateTime = BidEvent.defaultDateTime();
         }
+
         this.bidTimeout = setTimeout(() => {
             if (processManager.isActive()) this.endBidding();
             else this.reset();
         }, this.endDateTime.getTime() - Date.now());
-        await this.textChannel.send(`Bidding has started and will end on ${this.endDateTime.toLocaleString()}`);
+        // set the configs based on the ending date
+        const day = this.endDateTime.getDay();
+        const dailyBidConfig = this.dailyBidConfigs.get(day);
+        if (dailyBidConfig) {
+            this.minBidAmount = dailyBidConfig.minBidAmount;
+            this.minBidIncrement = dailyBidConfig.minBidIncrement;
+        } else {
+            this.minBidAmount = BidEvent.DEFAULT_MIN_BID_AMOUNT;
+            this.minBidIncrement = BidEvent.DEFAULT_MIN_BID_INCREMENT;
+        }
+        await new EmbedBuilderLocal()
+            .setTitle('Bidding: ' + this.description)
+            .setDescription(`starting bid: $${this.minBidAmount}\nminimum increment: $${this.minBidIncrement}`)
+            .setFooter(`ends ${this.endDateTime.toLocaleString()}`)
+            .send(this.textChannel);
     }
 
     public async endBidding(): Promise<void> {
@@ -138,4 +171,13 @@ export class BidEvent {
         this.reset();
         await this.textChannel.send('Bidding has been cancelled');
     }
+
+    public setDailyBidConfig(day: DayOfTheWeek, config: DailyBidConfig): void {
+        this.dailyBidConfigs.set(day, config);
+    }
 }
+
+export type DailyBidConfig = {
+    minBidAmount: number;
+    minBidIncrement: number;
+};
