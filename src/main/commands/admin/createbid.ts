@@ -5,7 +5,7 @@ import { TextChannel } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
     if (!event.args[0]) {
-        event.message.channel.send('You must specify a date in the format of MM/DD/YYYY HH:MM:SS');
+        event.message.channel.send('You must specify a args in the format of MM/DD/YYYY HH:MM:SS [description]');
         return;
     }
     if (!event.args[1]) {
@@ -17,6 +17,10 @@ exports.run = async (event: MessageEventLocal) => {
     endDate.setHours(Number(timeArr[0]), Number(timeArr[1]), Number(timeArr[2]));
     if (isNaN(endDate.getTime())) {
         event.message.channel.send('Invalid date');
+        return;
+    }
+    if (endDate.getTime() <= new Date().getTime()) {
+        event.message.channel.send('Date must be in the future');
         return;
     }
     let bidEvent = bidManager.getBidEvent(event.message.channel.id);

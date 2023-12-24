@@ -58,25 +58,32 @@ export class BidEvent {
     }
 
     public async addBid(bidder: BankUserCopy, bidAmount: number): Promise<void> {
+        if (this.hasEnded()) {
+            await this.textChannel.send('Bidding has ended');
+            return;
+        }
         if (this.highestBidder?.getUserId() === bidder.getUserId()) {
             await this.textChannel.send(`You are already the highest bidder with a bid of $${this.currentBidAmount}`);
             return;
         }
         if (bidAmount < this.minBidAmount) {
-            await this.textChannel.send(`Bid must be at least ${this.minBidAmount}`);
+            await this.textChannel.send(`Bid must be at least $${this.minBidAmount}`);
             return;
         }
         if (bidAmount < this.currentBidAmount + this.minBidIncrement) {
-            await this.textChannel.send(`Next bid must be at least ${this.currentBidAmount + this.minBidIncrement}`);
+            await this.textChannel.send(`Next bid must be at least $${this.currentBidAmount + this.minBidIncrement}`);
             return;
         }
         if (bidAmount > this.maxBidAmount) {
-            await this.textChannel.send(`Bid must be less than ${this.maxBidAmount}`);
+            await this.textChannel.send(`Bid must be less than $${this.maxBidAmount}`);
             return;
         }
         this.highestBidder = bidder;
         this.currentBidAmount = bidAmount;
-        await this.textChannel.send(`Bid of ${bidAmount} has been placed by $${bidder.getUsername()}`);
+        await new EmbedBuilderLocal()
+            .setDescription(`Bid of $${bidAmount} has been placed by ${bidder.getUsername()}`)
+            .setColor('#007000')
+            .send(this.textChannel);
     }
 
     public setDescription(description: string): void {
@@ -116,8 +123,8 @@ export class BidEvent {
             this.endDateTime = BidEvent.defaultDateTime();
         }
 
-        this.bidTimeout = setTimeout(() => {
-            if (processManager.isActive()) this.endBidding();
+        this.bidTimeout = setTimeout(async () => {
+            if (processManager.isActive()) await this.endBidding();
             else this.reset();
         }, this.endDateTime.getTime() - Date.now());
         // set the configs based on the ending date
