@@ -1,14 +1,15 @@
 import { User } from 'discord.js';
+import { Balance } from '../../utils/wrappers/Balance';
 
 export abstract class ABankUser {
     protected readonly userId: string;
     protected readonly name: string;
     protected readonly discordUser: User;
-    protected balance: number;
+    protected balance: Balance;
     protected history: string[] = [];
     private static readonly MAX_HISTORY_LENGTH = 2;
 
-    public constructor(discordUser: User, name: string, balance: number, history: string[] = []) {
+    public constructor(discordUser: User, name: string, balance: Balance, history: string[] = []) {
         this.userId = discordUser.id;
         this.name = name;
         this.balance = balance;
@@ -21,7 +22,7 @@ export abstract class ABankUser {
     }
 
     getBalance(): number {
-        return this.balance;
+        return this.balance.value;
     }
 
     getDiscordUser(): User {
@@ -47,7 +48,7 @@ export abstract class ABankUser {
         return {
             userId: this.userId,
             name: this.name,
-            balance: this.balance,
+            balance: this.balance.value,
             history: this.history,
         };
     }

@@ -12,6 +12,7 @@ import { config } from '../utils/constants/constants';
 import { ABankUser } from './BankUser/ABankUser';
 import { BOT_ID } from '../../tests/resources/constants';
 import { unitFormatFactory } from '../utils/utils';
+import { Balance } from '../utils/wrappers/Balance';
 
 export class Bank {
     #users: Map<string, OriginalBankUser> = new Map();
@@ -165,7 +166,7 @@ export class Bank {
     }
 
     addNewUser(author: User, username: string, balance: number, history?: string[]): BankUserCopy {
-        const bankUser = new OriginalBankUser(author, username, balance, history);
+        const bankUser = new OriginalBankUser(author, username, new Balance(balance), history);
         if (this.#usernames.has(bankUser.getUsername())) {
             throw new Error('name already exists');
         }
@@ -194,7 +195,7 @@ export class Bank {
                 const user = await userManager.fetch(userObj.userId);
                 this.#users.set(
                     userObj.userId,
-                    new OriginalBankUser(user, userObj.name, userObj.balance, userObj.history)
+                    new OriginalBankUser(user, userObj.name, new Balance(userObj.balance), userObj.history)
                 );
             } catch (e) {
                 console.log('could not load author data\n', e);

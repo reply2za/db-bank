@@ -4,14 +4,14 @@ import { BankUserCopy } from './BankUserCopy';
 
 class OriginalBankUser extends ABankUser {
     addBalance(amount: number) {
-        this.balance += amount;
-        this.balance = roundNumberTwoDecimals(this.balance);
+        this.balance.value += amount;
+        this.balance.value = roundNumberTwoDecimals(this.balance.value);
         return this.balance;
     }
 
     subtractBalance(amount: number) {
-        this.balance -= amount;
-        this.balance = roundNumberTwoDecimals(this.balance);
+        this.balance.value -= amount;
+        this.balance.value = roundNumberTwoDecimals(this.balance.value);
         return this.balance;
     }
 
