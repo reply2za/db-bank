@@ -1,11 +1,11 @@
-import { bank } from '../../finance/Bank';
-import iouVisualizer from '../../finance/visualizers/iouVisualizer';
+import { bank } from '../../../finance/Bank';
+import iouVisualizer from '../../../finance/visualizers/iouVisualizer';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
-import { formatErrorText, getUserResponse } from '../../utils/utils';
-import { bot } from '../../utils/constants/constants';
-import { EventDataNames, MessageEventLocal } from '../../utils/types';
-import Logger from '../../utils/Logger';
-import visualizerCommon from '../../finance/visualizers/visualizerCommon';
+import { formatErrorText, getUserResponse } from '../../../utils/utils';
+import { bot } from '../../../utils/constants/constants';
+import { EventDataNames, MessageEventLocal } from '../../../utils/types';
+import Logger from '../../../utils/Logger';
+import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 import { Colors, TextChannel } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
