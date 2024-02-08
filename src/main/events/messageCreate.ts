@@ -15,8 +15,8 @@ module.exports = async (message: Message) => {
     const args = message.content.replace(/\s+/g, ' ').split(' ');
     // the command name, removes the prefix and any args
     const statement = args[0].substring(1).toLowerCase();
-    const command = commandHandler.getCommand(statement, message.author.id);
-    if (!command || processManager.isAwaitingUserResponse(message.author.id, message.channelId)) return;
+    const commandResponse = commandHandler.getCommand(statement, message.author.id);
+    if (!commandResponse.command || processManager.isAwaitingUserResponse(message.author.id, message.channelId)) return;
     let bankUser = bank.getUserCopy(message.author.id);
     if (!bankUser) {
         if (message.author.bot) return;
@@ -42,5 +42,5 @@ module.exports = async (message: Message) => {
         bankUser,
         data: new Map(),
     };
-    command.run(event).catch((e) => Logger.errorLog(e));
+    commandResponse.command.run(event).catch((e) => Logger.errorLog(e));
 };
