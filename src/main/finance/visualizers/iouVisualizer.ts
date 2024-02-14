@@ -81,7 +81,7 @@ export default {
             .setColor('Aqua')
             .setThumbnail(images.REDEEMED_IOU_NOTIF_IMG)
             .setDescription(description)
-            .setFooter(`IOU: ${iouComment || 'unnamed'}`);
+            .setFooter(`Original IOU reason: ${iouComment || 'unnamed'}`);
     },
 };
 

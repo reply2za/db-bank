@@ -79,7 +79,7 @@ exports.run = async (event: MessageEventLocal) => {
         .getConfirmationEmbed(`redemption of ${quantity} IOU${appendS}`)
         .addFields(
             { name: 'to', value: `${iou.sender.name}`, inline: true },
-            { name: 'reason', value: redemptionComment, inline: true }
+            { name: 'comment', value: redemptionComment || '*(empty)*', inline: true }
         )
         .send(event.message.channel);
     const response = (await getUserResponse(event.message.channel, event.bankUser.getUserId()))?.content;
