@@ -30,6 +30,7 @@ exports.run = async (event: MessageEventLocal) => {
         bidEvent.setEndDateTime(endDate);
     } else {
         bidEvent = new BidEvent(<TextChannel>event.message.channel, description);
+        bidEvent.setEndDateTime(endDate);
         bidManager.addBidEvent(event.message.channel.id, bidEvent);
     }
     await bidEvent.startBidding();

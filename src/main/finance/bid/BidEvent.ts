@@ -105,8 +105,7 @@ export class BidEvent {
         return this.endDateTime && this.endDateTime < new Date();
     }
 
-    public async startBidding(date?: Date): Promise<void> {
-        if (date) this.endDateTime = date;
+    public async startBidding(newEndTime?: Date): Promise<void> {
         const currentDate = new Date();
         if (this.endDateTime && this.endDateTime < currentDate) {
             // create a new date with the cooldown time added
@@ -120,7 +119,7 @@ export class BidEvent {
             }
         }
         if (!this.endDateTime || this.endDateTime < currentDate) {
-            this.endDateTime = BidEvent.defaultDateTime();
+            this.endDateTime = newEndTime || BidEvent.defaultDateTime();
         }
 
         this.bidTimeout = setTimeout(async () => {
@@ -170,7 +169,6 @@ export class BidEvent {
                 this.description || 'bid'
             );
         }
-        this.reset();
     }
 
     public async cancelBidding(): Promise<void> {

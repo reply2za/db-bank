@@ -24,9 +24,9 @@ exports.run = async (event: MessageEventLocal) => {
             bidManager.addBidEvent(event.message.channel.id, bidEvent);
             await bidEvent.startBidding();
         } else if (bidEvent.hasEnded()) {
-            bidEvent.reset();
             bidEvent.setDescription(getTvBidDescription(currentDate));
             await bidEvent.startBidding();
+            if (bidEvent.hasEnded()) return;
         }
     }
     if (bidEvent) {
@@ -39,10 +39,6 @@ exports.run = async (event: MessageEventLocal) => {
             } else {
                 event.message.channel.send('*There are no bids as of yet*');
             }
-            return;
-        }
-        if (bidEvent.hasEnded()) {
-            event.message.channel.send('Bidding has ended');
             return;
         }
         const bid = Number(event.args[0].replace(/[$¢]/g, ''));
