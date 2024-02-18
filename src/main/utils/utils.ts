@@ -17,6 +17,7 @@ export async function getUserResponse(
         });
         return messages.first();
     } catch {
+        // if the user doesn't respond in time
     } finally {
         processManager.removeUserResponseLock(userId, channel.id.toString());
     }
@@ -30,6 +31,10 @@ export function formatErrorText(text: string): string {
     return `error: \`${text}\``;
 }
 
+/**
+ * Given a transfer type, returns a function that formats a number into an amount with the correct unit.
+ * @param transferType The transfer type to format the amount for.
+ */
 export function unitFormatFactory(transferType: TransferType): (amount: number) => string {
     if (transferType === TransferType.TRANSFER_IOU) {
         return (amount) => `${amount} IOU${amount === 1 ? '' : 's'}`;
