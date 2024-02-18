@@ -50,7 +50,7 @@ export const config = Object.freeze({
     dataFile: DATA_FILE,
     isDevMode: isDevMode,
     hardwareTag: HARDWARE_TAG,
-    sourceDirPath: 'dist/db-bank/src/main',
+    sourceDirPath: 'dist/src/main',
     NO_AMT_SELECTED_TXT: '*no amount selected*',
     TV_BID_CH: isDevMode ? '1091548846775095336' : '1177097674495905842',
 });

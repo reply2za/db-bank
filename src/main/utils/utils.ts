@@ -1,18 +1,7 @@
-import {
-    Collection,
-    EmojiIdentifierResolvable,
-    GuildTextBasedChannel,
-    If,
-    Message,
-    MessageReaction,
-    ReactionCollector,
-    TextBasedChannel,
-    User,
-} from 'discord.js';
+import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js';
 import { bot, config } from './constants/constants';
 import { processManager } from './ProcessManager';
 import { TransferType } from '../finance/types';
-import { attachReactionsToMessage } from '../../../../djs-common/src/main/utils/utils';
 
 export async function getUserResponse(
     channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>,
