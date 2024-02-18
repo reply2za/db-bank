@@ -13,6 +13,7 @@ import logger from '../../utils/Logger';
 import Logger from '../../utils/Logger';
 
 const MAX_RETRY_COUNT = 3;
+const USER_SELECT_REACTIONS = [reactions.ONE, reactions.TWO];
 
 export abstract class Transfer {
     readonly channel;
@@ -78,10 +79,12 @@ export abstract class Transfer {
                     ? bankUserLookup.getUser(history[history.length - 2])?.getDiscordUser().username
                     : undefined;
             let counter = 1;
-            let pastUsers = [user1, user2].filter((u) => u).map((u) => `${counter++}. \`${u}\``);
+            let pastUsers = [user1, user2]
+                .filter((u) => u)
+                .map((u) => `${USER_SELECT_REACTIONS[counter++ - 1]} \`${u}\``);
             let userLen = pastUsers.length;
             let userNumDesc = userLen > 1 ? `${userLen} users` : 'user';
-            return `The last ${userNumDesc} you've transferred to:` + '\n' + pastUsers.join('\n') + '\n';
+            return `The last ${userNumDesc} you've transferred to:` + '\n' + pastUsers.join('\n&\n') + '\n';
         }
         return '';
     }
