@@ -314,8 +314,8 @@ export abstract class Transfer {
                                 if (collector) collector.stop('reacted');
                                 return;
                             } else if (react.emoji.name === reactions.TWO && historyList.length > 1) {
-                                resolve({ recipientID: historyList[historyList.length - 2] });
                                 if (collector) collector.stop('reacted');
+                                resolve({ recipientID: historyList[historyList.length - 2] });
                                 return;
                             }
                         },
@@ -334,10 +334,14 @@ export abstract class Transfer {
                 collector?.stop();
                 isStopped = true;
                 // determines if abandoned, meaning that the same transfer is no longer active
-                if (initialTransferMsg.id !== eventData.get(EventDataNames.INITIAL_TRANSFER_MSG)?.id) return;
+                if (initialTransferMsg.id !== eventData.get(EventDataNames.INITIAL_TRANSFER_MSG)?.id) {
+                    resolve(undefined);
+                    return;
+                }
                 eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
                 if (!newMsg) {
                     message.channel.send('*no response provided*');
+                    resolve(undefined);
                     return;
                 }
                 recipientID = newMsg?.mentions?.users.first()?.id;
@@ -345,12 +349,14 @@ export abstract class Transfer {
                     if (newMsg.content) {
                         if (newMsg.content.toLowerCase() === 'q') {
                             message.channel.send('*cancelled*');
+                            resolve(undefined);
                             return;
                         } else {
                             name = newMsg.content;
                         }
                     } else {
                         message.channel.send(`must specify user to ${actionName} to`);
+                        resolve(undefined);
                         return;
                     }
                 }
