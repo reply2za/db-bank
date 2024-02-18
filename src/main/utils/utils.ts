@@ -1,5 +1,5 @@
 import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js';
-import { bot, config } from './constants/constants';
+import { config } from './constants/constants';
 import { processManager } from './ProcessManager';
 import { TransferType } from '../finance/types';
 
