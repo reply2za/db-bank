@@ -4,7 +4,7 @@ import { processManager } from '../../utils/ProcessManager';
 import { config } from '../../utils/constants/constants';
 import reactions from '../../utils/constants/reactions';
 import { MessageReaction, User } from 'discord.js';
-import { attachReactionToMessage } from '../../utils/utils';
+import { attachReactionsToMessage } from '@hoursofza/djs-common';
 
 exports.run = async (event: MessageEventLocal) => {
     if (!event.args[0]) {
@@ -26,7 +26,7 @@ function getBootStatus() {
 
 async function displayStatus(event: MessageEventLocal) {
     const sentMsg = await event.message.channel.send(getBootStatus());
-    await attachReactionToMessage(
+    await attachReactionsToMessage(
         sentMsg,
         [event.bankUser.getUserId()],
         [reactions.GEAR],

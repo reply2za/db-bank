@@ -1,6 +1,6 @@
 import { Colors, Message, ReactionCollector, TextChannel } from 'discord.js';
-import { EmbedBuilderLocal } from '@hoursofza/djs-common';
-import { attachReactionToMessage, formatErrorText, getUserResponse } from '../../utils/utils';
+import { attachReactionsToMessage, EmbedBuilderLocal } from '@hoursofza/djs-common';
+import { formatErrorText, getUserResponse } from '../../utils/utils';
 import { roundNumberTwoDecimals } from '../../utils/numberUtils';
 import reactions from '../../utils/constants/reactions';
 import visualizerCommon from '../visualizers/visualizerCommon';
@@ -301,7 +301,7 @@ export abstract class Transfer {
                 let collector: ReactionCollector | undefined;
                 let isStopped = false;
                 if (reactList.length) {
-                    attachReactionToMessage(
+                    attachReactionsToMessage(
                         initialTransferMsg,
                         [message.author.id],
                         reactList,
@@ -389,7 +389,7 @@ export abstract class Transfer {
     }
 
     private attachUndoReaction = async (msg: Message, callback: () => void) => {
-        return attachReactionToMessage(
+        return attachReactionsToMessage(
             msg,
             [this.responder.getUserId()],
             [reactions.ARROW_L],

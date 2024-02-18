@@ -1,12 +1,12 @@
 import { bank } from '../../../finance/Bank';
 import { EventDataNames, MessageEventLocal } from '../../../utils/types';
-import { attachReactionToMessage } from '../../../utils/utils';
 import reactions from '../../../utils/constants/reactions';
 import { commandHandler } from '../../../handlers/CommandHandler';
 import { MessageReaction } from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 import { processManager } from '../../../utils/ProcessManager';
+import { attachReactionsToMessage } from '@hoursofza/djs-common';
 
 exports.run = async (event: MessageEventLocal) => {
     const balanceMsg = await visualizerCommon.showBalance(
@@ -17,7 +17,7 @@ exports.run = async (event: MessageEventLocal) => {
     const reactionsList = [reactions.MONEY, reactions.TICKET];
     const userIOUs = bank.getUserIOUs(event.bankUser.getUserId());
     if (userIOUs.length) reactionsList.push(reactions.PAGE_C);
-    await attachReactionToMessage(
+    await attachReactionsToMessage(
         balanceMsg,
         [event.bankUser.getUserId()],
         reactionsList,

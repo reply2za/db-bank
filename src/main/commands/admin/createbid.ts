@@ -2,15 +2,38 @@ import { MessageEventLocal } from '../../utils/types';
 import { bidManager } from '../../finance/bid/BidManager';
 import { BidEvent } from '../../finance/bid/BidEvent';
 import { TextChannel } from 'discord.js';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
+import { getUserResponse } from '../../utils/utils';
 
 exports.run = async (event: MessageEventLocal) => {
     if (!event.args[0]) {
-        event.message.channel.send('You must specify a args in the format of MM/DD/YYYY HH:MM:SS [description]');
-        return;
+        await new EmbedBuilderLocal()
+            .setDescription('What is the date and time of the bid? (MM/DD/YYYY HH:MM:SS)')
+            .send(event.message.channel);
+        const resp = (await getUserResponse(event.message.channel, event.message.author.id))?.content.split(' ');
+        if (!resp) {
+            event.message.channel.send('Cancelled: You must specify a date and time');
+            return;
+        }
+        if (resp.length === 1) {
+            if (resp[0].includes(':')) resp.unshift(new Date().toLocaleDateString());
+            else {
+                event.message.channel.send('Cancelled: You must specify a time');
+                return;
+            }
+        }
+        event.args = resp;
     }
-    if (!event.args[1]) {
-        event.message.channel.send('You must specify a description');
-        return;
+    if (!event.args[2]) {
+        await new EmbedBuilderLocal()
+            .setDescription('What is the description of the bid? [q=cancel]')
+            .send(event.message.channel);
+        const resp = (await getUserResponse(event.message.channel, event.message.author.id))?.content;
+        if (!resp || resp.toLowerCase() === 'q') {
+            event.message.channel.send('Cancelled: You must specify a description');
+            return;
+        }
+        event.args.push(resp);
     }
     const endDate = new Date(event.args[0]);
     const timeArr = event.args[1].split(':');

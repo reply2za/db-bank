@@ -1,9 +1,9 @@
 import { bot, config } from './constants/constants';
 import { Message, MessageReaction, ReactionCollector, TextChannel } from 'discord.js';
 import reactions from './constants/reactions';
-import { attachReactionToMessage } from './utils';
 import { execSync } from 'child_process';
 import logger from './Logger';
+import { attachReactionsToMessage } from '@hoursofza/djs-common';
 
 const version = require('../../../package.json').version;
 
@@ -218,7 +218,7 @@ class ProcessManager {
                     statusMsg.channel.send(processNameChangedTxt);
                 }
             };
-            collector = await attachReactionToMessage(
+            collector = await attachReactionsToMessage(
                 statusMsg,
                 config.adminIDs.map((id) => id.trim()),
                 [reactions.CHECK, reactions.X],

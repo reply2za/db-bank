@@ -136,6 +136,7 @@ export class BidEvent {
             this.minBidAmount = BidEvent.DEFAULT_MIN_BID_AMOUNT;
             this.minBidIncrement = BidEvent.DEFAULT_MIN_BID_INCREMENT;
         }
+
         await new EmbedBuilderLocal()
             .setTitle('Bidding: ' + this.description)
             .setDescription(`starting bid: $${this.minBidAmount}\nminimum increment: $${this.minBidIncrement}`)
