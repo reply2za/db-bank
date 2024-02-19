@@ -1,7 +1,7 @@
 import { MockMessage } from './MockMessage';
 import { Collection, EmbedBuilder } from 'discord.js';
-import { BOT_ID } from '../../resources/constants';
 import { MockDiscordUser } from './MockDiscordUser';
+import { config } from '../../../main/utils/constants/constants';
 
 export class MockTextChannel {
     receivedMessages: string[] = [];
@@ -27,7 +27,7 @@ export class MockTextChannel {
             messageText = message;
         }
         const randomId = Math.floor(Math.random() * 1000000);
-        return new MockMessage(randomId.toString(), messageText, new MockDiscordUser(BOT_ID, 'db-bank'), this);
+        return new MockMessage(randomId.toString(), messageText, new MockDiscordUser(config.BOT_ID, 'db-bank'), this);
     }
 
     async awaitMessages(...args: any[]) {

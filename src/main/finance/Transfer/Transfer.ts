@@ -1,12 +1,12 @@
-import { Colors, Message, ReactionCollector, TextChannel } from 'discord.js';
-import { attachReactionsToMessage, EmbedBuilderLocal } from '@hoursofza/djs-common';
+import { Colors, Message, ReactionCollector, TextChannel, User } from 'discord.js';
+import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { formatErrorText, getUserResponse } from '../../utils/utils';
 import { roundNumberTwoDecimals } from '../../utils/numberUtils';
 import reactions from '../../utils/constants/reactions';
 import visualizerCommon from '../visualizers/visualizerCommon';
 import { BankUserCopy } from '../BankUser/BankUserCopy';
 import { EventDataNames } from '../../utils/types';
-import { config } from '../../utils/constants/constants';
+import { config, djsCommonUtils } from '../../utils/constants/constants';
 import { TransferType } from '../types';
 import { bankUserLookup } from '../BankUserLookup';
 import logger from '../../utils/Logger';
@@ -304,29 +304,30 @@ export abstract class Transfer {
                 let collector: ReactionCollector | undefined;
                 let isStopped = false;
                 if (reactList.length) {
-                    attachReactionsToMessage(
-                        initialTransferMsg,
-                        [message.author.id],
-                        reactList,
-                        (react) => {
-                            if (!historyList) return;
-                            if (initialTransferMsg.id !== eventData.get(EventDataNames.INITIAL_TRANSFER_MSG)?.id)
-                                return;
-                            if (react.emoji.name === reactions.ONE) {
-                                resolve({ recipientID: historyList[historyList.length - 1] });
-                                if (collector) collector.stop('reacted');
-                                return;
-                            } else if (react.emoji.name === reactions.TWO && historyList.length > 1) {
-                                if (collector) collector.stop('reacted');
-                                resolve({ recipientID: historyList[historyList.length - 2] });
-                                return;
+                    djsCommonUtils
+                        .attachReactionsToMessage(
+                            initialTransferMsg,
+                            [message.author.id],
+                            reactList,
+                            (react) => {
+                                if (!historyList) return;
+                                if (initialTransferMsg.id !== eventData.get(EventDataNames.INITIAL_TRANSFER_MSG)?.id)
+                                    return;
+                                if (react.emoji.name === reactions.ONE) {
+                                    resolve({ recipientID: historyList[historyList.length - 1] });
+                                    if (collector) collector.stop('reacted');
+                                    return;
+                                } else if (react.emoji.name === reactions.TWO && historyList.length > 1) {
+                                    if (collector) collector.stop('reacted');
+                                    resolve({ recipientID: historyList[historyList.length - 2] });
+                                    return;
+                                }
+                            },
+                            (collected, reason) => {
+                                initialTransferMsg.reactions.removeAll().catch((e) => logger.debugLog(e));
+                                if (reason === 'reacted') eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
                             }
-                        },
-                        (collected, reason) => {
-                            initialTransferMsg.reactions.removeAll().catch((e) => logger.debugLog(e));
-                            if (reason === 'reacted') eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
-                        }
-                    )
+                        )
                         .then((result) => {
                             collector = result;
                             if (isStopped) collector.stop();
@@ -398,11 +399,11 @@ export abstract class Transfer {
     }
 
     private attachUndoReaction = async (msg: Message, callback: () => void) => {
-        return attachReactionsToMessage(
+        return djsCommonUtils.attachReactionsToMessage(
             msg,
             [this.responder.getUserId()],
             [reactions.ARROW_L],
-            async (react, user, collector) => {
+            async (react, _user, collector) => {
                 collector.stop();
                 if (react.emoji.name === reactions.ARROW_L) {
                     callback();

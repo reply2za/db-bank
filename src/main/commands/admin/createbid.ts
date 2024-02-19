@@ -6,6 +6,11 @@ import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { getUserResponse } from '../../utils/utils';
 
 exports.run = async (event: MessageEventLocal) => {
+    let bidEvent = bidManager.getBidEvent(event.message.channel.id);
+    if (bidEvent && !bidEvent.hasEnded()) {
+        event.message.channel.send('There is already a bid in progress');
+        return;
+    }
     if (!event.args[0]) {
         await new EmbedBuilderLocal()
             .setDescription('What is the date and time of the bid? (MM/DD/YYYY HH:MM:SS)')
@@ -46,7 +51,6 @@ exports.run = async (event: MessageEventLocal) => {
         event.message.channel.send('Date must be in the future');
         return;
     }
-    let bidEvent = bidManager.getBidEvent(event.message.channel.id);
     const description = event.args.slice(2).join(' ');
     if (bidEvent) {
         bidEvent.setDescription(description);

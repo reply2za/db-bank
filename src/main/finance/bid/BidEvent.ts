@@ -149,7 +149,7 @@ export class BidEvent {
             const msg = await this.textChannel.send(
                 'Bidding has ended, the winner is: ' +
                     this.highestBidder.getUsername() +
-                    ' with a bid of ' +
+                    ' with a bid of $' +
                     this.currentBidAmount
             );
             const dbBank = bank.getUserCopy(msg.author.id);

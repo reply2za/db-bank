@@ -10,7 +10,6 @@ import visualizerCommon from './visualizers/visualizerCommon';
 import { BankUserCopy } from './BankUser/BankUserCopy';
 import { config } from '../utils/constants/constants';
 import { ABankUser } from './BankUser/ABankUser';
-import { BOT_ID } from '../../tests/resources/constants';
 import { unitFormatFactory } from '../utils/utils';
 import { Balance } from '../utils/wrappers/Balance';
 
@@ -133,7 +132,15 @@ export class Bank {
             };
         }
         const transferResponse = this.#creditAmountCore(receiver, amount);
-        await this.#recordTransfer(transferResponse, amount, BOT_ID, receiverId, channel, TransferType.CREDIT, comment);
+        await this.#recordTransfer(
+            transferResponse,
+            amount,
+            config.BOT_ID,
+            receiverId,
+            channel,
+            TransferType.CREDIT,
+            comment
+        );
         return transferResponse;
     }
 

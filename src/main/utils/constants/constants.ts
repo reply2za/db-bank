@@ -1,4 +1,5 @@
 import { Client, GatewayIntentBits, Partials } from 'discord.js';
+import { Utils } from '@hoursofza/djs-common';
 
 const TOKEN = process.env.CLIENT_TOKEN?.replace(/\\n/gm, '\n');
 
@@ -53,4 +54,7 @@ export const config = Object.freeze({
     sourceDirPath: 'dist/src/main',
     NO_AMT_SELECTED_TXT: '*no amount selected*',
     TV_BID_CH: isDevMode ? '1091548846775095336' : '1177097674495905842',
+    BOT_ID: '1062574908451856574',
 });
+
+export const djsCommonUtils = new Utils(config.BOT_ID);

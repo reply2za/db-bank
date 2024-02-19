@@ -1,6 +1,5 @@
-import { BOT_ID } from '../resources/constants';
 import { commandHandler } from '../../main/handlers/CommandHandler';
-import { bot } from '../../main/utils/constants/constants';
+import { bot, config } from '../../main/utils/constants/constants';
 import { processManager } from '../../main/utils/ProcessManager';
 import { BankUserCopy } from '../../main/finance/BankUser/BankUserCopy';
 import { MockMessage } from './classes/MockMessage';
@@ -8,7 +7,7 @@ import { MockDiscordUser } from './classes/MockDiscordUser';
 import { MockTextChannel } from './classes/MockTextChannel';
 
 export const tempBankUserStore: BankUserCopy[] = [];
-export const USER_BOT = new MockDiscordUser(BOT_ID, 'db-bank');
+export const USER_BOT = new MockDiscordUser(config.BOT_ID, 'db-bank');
 function init() {
     commandHandler.loadAllCommands();
     const BOT_TEXT_CHANNEL = new MockTextChannel();

@@ -6,7 +6,7 @@ import { MessageReaction } from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 import { processManager } from '../../../utils/ProcessManager';
-import { attachReactionsToMessage } from '@hoursofza/djs-common';
+import { config, djsCommonUtils } from '../../../utils/constants/constants';
 
 exports.run = async (event: MessageEventLocal) => {
     const balanceMsg = await visualizerCommon.showBalance(
@@ -17,7 +17,7 @@ exports.run = async (event: MessageEventLocal) => {
     const reactionsList = [reactions.MONEY, reactions.TICKET];
     const userIOUs = bank.getUserIOUs(event.bankUser.getUserId());
     if (userIOUs.length) reactionsList.push(reactions.PAGE_C);
-    await attachReactionsToMessage(
+    await djsCommonUtils.attachReactionsToMessage(
         balanceMsg,
         [event.bankUser.getUserId()],
         reactionsList,

@@ -4,7 +4,7 @@ import reactions from '../../../utils/constants/reactions';
 import { commandHandler } from '../../../handlers/CommandHandler';
 import { MessageReaction } from 'discord.js';
 import iouVisualizer from '../../../finance/visualizers/iouVisualizer';
-import { attachReactionsToMessage } from '@hoursofza/djs-common';
+import { djsCommonUtils } from '../../../utils/constants/constants';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.getUserId());
@@ -36,5 +36,10 @@ exports.run = async (event: MessageEventLocal) => {
                 break;
         }
     };
-    await attachReactionsToMessage(redeemableIOUMsg, [event.bankUser.getUserId()], reactionsList, reactionCallback);
+    await djsCommonUtils.attachReactionsToMessage(
+        redeemableIOUMsg,
+        [event.bankUser.getUserId()],
+        reactionsList,
+        reactionCallback
+    );
 };

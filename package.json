@@ -17,7 +17,7 @@
   "author": "Reply2za",
   "license": "ISC",
   "dependencies": {
-    "@hoursofza/djs-common": "~1.3.3",
+    "@hoursofza/djs-common": "~1.3.4",
     "@types/uuid": "^9.0.0",
     "axios": "^1.6.7",
     "discord.js": "~14.14.1",
