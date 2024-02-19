@@ -8,22 +8,29 @@ import { getUserResponse } from '../../utils/utils';
 exports.run = async (event: MessageEventLocal) => {
     let bidEvent = bidManager.getBidEvent(event.message.channel.id);
     if (bidEvent && !bidEvent.hasEnded()) {
-        event.message.channel.send('There is already a bid in progress');
+        await event.message.channel.send('There is already a bid in progress');
         return;
     }
+    let isDefaultDateTime = false;
     if (!event.args[0]) {
         await new EmbedBuilderLocal()
-            .setDescription('What is the date and time of the bid? (MM/DD/YYYY HH:MM:SS)')
+            .setDescription("What is the date and time of the bid? (MM/DD/YYYY HH:MM:SS) or 'default' [q=cancel]")
             .send(event.message.channel);
         const resp = (await getUserResponse(event.message.channel, event.message.author.id))?.content.split(' ');
         if (!resp) {
-            event.message.channel.send('Cancelled: You must specify a date and time');
+            await event.message.channel.send('cancelled: You must specify a date and time');
             return;
         }
         if (resp.length === 1) {
-            if (resp[0].includes(':')) resp.unshift(new Date().toLocaleDateString());
-            else {
-                event.message.channel.send('Cancelled: You must specify a time');
+            if (resp[0].includes(':')) {
+                resp.unshift(new Date().toLocaleDateString());
+            } else if (resp[0].toLowerCase() === 'default') {
+                isDefaultDateTime = true;
+            } else if (resp[0].toLowerCase() === 'q') {
+                await event.message.channel.send('*cancelled*');
+                return;
+            } else {
+                await event.message.channel.send('cancelled: You must specify a time');
                 return;
             }
         }
@@ -35,22 +42,28 @@ exports.run = async (event: MessageEventLocal) => {
             .send(event.message.channel);
         const resp = (await getUserResponse(event.message.channel, event.message.author.id))?.content;
         if (!resp || resp.toLowerCase() === 'q') {
-            event.message.channel.send('Cancelled: You must specify a description');
+            await event.message.channel.send('cancelled: You must specify a description');
             return;
         }
         event.args.push(resp);
     }
-    const endDate = new Date(event.args[0]);
-    const timeArr = event.args[1].split(':');
-    endDate.setHours(Number(timeArr[0]), Number(timeArr[1]), Number(timeArr[2]));
-    if (isNaN(endDate.getTime())) {
-        event.message.channel.send('Invalid date');
-        return;
+    let endDate;
+    if (isDefaultDateTime) {
+        endDate = BidEvent.defaultDateTime();
+    } else {
+        endDate = new Date(event.args[0]);
+        const timeArr = event.args[1].split(':');
+        endDate.setHours(Number(timeArr[0]), Number(timeArr[1]), Number(timeArr[2]));
+        if (isNaN(endDate.getTime())) {
+            await event.message.channel.send('Invalid date');
+            return;
+        }
+        if (endDate.getTime() <= new Date().getTime()) {
+            await event.message.channel.send('Date must be in the future');
+            return;
+        }
     }
-    if (endDate.getTime() <= new Date().getTime()) {
-        event.message.channel.send('Date must be in the future');
-        return;
-    }
+
     const description = event.args.slice(2).join(' ');
     if (bidEvent) {
         bidEvent.setDescription(description);
