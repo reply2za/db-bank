@@ -179,7 +179,6 @@ export class BidEvent {
             this.bidTimeout = null;
         }
         this.reset();
-        if (this.highestBidder) await this.textChannel.send('Bidding has been cancelled');
     }
 
     public setDailyBidConfig(day: DayOfTheWeek, config: DailyBidConfig): void {
