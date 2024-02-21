@@ -70,6 +70,10 @@ class BidManager {
         }
         return false;
     }
+
+    public getAllActiveBidEvents(): Array<BidEvent> {
+        return Array.from(this.#activeBidEvents.values());
+    }
 }
 
 export const bidManager = new BidManager();

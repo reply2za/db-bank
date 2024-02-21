@@ -3,8 +3,28 @@ import { execSync } from 'child_process';
 import { processManager } from '../../utils/ProcessManager';
 import { config } from '../../utils/constants/constants';
 import { TextChannel } from 'discord.js';
+import { bidManager } from '../../finance/bid/BidManager';
 
 exports.run = async (event: MessageEventLocal) => {
+    const bidEvents = bidManager.getAllActiveBidEvents();
+    let bidsAreInProgress = false;
+    if (processManager.isActive()) {
+        if (event.args[0] !== 'force') {
+            for (const bidEvent of bidEvents) {
+                if (!bidEvent.hasEnded() && bidEvent.getHighestBidder()) {
+                    await bidEvent.getBidEmbed().send(event.message.channel);
+                    bidsAreInProgress = true;
+                }
+            }
+        }
+        if (bidsAreInProgress) {
+            await event.message.channel.send(
+                `Bids are in progress. Use \`${event.prefix}update force\` to force an update`
+            );
+            return;
+        }
+    }
+
     const processId = event.args[0];
     if (processId) {
         if (processId === process.pid.toString() || processId === 'all') {
