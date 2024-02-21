@@ -16,17 +16,21 @@ exports.run = async (event: MessageEventLocal) => {
     let bidEvent = bidManager.getBidEvent(event.message.channel.id);
     const currentDate = new Date();
     if (event.message.channel.id === config.TV_BID_CH) {
-        if (!bidEvent) {
+        if (currentDate.getHours() === 0 && currentDate.getMinutes() === 0) {
+            event.message.channel.send('Bidding for the next day will start at 12:01am');
+            return;
+        }
+        if (!bidEvent || (bidEvent && bidEvent.hasEnded())) {
             bidEvent = new BidEvent(<TextChannel>event.message.channel, getTvBidDescription(currentDate));
             const weekendBidAmounts = { minBidAmount: 0.5, minBidIncrement: 0.5 };
             bidEvent.setDailyBidConfig(DayOfTheWeek.Friday, weekendBidAmounts);
             bidEvent.setDailyBidConfig(DayOfTheWeek.Saturday, weekendBidAmounts);
-            bidManager.addBidEvent(event.message.channel.id, bidEvent);
+            const addedBidEvent = bidManager.addBidEvent(event.message.channel.id, bidEvent);
+            if (!addedBidEvent) {
+                event.message.channel.send('error creating new bid event');
+                return;
+            }
             await bidEvent.startBidding();
-        } else if (bidEvent.hasEnded()) {
-            bidEvent.setDescription(getTvBidDescription(currentDate));
-            await bidEvent.startBidding();
-            if (bidEvent.hasEnded()) return;
         }
     }
     if (bidEvent) {

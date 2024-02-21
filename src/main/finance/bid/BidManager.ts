@@ -18,11 +18,11 @@ class BidManager {
      * @param channelId The channel id.
      * @param bidEvent The BidEvent.
      */
-    addBidEvent(channelId: string, bidEvent: BidEvent): void {
-        if (this.#activeBidEvents.has(channelId)) {
-            throw new Error('BidEvent already exists for this channel');
-        }
+    addBidEvent(channelId: string, bidEvent: BidEvent): boolean {
+        const prevBidEvent = this.#activeBidEvents.get(channelId);
+        if (prevBidEvent && !prevBidEvent.hasEnded()) return false;
         this.#activeBidEvents.set(channelId, bidEvent);
+        return true;
     }
 
     async resumeBidEvent(channelId: string): Promise<boolean> {
