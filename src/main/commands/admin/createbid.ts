@@ -8,11 +8,29 @@ import { getUserResponse } from '../../utils/utils';
 exports.run = async (event: MessageEventLocal) => {
     let bidEvent = bidManager.getBidEvent(event.message.channel.id);
     if (bidEvent && !bidEvent.hasEnded()) {
-        await event.message.channel.send('There is already a bid in progress');
+        const msg = await bidEvent.getBidEmbed().send(event.message.channel);
+        await msg.reply('There is already a bid in progress');
         return;
     }
     let isDefaultDateTime = false;
-    if (!event.args[0]) {
+    let day;
+    let time;
+    if (event.args[0]) {
+        if (event.args[0].toLowerCase() === 'default') isDefaultDateTime = true;
+        if (event.args[0].toLowerCase() === 'q') {
+            await event.message.channel.send('*cancelled*');
+            return;
+        }
+        if (event.args[0].includes('/')) {
+            day = event.args[0];
+        } else if (event.args[0].includes(':')) {
+            day = new Date().toLocaleDateString();
+            time = event.args[0];
+        }
+        if (event.args[1] && event.args[1].includes(':')) {
+            time = event.args[1];
+        }
+    } else {
         await new EmbedBuilderLocal()
             .setDescription("What is the date and time of the bid? (MM/DD/YYYY HH:MM:SS) or 'default' [q=cancel]")
             .send(event.message.channel);
@@ -23,7 +41,8 @@ exports.run = async (event: MessageEventLocal) => {
         }
         if (resp.length === 1) {
             if (resp[0].includes(':')) {
-                resp.unshift(new Date().toLocaleDateString());
+                day = new Date().toLocaleDateString();
+                time = resp[0];
             } else if (resp[0].toLowerCase() === 'default') {
                 isDefaultDateTime = true;
             } else if (resp[0].toLowerCase() === 'q') {
@@ -33,26 +52,34 @@ exports.run = async (event: MessageEventLocal) => {
                 await event.message.channel.send('cancelled: You must specify a time');
                 return;
             }
+        } else {
+            day = resp[0];
         }
-        event.args = resp;
     }
-    if (!event.args[2]) {
-        await new EmbedBuilderLocal()
-            .setDescription('What is the description of the bid? [q=cancel]')
-            .send(event.message.channel);
-        const resp = (await getUserResponse(event.message.channel, event.message.author.id))?.content;
-        if (!resp || resp.toLowerCase() === 'q') {
-            await event.message.channel.send('cancelled: You must specify a description');
-            return;
-        }
-        event.args.push(resp);
+    await new EmbedBuilderLocal()
+        .setDescription('What is the description of the bid? [q=cancel]')
+        .send(event.message.channel);
+    const description = (await getUserResponse(event.message.channel, event.message.author.id))?.content;
+    if (!description || description.toLowerCase() === 'q') {
+        await event.message.channel.send('cancelled: You must specify a description');
+        return;
     }
     let endDate;
     if (isDefaultDateTime) {
         endDate = BidEvent.defaultDateTime();
     } else {
-        endDate = new Date(event.args[0]);
-        const timeArr = event.args[1].split(':');
+        if (!day || !time) {
+            await event.message.channel.send('You must specify a date and time');
+            return;
+        }
+        endDate = new Date(day);
+        const timeArr = time.split(':');
+        if (timeArr.length < 2) {
+            timeArr.push('00');
+            timeArr.push('00');
+        } else if (timeArr.length < 3) {
+            timeArr.push('00');
+        }
         endDate.setHours(Number(timeArr[0]), Number(timeArr[1]), Number(timeArr[2]));
         if (isNaN(endDate.getTime())) {
             await event.message.channel.send('Invalid date');
@@ -63,9 +90,8 @@ exports.run = async (event: MessageEventLocal) => {
             return;
         }
     }
-
-    const description = event.args.slice(2).join(' ');
     if (bidEvent) {
+        bidEvent.reset();
         bidEvent.setDescription(description);
         bidEvent.setEndDateTime(endDate);
     } else {

@@ -22,6 +22,7 @@ export class BidEvent {
     private bidTimeout: NodeJS.Timeout | null = null;
     private dailyBidConfigs: Map<DayOfTheWeek, DailyBidConfig> = new Map();
     private cooldown_minutes = 5;
+    private userHasBeenCharged = false;
 
     public constructor(textChannel: TextChannel, description = 'bid') {
         this.textChannel = textChannel;
@@ -95,10 +96,14 @@ export class BidEvent {
     }
 
     public reset(): void {
-        if (this.bidTimeout) clearTimeout(this.bidTimeout);
+        if (this.bidTimeout) {
+            clearTimeout(this.bidTimeout);
+            this.bidTimeout = null;
+        }
         this.endDateTime = null;
         this.highestBidder = null;
         this.currentBidAmount = 0;
+        this.userHasBeenCharged = false;
     }
 
     public hasEnded() {
@@ -123,8 +128,7 @@ export class BidEvent {
         }
 
         this.bidTimeout = setTimeout(async () => {
-            if (processManager.isActive()) await this.endBidding();
-            else this.reset();
+            await this.endBidAction();
         }, this.endDateTime.getTime() - Date.now());
         // set the configs based on the ending date
         const day = this.endDateTime.getDay();
@@ -137,11 +141,7 @@ export class BidEvent {
             this.minBidIncrement = BidEvent.DEFAULT_MIN_BID_INCREMENT;
         }
 
-        await new EmbedBuilderLocal()
-            .setTitle('Bidding: ' + this.description)
-            .setDescription(`starting bid: $${this.minBidAmount}\nminimum increment: $${this.minBidIncrement}`)
-            .setFooter(`ends ${this.endDateTime.toLocaleString()}`)
-            .send(this.textChannel);
+        await this.getBidEmbed().send(this.textChannel);
     }
 
     public async endBidding(): Promise<void> {
@@ -169,17 +169,61 @@ export class BidEvent {
                 this.currentBidAmount,
                 this.description || 'bid'
             );
+            this.userHasBeenCharged = true;
         }
     }
 
     public async cancelBidding(): Promise<void> {
-        if (this.bidTimeout) clearTimeout(this.bidTimeout);
+        if (this.bidTimeout) {
+            clearTimeout(this.bidTimeout);
+            this.bidTimeout = null;
+        }
         this.reset();
-        await this.textChannel.send('Bidding has been cancelled');
+        if (this.highestBidder) await this.textChannel.send('Bidding has been cancelled');
     }
 
     public setDailyBidConfig(day: DayOfTheWeek, config: DailyBidConfig): void {
         this.dailyBidConfigs.set(day, config);
+    }
+
+    public pause(): void {
+        if (this.bidTimeout) {
+            clearTimeout(this.bidTimeout);
+            this.bidTimeout = null;
+        }
+    }
+
+    public async resume(): Promise<boolean> {
+        if (this.bidTimeout) return true;
+        if (!this.endDateTime) {
+            return false;
+        } else {
+            const timeRemaining = this.endDateTime.getTime() - Date.now();
+            if (timeRemaining <= 0) {
+                await this.endBidAction();
+            } else {
+                this.bidTimeout = setTimeout(async () => {
+                    await this.endBidAction();
+                }, timeRemaining);
+            }
+        }
+        return true;
+    }
+
+    public getBidEmbed(): EmbedBuilderLocal {
+        return new EmbedBuilderLocal()
+            .setTitle('Bidding: ' + this.description)
+            .setDescription(`starting bid: $${this.minBidAmount}\nminimum increment: $${this.minBidIncrement}`)
+            .setFooter(`ends ${this.endDateTime?.toLocaleString() || 'N/A'}`);
+    }
+
+    public hasUserBeenCharged(): boolean {
+        return this.userHasBeenCharged;
+    }
+
+    private async endBidAction() {
+        if (processManager.isActive()) await this.endBidding();
+        else this.reset();
     }
 }
 
