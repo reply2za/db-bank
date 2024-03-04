@@ -14,6 +14,7 @@ import Logger from '../../utils/Logger';
 
 const MAX_RETRY_COUNT = 3;
 const USER_SELECT_REACTIONS = [reactions.ONE, reactions.TWO];
+const USER_SELECT_REACTION_TIMEOUT_MS = 60000;
 
 export abstract class Transfer {
     readonly channel;
@@ -286,11 +287,14 @@ export abstract class Transfer {
             if (!name && !recipientID) {
                 let historyList: string[] | undefined = eventData.get(EventDataNames.AUTHOR_INTERACT_HISTORY);
                 let historyMsg = this.printUserHistory(historyList);
-                const initialTransferMsg = await message.channel.send(
-                    `${historyMsg}Type a username ${
-                        historyList?.length ? '(or select a reaction)' : ''
-                    } to ${actionName} *['q' = cancel]*`
-                );
+                const initialTransferMsg = await new EmbedBuilderLocal()
+                    .setDescription(
+                        `${historyMsg}Type a username ${
+                            historyList?.length ? '(or select a reaction)' : ''
+                        } to ${actionName} *['q' = cancel]*`
+                    )
+                    .send(message.channel);
+
                 eventData.set(EventDataNames.INITIAL_TRANSFER_MSG, initialTransferMsg);
                 const reactList = [];
                 if (historyList) {
@@ -326,7 +330,9 @@ export abstract class Transfer {
                             (collected, reason) => {
                                 initialTransferMsg.reactions.removeAll().catch((e) => logger.debugLog(e));
                                 if (reason === 'reacted') eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
-                            }
+                            },
+                            undefined,
+                            USER_SELECT_REACTION_TIMEOUT_MS
                         )
                         .then((result) => {
                             collector = result;
