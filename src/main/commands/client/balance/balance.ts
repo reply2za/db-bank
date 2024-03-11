@@ -2,11 +2,11 @@ import { bank } from '../../../finance/Bank';
 import { EventDataNames, MessageEventLocal } from '../../../utils/types';
 import reactions from '../../../utils/constants/reactions';
 import { commandHandler } from '../../../handlers/CommandHandler';
-import { MessageReaction } from 'discord.js';
+import { Message, MessageReaction } from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 import { processManager } from '../../../utils/ProcessManager';
-import { config, djsCommonUtils } from '../../../utils/constants/constants';
+import { djsCommonUtils } from '../../../utils/constants/constants';
 
 exports.run = async (event: MessageEventLocal) => {
     const balanceMsg = await visualizerCommon.showBalance(
@@ -45,12 +45,12 @@ function reactionCallback(event: MessageEventLocal) {
             default:
                 return;
         }
-        let transferMsg = event.data.get(EventDataNames.INITIAL_TRANSFER_MSG);
+        let transferMsg: Message | undefined = event.data.get(EventDataNames.INITIAL_TRANSFER_MSG);
         if (transferMsg) {
             const activeTransferReq = event.data.get(EventDataNames.REACTION_TSFR_REQ);
             if (activeTransferReq?.cmdName !== cmdName) {
                 processManager.removeUserResponseLock(event.bankUser.getUserId(), event.message.channel.id);
-                transferMsg.delete();
+                transferMsg.deletable && (await transferMsg.delete());
                 event.data.delete(EventDataNames.INITIAL_TRANSFER_MSG);
                 event.data.delete(EventDataNames.REACTION_TSFR_REQ);
             }

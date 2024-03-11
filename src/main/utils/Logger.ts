@@ -20,8 +20,13 @@ class Logger implements ILogger {
         (<TextChannel>await bot.channels.fetch(config.transactionLogChID))?.send(info);
     }
 
-    async debugLog(error: Error): Promise<Message | undefined> {
-        if (config.isDevMode) console.log(error);
+    /**
+     * Logs the error to the console if in dev mode.
+     * @param error The error to log.
+     * @param from Optional - The function or class that the error originated from.
+     */
+    async debugLog(error: Error, from?: string): Promise<Message | undefined> {
+        if (config.isDevMode) console.log('[DEBUG_LOG] ', `[${from}] `, error);
         return;
     }
 

@@ -1,4 +1,4 @@
-import { Colors, Message, ReactionCollector, TextChannel, User } from 'discord.js';
+import { Colors, Message, ReactionCollector, TextChannel } from 'discord.js';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { formatErrorText, getUserResponse } from '../../utils/utils';
 import { roundNumberTwoDecimals } from '../../utils/numberUtils';
@@ -159,7 +159,7 @@ export abstract class Transfer {
                         this.channel
                     );
                 } catch (e: any) {
-                    this.channel.send(formatErrorText(e.message));
+                    await this.channel.send(formatErrorText(e.message));
                     await logger.debugLog(e);
                 }
                 await embedMsg.react(reactions.CHECK);
@@ -328,8 +328,15 @@ export abstract class Transfer {
                                 }
                             },
                             (collected, reason) => {
-                                initialTransferMsg.reactions.removeAll().catch((e) => logger.debugLog(e));
-                                if (reason === 'reacted') eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
+                                if (reason != 'messageDelete') {
+                                    initialTransferMsg.reactions
+                                        .removeAll()
+                                        .catch((e) => logger.debugLog(e, 'initial_message_reactions_remove_error'));
+                                    if (reason === 'reacted') {
+                                        eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
+                                        initialTransferMsg.delete();
+                                    }
+                                }
                             },
                             undefined,
                             USER_SELECT_REACTION_TIMEOUT_MS
