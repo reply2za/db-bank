@@ -55,7 +55,7 @@ export default {
             i++;
         }
         return new EmbedBuilderLocal()
-            .setTitle(`Your sent IOUs (${total} outstanding)`)
+            .setTitle(`You've sent ${total} IOUs`)
             .setDescription(descriptionText)
             .setColor('Fuchsia')
             .setThumbnail(images.SENT_IOU_IMG);
