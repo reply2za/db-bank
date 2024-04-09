@@ -12,12 +12,16 @@ export default {
         let descriptionText = '';
         let i = 1;
         if (highlight !== undefined) highlight++;
-        let selectedIOU;
         for (const singleIOU of ious) {
-            const iouDescription = getIOUDescription(i, singleIOU.sender.name, singleIOU.comment, singleIOU.quantity);
+            const iouDescription = getIOUDescription(
+                i,
+                singleIOU.sender.name,
+                singleIOU.comment,
+                singleIOU.quantity,
+                singleIOU.expirationDate
+            );
             if (i === highlight) {
                 descriptionText += `[${iouDescription}]`;
-                selectedIOU = singleIOU;
             } else {
                 descriptionText += iouDescription;
             }
@@ -38,7 +42,13 @@ export default {
         let descriptionText = '';
         let i = 1;
         for (const singleIOU of ious) {
-            descriptionText += getIOUDescription(i, singleIOU.receiver.name, singleIOU.comment, singleIOU.quantity);
+            descriptionText += getIOUDescription(
+                i,
+                singleIOU.receiver.name,
+                singleIOU.comment,
+                singleIOU.quantity,
+                singleIOU.expirationDate
+            );
             descriptionText += '\n';
             i++;
         }
@@ -85,6 +95,6 @@ export default {
     },
 };
 
-function getIOUDescription(num: number, name: string, comment: string, quantity: number) {
-    return `${num}. **${name}**${quantity > 1 ? ` (x${quantity})` : ''}: ${comment.substring(0, 50)}`;
+function getIOUDescription(num: number, name: string, comment: string, quantity: number, expDate: string) {
+    return `${num}. **${name}**${quantity > 1 ? ` (x${quantity})` : ''} (exp ${expDate}): ${comment.substring(0, 50)}`;
 }

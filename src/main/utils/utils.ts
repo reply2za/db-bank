@@ -42,3 +42,7 @@ export function unitFormatFactory(transferType: TransferType): (amount: number) 
         return (amount) => `$${amount.toLocaleString()}`;
     }
 }
+
+export function formatDate(date: Date) {
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().substring(2)}`;
+}

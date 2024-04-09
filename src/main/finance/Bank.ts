@@ -10,7 +10,7 @@ import visualizerCommon from './visualizers/visualizerCommon';
 import { BankUserCopy } from './BankUser/BankUserCopy';
 import { config } from '../utils/constants/constants';
 import { ABankUser } from './BankUser/ABankUser';
-import { unitFormatFactory } from '../utils/utils';
+import { formatDate, unitFormatFactory } from '../utils/utils';
 import { Balance } from '../utils/wrappers/Balance';
 
 export class Bank {
@@ -47,11 +47,13 @@ export class Bank {
             };
         }
         const date = new Date();
+        const expirationDate = IOUTicket.setExpirationDate(new Date());
         const iou = new IOUTicket(
             null,
             { id: sender.getUserId(), name: sender.getUsername() },
             { id: receiver.getUserId(), name: receiver.getUsername() },
-            `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().substring(2)}`,
+            formatDate(date),
+            formatDate(expirationDate),
             comment,
             quantity
         );
@@ -209,7 +211,9 @@ export class Bank {
             }
         }
         for (let iou of parsedData.bank.ious) {
-            this.#iOUList.push(new IOUTicket(iou.id, iou.sender, iou.receiver, iou.date, iou.comment, iou.quantity));
+            this.#iOUList.push(
+                new IOUTicket(iou.id, iou.sender, iou.receiver, iou.date, iou.expirationDate, iou.comment, iou.quantity)
+            );
         }
     }
 
