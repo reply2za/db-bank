@@ -41,7 +41,9 @@ export default {
     getSentIOUEmbed(ious: IOUTicket[]) {
         let descriptionText = '';
         let i = 1;
+        let total = 0;
         for (const singleIOU of ious) {
+            total += singleIOU.quantity;
             descriptionText += getIOUDescription(
                 i,
                 singleIOU.receiver.name,
@@ -53,7 +55,7 @@ export default {
             i++;
         }
         return new EmbedBuilderLocal()
-            .setTitle(`Your sent IOUs to`)
+            .setTitle(`Your sent IOUs (${total} outstanding)`)
             .setDescription(descriptionText)
             .setColor('Fuchsia')
             .setThumbnail(images.SENT_IOU_IMG);
@@ -96,5 +98,5 @@ export default {
 };
 
 function getIOUDescription(num: number, name: string, comment: string, quantity: number, expDate: string) {
-    return `${num}. **${name}**${quantity > 1 ? ` (x${quantity})` : ''} (exp ${expDate}): ${comment.substring(0, 50)}`;
+    return `${num}. **${name}**${quantity > 1 ? ` [x${quantity}]` : ''} (exp ${expDate}): ${comment.substring(0, 50)}`;
 }
