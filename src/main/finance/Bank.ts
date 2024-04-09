@@ -159,7 +159,13 @@ export class Bank {
      * @param id The author id
      */
     getUserIOUs(id: string): IOUTicket[] {
-        return this.#iOUList.filter((value: IOUTicket) => value.receiver.id === id);
+        let iouArr = this.#iOUList.filter((value: IOUTicket) => value.receiver.id === id);
+        let now = Date.now();
+        return iouArr.filter((iou) => {
+            let expDate = Date.parse(iou.expirationDate);
+            if (Number.isNaN(expDate)) return true;
+            return expDate >= now;
+        });
     }
 
     /**

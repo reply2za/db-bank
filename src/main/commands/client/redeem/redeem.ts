@@ -7,6 +7,7 @@ import { EventDataNames, MessageEventLocal } from '../../../utils/types';
 import Logger from '../../../utils/Logger';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 import { Colors, TextChannel } from 'discord.js';
+import { IOUTicket } from '../../../finance/IOUTicket';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.getUserId());
