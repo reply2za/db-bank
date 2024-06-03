@@ -67,6 +67,11 @@ export class BidEvent {
             await this.textChannel.send(`You are already the highest bidder with a bid of $${this.currentBidAmount}`);
             return;
         }
+        const digitCheck = Number(bidAmount.toFixed(2));
+        if (bidAmount !== digitCheck) {
+            await this.textChannel.send(`You can only bid up to two decimal places`);
+            return;
+        }
         if (bidAmount < this.minBidAmount) {
             await this.textChannel.send(`Bid must be at least $${this.minBidAmount}`);
             return;
