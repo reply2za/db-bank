@@ -2,9 +2,13 @@ import { MessageEventLocal } from "../../utils/types";
 import { exec } from 'child_process';
 
 exports.run = async (event: MessageEventLocal) => {
-    exec("date", (err, stdout, stderr)=> {
-        if (err) console.log(`error: ${stdout}`);
-        if (stdout) console.log(`stdout: ${stdout}`);
-        if (stderr) console.log(`stderr: ${stderr}`);
+    const process = exec("date", async (err, stdout, stderr)=> {
+        let resp = "";
+        if (err) resp += `error: ${stdout}\n`;
+        if (stdout) resp +=`stdout: ${stdout}\n`;
+        if (stderr) resp +=`stderr: ${stderr}\n`;
+        await event.message.channel.send(resp);
+        process.disconnect();
     });
+
 }
