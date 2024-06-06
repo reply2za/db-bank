@@ -23,7 +23,7 @@ exports.run = async (event: MessageEventLocal) => {
                 return;
             }
         } else {
-            event.args.splice()
+            event.args.shift();
         }
     }
 
