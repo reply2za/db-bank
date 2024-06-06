@@ -7,21 +7,23 @@ import { bidManager } from '../../finance/bid/BidManager';
 
 exports.run = async (event: MessageEventLocal) => {
     const bidEvents = bidManager.getAllActiveBidEvents();
-    let bidsAreInProgress = false;
     if (processManager.isActive()) {
         if (event.args[0] !== 'force') {
+            let bidsAreInProgress = false;
             for (const bidEvent of bidEvents) {
                 if (!bidEvent.hasEnded() && bidEvent.getHighestBidder()) {
                     await bidEvent.getBidEmbed().send(event.message.channel);
                     bidsAreInProgress = true;
                 }
             }
-        }
-        if (bidsAreInProgress) {
-            await event.message.channel.send(
-                `Bids are in progress. Use \`${event.prefix}update force\` to force an update`
-            );
-            return;
+            if (bidsAreInProgress) {
+                await event.message.channel.send(
+                    `Bids are in progress. Use \`${event.prefix}update force\` to force an update`
+                );
+                return;
+            }
+        } else {
+            event.args.splice()
         }
     }
 
