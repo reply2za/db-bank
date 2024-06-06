@@ -36,7 +36,7 @@ exports.run = async (event: MessageEventLocal) => {
     if (bidEvent) {
         if (!event.args[0]) {
             const endDate = bidEvent.getEndDateTime();
-            if (bidEvent.getCurrentBidAmount() > 0 && bidEvent.getHighestBidder() && endDate && endDate < currentDate) {
+            if (bidEvent.getCurrentBidAmount() > 0 && bidEvent.getHighestBidder() && endDate && endDate.isBefore(currentDate)) {
                 event.message.channel.send(
                     `Current bid: $${bidEvent.getCurrentBidAmount()} by ${bidEvent.getHighestBidder()?.getUsername()}`
                 );

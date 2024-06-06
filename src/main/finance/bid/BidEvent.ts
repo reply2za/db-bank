@@ -6,11 +6,12 @@ import { bank } from '../Bank';
 import { ApprovedChargeTransfer } from '../Transfer/ApprovedChargeTransfer';
 import { DayOfTheWeek } from '../../utils/enums';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
+import moment from 'moment';
 
 export class BidEvent {
     private highestBidder: BankUserCopy | null;
     private currentBidAmount = 0;
-    private endDateTime: Date | null = BidEvent.defaultDateTime();
+    private endDateTime: moment.Moment | null = BidEvent.defaultDateTime();
     private static readonly DEFAULT_MIN_BID_AMOUNT = 0.25;
     private static readonly DEFAULT_MIN_BID_INCREMENT = 0.25;
     private minBidAmount = BidEvent.DEFAULT_MIN_BID_AMOUNT;
@@ -29,10 +30,8 @@ export class BidEvent {
         this.description = description;
     }
 
-    public static defaultDateTime(): Date {
-        const date = new Date();
-        date.setHours(23, 59, 59, 999);
-        return date;
+    public static defaultDateTime(): moment.Moment {
+        return moment().endOf('day');
     }
 
     public getCurrentBidAmount(): number {
@@ -45,10 +44,10 @@ export class BidEvent {
     public setHighestBidder(bidder: ABankUser): void {
         this.highestBidder = bidder;
     }
-    public setEndDateTime(endDateTime: Date): void {
+    public setEndDateTime(endDateTime: moment.Moment): void {
         this.endDateTime = endDateTime;
     }
-    public getEndDateTime(): Date | null {
+    public getEndDateTime(): moment.Moment | null {
         return this.endDateTime;
     }
     public getMinBidAmount(): number {
@@ -112,15 +111,15 @@ export class BidEvent {
     }
 
     public hasEnded() {
-        return this.endDateTime && this.endDateTime < new Date();
+        return this.endDateTime && this.endDateTime.isBefore(moment());
     }
 
-    public async startBidding(newEndTime?: Date): Promise<void> {
-        const currentDate = new Date();
+    public async startBidding(newEndTime?: moment.Moment): Promise<void> {
+        const currentDate = moment();
         if (this.endDateTime && this.endDateTime < currentDate) {
             // create a new date with the cooldown time added
-            const cooldownExpiryDate = new Date(this.endDateTime.getTime());
-            cooldownExpiryDate.setMinutes(cooldownExpiryDate.getMinutes() + this.cooldown_minutes);
+            const cooldownExpiryDate = moment(this.endDateTime);
+            cooldownExpiryDate.minutes(cooldownExpiryDate.minute() + this.cooldown_minutes);
             if (cooldownExpiryDate > currentDate) {
                 await this.textChannel.send(
                     `Bidding has ended, bidding will be available again at ${cooldownExpiryDate.toLocaleString()}`
@@ -131,12 +130,12 @@ export class BidEvent {
         if (!this.endDateTime || this.endDateTime < currentDate) {
             this.endDateTime = newEndTime || BidEvent.defaultDateTime();
         }
-
+        const diffMS = this.endDateTime.diff(moment());
         this.bidTimeout = setTimeout(async () => {
             await this.endBidAction();
-        }, this.endDateTime.getTime() - Date.now());
+        }, diffMS);
         // set the configs based on the ending date
-        const day = this.endDateTime.getDay();
+        const day = this.endDateTime.day();
         const dailyBidConfig = this.dailyBidConfigs.get(day);
         if (dailyBidConfig) {
             this.minBidAmount = dailyBidConfig.minBidAmount;
@@ -202,7 +201,7 @@ export class BidEvent {
         if (!this.endDateTime) {
             return false;
         } else {
-            const timeRemaining = this.endDateTime.getTime() - Date.now();
+            const timeRemaining = this.endDateTime.diff(moment());
             if (timeRemaining <= 0) {
                 await this.endBidAction();
             } else {
