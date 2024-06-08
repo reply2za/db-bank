@@ -33,4 +33,9 @@ export enum EventDataNames {
      * {string[]} - the users that the author has transferred to. The last user is the most recent.
      */
     AUTHOR_INTERACT_HISTORY,
+    /**
+     * Whether the bot is initiating a max bid req on behalf of a user. 
+     * value is either 'true', 'false', or undefined
+     */
+    IS_MAX_BID
 }

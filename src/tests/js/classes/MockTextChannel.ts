@@ -45,4 +45,8 @@ export class MockTextChannel {
     createReactionCollector(...args: any[]) {
         return false;
     }
+
+    fetch(x: any) {
+        return this;
+    }
 }

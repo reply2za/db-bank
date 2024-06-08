@@ -7,17 +7,18 @@ import { ApprovedChargeTransfer } from '../Transfer/ApprovedChargeTransfer';
 import { DayOfTheWeek } from '../../utils/enums';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import moment from 'moment';
+import { getCurrentMoment } from '../../utils/utils';
 
 export class BidEvent {
     private highestBidder: BankUserCopy | null;
     private currentBidAmount = 0;
-    private endDateTime: moment.Moment | null = BidEvent.defaultDateTime();
+    private endDateTime: string | null = BidEvent.defaultDateTime().toISOString();
     private static readonly DEFAULT_MIN_BID_AMOUNT = 0.25;
     private static readonly DEFAULT_MIN_BID_INCREMENT = 0.25;
     private minBidAmount = BidEvent.DEFAULT_MIN_BID_AMOUNT;
     private minBidIncrement = BidEvent.DEFAULT_MIN_BID_INCREMENT;
     private textChannel: TextChannel;
-    private maxBidAmount = 50;
+    private maxBidAmount = 100;
     private static readonly FAILED_CHARGE_TXT = 'charge failed, could not find user in the database';
     private description: string;
     private bidTimeout: NodeJS.Timeout | null = null;
@@ -31,7 +32,7 @@ export class BidEvent {
     }
 
     public static defaultDateTime(): moment.Moment {
-        return BidEvent.getCurrentMoment().endOf('day');
+        return getCurrentMoment().endOf('day');
     }
 
     public getCurrentBidAmount(): number {
@@ -45,10 +46,11 @@ export class BidEvent {
         this.highestBidder = bidder;
     }
     public setEndDateTime(endDateTime: moment.Moment): void {
-        this.endDateTime = endDateTime;
+        this.endDateTime = endDateTime.toISOString();
     }
     public getEndDateTime(): moment.Moment | null {
-        return this.endDateTime;
+        if (!this.endDateTime) return null;
+        return moment(this.endDateTime);
     }
     public getMinBidAmount(): number {
         return this.minBidAmount;
@@ -83,12 +85,41 @@ export class BidEvent {
             await this.textChannel.send(`Bid must be less than $${this.maxBidAmount}`);
             return;
         }
+        const previousBidderMaxBid = this.highestBidder?.getMaxBid(getCurrentMoment());
+        const newOutbidMin = bidAmount + this.minBidIncrement;
+        if (previousBidderMaxBid && previousBidderMaxBid > 0 && 
+            previousBidderMaxBid < newOutbidMin && previousBidderMaxBid >= this.currentBidAmount) {
+                const outbidderName = bidder.getDiscordUser().displayName || bidder.getDiscordUser().username;
+                this.highestBidder?.getDiscordUser().send(outbidderName + " surpassed your max bid of $" + previousBidderMaxBid);
+        }
         this.highestBidder = bidder;
         this.currentBidAmount = bidAmount;
         await new EmbedBuilderLocal()
             .setDescription(`Bid of $${bidAmount} has been placed by ${bidder.getUsername()}`)
             .setColor('#007000')
             .send(this.textChannel);
+        this.checkMaxBids();
+    }
+
+    private checkMaxBids() {
+        if (!this.highestBidder || !this.description.includes("VIP TV access for")) return;
+        const date = getCurrentMoment();
+        const resUsers = bank.getAllUsers().filter(i => {
+            return (i.getUserId() !== this.highestBidder!.getUserId() &&
+            i.getMaxBid(date) >= (this.currentBidAmount + this.minBidIncrement));
+        }); 
+        let earliestBidDate = getCurrentMoment().add(1,'second');
+        let earliestUser: BankUserCopy | null = null; 
+        resUsers.forEach(x => {
+            const bidDate = x.getMaxBidDate();
+            if (bidDate.isBefore(earliestBidDate, 'second')) {
+                earliestBidDate = bidDate;
+                earliestUser = x;
+            }
+        });
+        if (earliestUser) {
+            this.addBid(earliestUser, this.currentBidAmount + this.minBidIncrement);
+        }
     }
 
     public setDescription(description: string): void {
@@ -111,12 +142,12 @@ export class BidEvent {
     }
 
     public hasEnded() {
-        return this.endDateTime && this.endDateTime.isBefore(BidEvent.getCurrentMoment());
+        return this.endDateTime && moment(this.endDateTime).isBefore(getCurrentMoment());
     }
 
     public async startBidding(newEndTime?: moment.Moment): Promise<void> {
-        const currentDate = BidEvent.getCurrentMoment();
-        if (this.endDateTime && this.endDateTime < currentDate) {
+        const currentDate = getCurrentMoment();
+        if (this.endDateTime && moment(this.endDateTime).isBefore(currentDate)) {
             // create a new date with the cooldown time added
             const cooldownExpiryDate = moment(this.endDateTime);
             cooldownExpiryDate.minutes(cooldownExpiryDate.minute() + this.cooldown_minutes);
@@ -127,15 +158,15 @@ export class BidEvent {
                 return;
             }
         }
-        if (!this.endDateTime || this.endDateTime < currentDate) {
-            this.endDateTime = newEndTime || BidEvent.defaultDateTime();
+        if (!this.endDateTime || moment(this.endDateTime).isBefore(currentDate)) {
+            this.endDateTime = newEndTime?.toISOString() || BidEvent.defaultDateTime().toISOString();
         }
-        const diffMS = this.endDateTime.diff(BidEvent.getCurrentMoment());
+        const diffMS = moment(this.endDateTime).diff(getCurrentMoment());
         this.bidTimeout = setTimeout(async () => {
             await this.endBidAction();
         }, diffMS);
         // set the configs based on the ending date
-        const day = this.endDateTime.day();
+        const day = moment(this.endDateTime).day();
         const dailyBidConfig = this.dailyBidConfigs.get(day);
         if (dailyBidConfig) {
             this.minBidAmount = dailyBidConfig.minBidAmount;
@@ -201,7 +232,7 @@ export class BidEvent {
         if (!this.endDateTime) {
             return false;
         } else {
-            const timeRemaining = this.endDateTime.diff(BidEvent.getCurrentMoment());
+            const timeRemaining = moment(this.endDateTime).diff(getCurrentMoment());
             if (timeRemaining <= 0) {
                 await this.endBidAction();
             } else {
@@ -227,36 +258,6 @@ export class BidEvent {
     private async endBidAction() {
         if (processManager.isActive()) await this.endBidding();
         else this.reset();
-    }
-
-    public static getCurrentMoment(): moment.Moment {
-        const date = new Date();
-        const month = date.getMonth() + 1;
-        if (month > 3 && month < 11) {
-            return this.getMomentEDT();
-        } else if (month < 3 || month > 11) {
-            return this.getMomentEST();
-        } else {
-            const dateNum = date.getDate();
-            if (month == 3) {
-                if (dateNum >= 10) {
-                    return this.getMomentEDT();
-                } else return this.getMomentEST();
-            } else {
-                if (dateNum >= 3) {
-                    return this.getMomentEST();
-                } 
-            }
-            return this.getMomentEDT();
-        }
-    }
-
-    private static getMomentEDT() {
-        return (moment(Date.now()).utcOffset('-0400'));
-    }
-
-    private static getMomentEST() {
-        return (moment(Date.now()).utcOffset('-0500'));
     }
 }
 

@@ -2,6 +2,7 @@ import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js
 import { config } from './constants/constants';
 import { processManager } from './ProcessManager';
 import { TransferType } from '../finance/types';
+import moment from 'moment';
 
 export async function getUserResponse(
     channel: If<boolean, GuildTextBasedChannel, TextBasedChannel>,
@@ -46,3 +47,34 @@ export function unitFormatFactory(transferType: TransferType): (amount: number) 
 export function formatDate(date: Date) {
     return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().substring(2)}`;
 }
+
+export function getCurrentMoment(): moment.Moment {
+    const date = new Date();
+    const month = date.getMonth() + 1;
+    if (month > 3 && month < 11) {
+        return getMomentEDT();
+    } else if (month < 3 || month > 11) {
+        return getMomentEST();
+    } else {
+        const dateNum = date.getDate();
+        if (month == 3) {
+            if (dateNum >= 10) {
+                return getMomentEDT();
+            } else return getMomentEST();
+        } else {
+            if (dateNum >= 3) {
+                return getMomentEST();
+            } 
+        }
+        return getMomentEDT();
+    }
+}
+
+export function getMomentEDT() {
+    return (moment(Date.now()).utcOffset('-0400'));
+}
+
+export function getMomentEST() {
+    return (moment(Date.now()).utcOffset('-0500'));
+}
+

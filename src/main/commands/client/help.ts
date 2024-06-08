@@ -10,6 +10,7 @@ exports.run = async (event: MessageEventLocal) => {
 **transfer** [name] - initiate transfer process
 **calculate** [expression] - calculate an expression
 **bid [amount]** - bid in a bidding channel
+**maxbid [amount]** - sets a max bid for the VIP TV access
 
 -- IOU commands -- 
 **transferIOU** - transfer an IOU

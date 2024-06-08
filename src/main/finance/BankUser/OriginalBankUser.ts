@@ -1,4 +1,5 @@
 import { roundNumberTwoDecimals } from '../../utils/numberUtils';
+import { getCurrentMoment } from '../../utils/utils';
 import { ABankUser } from './ABankUser';
 import { BankUserCopy } from './BankUserCopy';
 
@@ -16,7 +17,9 @@ class OriginalBankUser extends ABankUser {
     }
 
     getBankUserCopy(): BankUserCopy {
-        return new BankUserCopy(this.discordUser, this.name, this.balance, this.history);
+        const bankUser = new BankUserCopy(this.discordUser, this.name, this.balance, this.history);
+        bankUser.setMaxBid(this.getMaxBid(getCurrentMoment()));
+        return bankUser;
     }
 }
 

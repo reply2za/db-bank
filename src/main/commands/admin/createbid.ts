@@ -1,9 +1,9 @@
 import { MessageEventLocal } from '../../utils/types';
 import { bidManager } from '../../finance/bid/BidManager';
 import { BidEvent } from '../../finance/bid/BidEvent';
-import { TextChannel } from 'discord.js';
+import { TextChannel, Utils } from 'discord.js';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
-import { getUserResponse } from '../../utils/utils';
+import { getCurrentMoment, getUserResponse } from '../../utils/utils';
 import moment from 'moment';
 
 exports.run = async (event: MessageEventLocal) => {
@@ -25,7 +25,7 @@ exports.run = async (event: MessageEventLocal) => {
         if (event.args[0].includes('/')) {
             day = event.args[0];
         } else if (event.args[0].includes(':')) {
-            day = BidEvent.getCurrentMoment().format('L');
+            day = getCurrentMoment().format('L');
             time = event.args[0];
         }
         if (event.args[1] && event.args[1].includes(':')) {
@@ -91,7 +91,7 @@ exports.run = async (event: MessageEventLocal) => {
             await event.message.channel.send('Invalid date');
             return;
         }
-        if (endDate.isBefore(BidEvent.getCurrentMoment())) {
+        if (endDate.isBefore(getCurrentMoment())) {
             await event.message.channel.send('Date must be in the future');
             return;
         }

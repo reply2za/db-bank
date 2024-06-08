@@ -154,6 +154,16 @@ export class Bank {
         return Array.from(this.#users.values()).map((bankUser) => bankUser.getBankUserCopy());
     }
 
+    setMaxBidAmount(id: string, amount: number): BankUserCopy | undefined {
+        const user = this.#users.get(id);
+        if (user) {
+            user.setMaxBid(amount);
+            return user.getBankUserCopy();
+        } else {
+            console.log(`[error] no user found with id: ${id}`);
+        }
+    }
+
     /**
      * Gets all the active IOU tickets given to a author.
      * @param id The author id
