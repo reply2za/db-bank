@@ -31,7 +31,7 @@ export class BidEvent {
     }
 
     public static defaultDateTime(): moment.Moment {
-        return moment().endOf('day');
+        return BidEvent.getCurrentMoment().endOf('day');
     }
 
     public getCurrentBidAmount(): number {
@@ -111,11 +111,11 @@ export class BidEvent {
     }
 
     public hasEnded() {
-        return this.endDateTime && this.endDateTime.isBefore(moment());
+        return this.endDateTime && this.endDateTime.isBefore(BidEvent.getCurrentMoment());
     }
 
     public async startBidding(newEndTime?: moment.Moment): Promise<void> {
-        const currentDate = moment();
+        const currentDate = BidEvent.getCurrentMoment();
         if (this.endDateTime && this.endDateTime < currentDate) {
             // create a new date with the cooldown time added
             const cooldownExpiryDate = moment(this.endDateTime);
@@ -130,7 +130,7 @@ export class BidEvent {
         if (!this.endDateTime || this.endDateTime < currentDate) {
             this.endDateTime = newEndTime || BidEvent.defaultDateTime();
         }
-        const diffMS = this.endDateTime.diff(moment());
+        const diffMS = this.endDateTime.diff(BidEvent.getCurrentMoment());
         this.bidTimeout = setTimeout(async () => {
             await this.endBidAction();
         }, diffMS);
@@ -152,9 +152,9 @@ export class BidEvent {
         if (this.highestBidder) {
             const msg = await this.textChannel.send(
                 'Bidding has ended, the winner is: ' +
-                    this.highestBidder.getUsername() +
-                    ' with a bid of $' +
-                    this.currentBidAmount
+                this.highestBidder.getUsername() +
+                ' with a bid of $' +
+                this.currentBidAmount
             );
             const dbBank = bank.getUserCopy(msg.author.id);
             let userToTransferTo = dbBank;
@@ -201,7 +201,7 @@ export class BidEvent {
         if (!this.endDateTime) {
             return false;
         } else {
-            const timeRemaining = this.endDateTime.diff(moment());
+            const timeRemaining = this.endDateTime.diff(BidEvent.getCurrentMoment());
             if (timeRemaining <= 0) {
                 await this.endBidAction();
             } else {
@@ -227,6 +227,36 @@ export class BidEvent {
     private async endBidAction() {
         if (processManager.isActive()) await this.endBidding();
         else this.reset();
+    }
+
+    public static getCurrentMoment(): moment.Moment {
+        const date = new Date();
+        const month = date.getMonth() + 1;
+        if (month > 3 && month < 11) {
+            return this.getMomentEDT();
+        } else if (month < 3 || month > 11) {
+            return this.getMomentEST();
+        } else {
+            const dateNum = date.getDate();
+            if (month == 3) {
+                if (dateNum >= 10) {
+                    return this.getMomentEDT();
+                } else return this.getMomentEST();
+            } else {
+                if (dateNum >= 3) {
+                    return this.getMomentEST();
+                } 
+            }
+            return this.getMomentEDT();
+        }
+    }
+
+    private static getMomentEDT() {
+        return (moment(Date.now()).utcOffset('-0400'));
+    }
+
+    private static getMomentEST() {
+        return (moment(Date.now()).utcOffset('-0500'));
     }
 }
 

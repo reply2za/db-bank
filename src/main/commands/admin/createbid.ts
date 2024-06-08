@@ -25,7 +25,7 @@ exports.run = async (event: MessageEventLocal) => {
         if (event.args[0].includes('/')) {
             day = event.args[0];
         } else if (event.args[0].includes(':')) {
-            day = moment().format('L');
+            day = BidEvent.getCurrentMoment().format('L');
             time = event.args[0];
         }
         if (event.args[1] && event.args[1].includes(':')) {
@@ -91,7 +91,7 @@ exports.run = async (event: MessageEventLocal) => {
             await event.message.channel.send('Invalid date');
             return;
         }
-        if (endDate.isBefore(moment())) {
+        if (endDate.isBefore(BidEvent.getCurrentMoment())) {
             await event.message.channel.send('Date must be in the future');
             return;
         }
