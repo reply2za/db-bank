@@ -245,10 +245,11 @@ export class BidEvent {
     }
 
     public getBidEmbed(): EmbedBuilderLocal {
+        const localEndDateTime = moment(this.endDateTime).local().format('YYYY-MM-DD HH:mm:ss')
         return new EmbedBuilderLocal()
             .setTitle('Bidding: ' + this.description)
             .setDescription(`starting bid: $${this.minBidAmount}\nminimum increment: $${this.minBidIncrement}`)
-            .setFooter(`ends ${this.endDateTime?.toLocaleString() || 'N/A'}`);
+            .setFooter(`ends ${localEndDateTime || 'N/A'}`);
     }
 
     public hasUserBeenCharged(): boolean {

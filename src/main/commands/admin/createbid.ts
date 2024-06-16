@@ -1,7 +1,7 @@
 import { MessageEventLocal } from '../../utils/types';
 import { bidManager } from '../../finance/bid/BidManager';
 import { BidEvent } from '../../finance/bid/BidEvent';
-import { TextChannel, Utils } from 'discord.js';
+import { TextChannel } from 'discord.js';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { getCurrentMoment, getUserResponse } from '../../utils/utils';
 import moment from 'moment';
@@ -22,11 +22,11 @@ exports.run = async (event: MessageEventLocal) => {
             await event.message.channel.send('*cancelled*');
             return;
         }
-        if (event.args[0].includes('/')) {
-            day = event.args[0];
-        } else if (event.args[0].includes(':')) {
+        if (event.args[0].includes(':')) {
             day = getCurrentMoment().format('L');
             time = event.args[0];
+        } else {
+            day = event.args[0];
         }
         if (event.args[1] && event.args[1].includes(':')) {
             time = event.args[1];
@@ -71,7 +71,7 @@ exports.run = async (event: MessageEventLocal) => {
         endDate = BidEvent.defaultDateTime();
     } else {
         if (!day || !time) {
-            await event.message.channel.send('You must specify a date and time ' + day + "|" + time);
+            await event.message.channel.send(`You must specify a date (${day}) and time (${time})`);
             return;
         }
         endDate = moment(day);
@@ -82,7 +82,7 @@ exports.run = async (event: MessageEventLocal) => {
         } else if (timeArr.length < 3) {
             timeArr.push('00');
         }
-        endDate.set({
+        endDate = endDate.set({
             hour: parseInt(timeArr[0]),
             minute: parseInt(timeArr[1]),
             second: parseInt(timeArr[2])
