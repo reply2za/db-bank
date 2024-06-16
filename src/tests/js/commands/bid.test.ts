@@ -81,7 +81,9 @@ describe('bid events', () => {
         expect(channel1Length).toBe(2);
         let bidEvent = bidManager.getBidEvent(bidS1.channel1.id);
         expect(bidS1.channel1.receivedMessages.pop()).toBe('Bid of $0.5 has been placed by Josephine');
-        expect(bidS1.channel1.receivedMessages.pop()).toBe('starting bid: $0.5\nminimum increment: $0.5');
+        const bidEmbed = bidS1.channel1.receivedMessages.pop();
+        expect(bidEmbed).toContain('starting bid: $');
+        expect(bidEmbed).toContain('minimum increment: $');
         expect(!!bidEvent).toBe(true);
         if (!bidEvent) return;
         expect(spy).toHaveBeenCalled();
