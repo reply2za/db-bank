@@ -87,7 +87,7 @@ export default {
             title = `${iouRecipientName} redeemed an IOU`;
             description = `An IOU that you gave to ${iouRecipientName} has been redeemed.\nCongratulations!`;
         }
-        if (redemptionComment) description += `\nRedemption comment: ${redemptionComment}`;
+        if (redemptionComment) description += `\n**Redemption comment:** ${redemptionComment}`;
         return new EmbedBuilderLocal()
             .setTitle(title)
             .setColor('Aqua')
