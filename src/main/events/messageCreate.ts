@@ -22,7 +22,7 @@ module.exports = async (message: Message) => {
         if (message.author.bot) return;
         if (message.content.toLowerCase() !== `${config.prefix}adduser`) return;
         try {
-            bank.addNewUser(message.author, message.author.username, 0, []);
+            bankUser = bank.addNewUser(message.author, message.author.username, 0, []);
             await localStorage.saveData(bank.serializeData());
         } catch (e) {
             if (e instanceof Error) Logger.errorLog(e).catch((e) => console.log(e));
