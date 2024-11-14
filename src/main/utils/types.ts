@@ -1,5 +1,6 @@
 import { BankUserCopy } from '../finance/BankUser/BankUserCopy';
 import { MessageEventCore } from '@hoursofza/djs-common';
+import { Message, TextChannel, DMChannel, NewsChannel, PartialDMChannel, TextBasedChannel } from 'discord.js';
 
 export type MessageEventLocal = MessageEventCore<EventDataNames> & {
     // the bank author initiating the event
@@ -34,8 +35,10 @@ export enum EventDataNames {
      */
     AUTHOR_INTERACT_HISTORY,
     /**
-     * Whether the bot is initiating a max bid req on behalf of a user. 
+     * Whether the bot is initiating a max bid req on behalf of a user.
      * value is either 'true', 'false', or undefined
      */
-    IS_MAX_BID
+    IS_MAX_BID,
 }
+
+export type MessageChannel = TextBasedChannel;

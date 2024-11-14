@@ -5,7 +5,7 @@ import { roundNumberTwoDecimals } from '../../utils/numberUtils';
 import reactions from '../../utils/constants/reactions';
 import visualizerCommon from '../visualizers/visualizerCommon';
 import { BankUserCopy } from '../BankUser/BankUserCopy';
-import { EventDataNames } from '../../utils/types';
+import { EventDataNames, MessageChannel } from '../../utils/types';
 import { config, djsCommonUtils } from '../../utils/constants/constants';
 import { TransferType } from '../types';
 import { bankUserLookup } from '../BankUserLookup';
@@ -28,7 +28,7 @@ export abstract class Transfer {
     private commentMsg: Message | undefined;
 
     protected constructor(
-        channel: TextChannel,
+        channel: MessageChannel,
         sender: BankUserCopy,
         receiver: BankUserCopy,
         transferType = TransferType.TRANSFER,
@@ -230,7 +230,7 @@ export abstract class Transfer {
         await this.channel.send(`*cancelled ${this.transferType}${reason ? `: ${reason}` : ''}*`);
     }
 
-    protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
+    protected async validateAmount(transferAmount: number, channel: MessageChannel): Promise<boolean> {
         if (!Number.isFinite(transferAmount)) {
             await channel.send(formatErrorText('invalid input'));
             return false;
@@ -273,7 +273,7 @@ export abstract class Transfer {
         receiver: BankUserCopy,
         transferAmount: number,
         comment: string,
-        channel: TextChannel
+        channel: MessageChannel
     ): Promise<void>;
 
     private static async promptForRecipient(

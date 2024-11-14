@@ -5,9 +5,10 @@ import { TransferType } from '../types';
 import { bank } from '../Bank';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import chargeTransferVisualizer from '../visualizers/transfers/chargeTransferVisualizer';
+import { MessageChannel } from '../../utils/types';
 
 export class ChargeTransfer extends ACashTransfer {
-    constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy) {
+    constructor(channel: MessageChannel, sender: BankUserCopy, receiver: BankUserCopy) {
         super(channel, sender, receiver, TransferType.CHARGE, receiver);
     }
 
