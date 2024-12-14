@@ -1,4 +1,4 @@
-import { Colors, Message, ReactionCollector, TextChannel } from 'discord.js';
+import { Collection, Colors, Message, MessageReaction, ReactionCollector, TextChannel } from 'discord.js';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { formatErrorText, getUserResponse } from '../../utils/utils';
 import { roundNumberTwoDecimals } from '../../utils/numberUtils';
@@ -11,6 +11,7 @@ import { TransferType } from '../types';
 import { bankUserLookup } from '../BankUserLookup';
 import logger from '../../utils/Logger';
 import Logger from '../../utils/Logger';
+import { processManager } from '../../utils/ProcessManager';
 
 const MAX_RETRY_COUNT = 3;
 const USER_SELECT_REACTIONS = [reactions.ONE, reactions.TWO];
@@ -284,7 +285,7 @@ export abstract class Transfer {
         actionName = 'transfer',
         eventData = new Map<EventDataNames, any>()
     ): Promise<{ recipientID?: string; recipientName?: string } | undefined> {
-        return new Promise(async (resolve) => {
+        return new Promise(async (resolve, reject) => {
             let recipientID = message.mentions?.users.first()?.id;
             if (!name && !recipientID) {
                 let historyList: string[] | undefined = eventData.get(EventDataNames.AUTHOR_INTERACT_HISTORY);
@@ -299,13 +300,12 @@ export abstract class Transfer {
 
                 eventData.set(EventDataNames.INITIAL_TRANSFER_MSG, initialTransferMsg);
                 const reactList = [];
-                if (historyList) {
-                    if (historyList.length > 0) {
-                        reactList.push(reactions.ONE);
-                        if (historyList.length > 1) {
-                            reactList.push(reactions.TWO);
-                        }
+                if (historyList && historyList.length) {
+                    reactList.push(reactions.ONE);
+                    if (historyList.length > 1) {
+                        reactList.push(reactions.TWO);
                     }
+                    reactList.push(reactions.X);
                 }
                 let collector: ReactionCollector | undefined;
                 let isStopped = false;
@@ -321,15 +321,32 @@ export abstract class Transfer {
                                     return;
                                 if (react.emoji.name === reactions.ONE) {
                                     resolve({ recipientID: historyList[historyList.length - 1] });
+                                    processManager.removeUserResponseLock(
+                                        message.author.id,
+                                        message.channel.id.toString()
+                                    );
                                     if (collector) collector.stop('reacted');
                                     return;
                                 } else if (react.emoji.name === reactions.TWO && historyList.length > 1) {
                                     if (collector) collector.stop('reacted');
                                     resolve({ recipientID: historyList[historyList.length - 2] });
+                                    processManager.removeUserResponseLock(
+                                        message.author.id,
+                                        message.channel.id.toString()
+                                    );
+                                    return;
+                                } else if (react.emoji.name === reactions.X) {
+                                    (<TextChannel>message.channel).send('*cancelled*');
+                                    resolve(undefined);
+                                    processManager.removeUserResponseLock(
+                                        message.author.id,
+                                        message.channel.id.toString()
+                                    );
+                                    if (collector) collector.stop('user cancelled');
                                     return;
                                 }
                             },
-                            (collected, reason) => {
+                            (_collected, reason) => {
                                 if (reason != 'messageDelete') {
                                     initialTransferMsg.reactions
                                         .removeAll()
