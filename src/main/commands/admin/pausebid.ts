@@ -1,11 +1,12 @@
 import { MessageEventLocal } from '../../utils/types';
 import { bidManager } from '../../finance/bid/BidManager';
+import { TextChannel } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
     const wasSuccessful = bidManager.pauseBidEvent(event.message.channel.id);
     if (wasSuccessful) {
-        await event.message.channel.send('Bid paused');
+        await (<TextChannel>event.message.channel).send('Bid paused');
     } else {
-        await event.message.channel.send('No bid found');
+        await (<TextChannel>event.message.channel).send('No bid found');
     }
 };

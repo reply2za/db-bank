@@ -2,7 +2,7 @@ import { MessageEventLocal } from '../../utils/types';
 import { bank } from '../../finance/Bank';
 import { bot, config } from '../../utils/constants/constants';
 import { localStorage } from '../../storage/LocalStorage';
-import { Message } from 'discord.js';
+import { Message, TextChannel } from 'discord.js';
 import fs from 'fs';
 import axios from 'axios';
 let previousData: string;
@@ -10,7 +10,7 @@ exports.run = async (event: MessageEventLocal) => {
     if (event.args.length) {
         if (event.args[0].toLowerCase() === 'previous') {
             if (previousData) {
-                event.message.channel.send(previousData);
+                (<TextChannel>event.message.channel).send(previousData);
             }
         }
         return;
@@ -24,9 +24,9 @@ exports.run = async (event: MessageEventLocal) => {
         const data = localStorage.retrieveLocalData();
         await localStorage.saveData(data);
         await bank.deserializeAndLoadData(data, bot.users);
-        event.message.channel.send('*contents changed*');
+        (<TextChannel>event.message.channel).send('*contents changed*');
     } else {
-        event.message.channel.send('*there was an issue processing the data*');
+        (<TextChannel>event.message.channel).send('*there was an issue processing the data*');
     }
 };
 

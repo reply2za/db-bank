@@ -1,4 +1,4 @@
-import { GuildTextBasedChannel, If, Message, TextBasedChannel } from 'discord.js';
+import { GuildTextBasedChannel, If, Message, TextBasedChannel, TextChannel } from 'discord.js';
 import { config } from './constants/constants';
 import { processManager } from './ProcessManager';
 import { TransferType } from '../finance/types';
@@ -10,7 +10,7 @@ export async function getUserResponse(
 ): Promise<Message | undefined> {
     processManager.setUserResponseLock(userId, channel.id.toString());
     try {
-        const messages = await channel.awaitMessages({
+        const messages = await (<TextChannel>channel).awaitMessages({
             filter: (m: Message) => userId === m.author.id,
             time: 60000,
             max: 1,
@@ -64,17 +64,16 @@ export function getCurrentMoment(): moment.Moment {
         } else {
             if (dateNum >= 3) {
                 return getMomentEST();
-            } 
+            }
         }
         return getMomentEDT();
     }
 }
 
 export function getMomentEDT() {
-    return (moment(Date.now()).utcOffset('-0400'));
+    return moment(Date.now()).utcOffset('-0400');
 }
 
 export function getMomentEST() {
-    return (moment(Date.now()).utcOffset('-0500'));
+    return moment(Date.now()).utcOffset('-0500');
 }
-

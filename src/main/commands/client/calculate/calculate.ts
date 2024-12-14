@@ -2,6 +2,7 @@ import { MessageEventLocal } from '../../../utils/types';
 import { calculateTotal } from '../../../finance/utils';
 import { formatErrorText, getUserResponse } from '../../../utils/utils';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
+import { TextChannel } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
     let totalTxt = event.args.join(' ');
@@ -13,16 +14,16 @@ exports.run = async (event: MessageEventLocal) => {
         if (response && response.content) {
             totalTxt = response.content;
         } else {
-            event.message.channel.send('*cancelled calc command*');
+            (<TextChannel>event.message.channel).send('*cancelled calc command*');
             return;
         }
     }
     totalTxt = calculateTotal(totalTxt);
     const total = Number(totalTxt);
     if (!Number.isFinite(total)) {
-        event.message.channel.send(formatErrorText('invalid expression'));
+        (<TextChannel>event.message.channel).send(formatErrorText('invalid expression'));
         return;
     }
-    event.message.channel.send(`total: \`${totalTxt}\``);
+    (<TextChannel>event.message.channel).send(`total: \`${totalTxt}\``);
     return total;
 };

@@ -3,7 +3,7 @@ import { MessageEventLocal } from '../../utils/types';
 import { processManager } from '../../utils/ProcessManager';
 import { config, djsCommonUtils } from '../../utils/constants/constants';
 import reactions from '../../utils/constants/reactions';
-import { MessageReaction, User } from 'discord.js';
+import { MessageReaction, TextChannel, User } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
     if (!event.args[0]) {
@@ -24,7 +24,7 @@ function getBootStatus() {
 }
 
 async function displayStatus(event: MessageEventLocal) {
-    const sentMsg = await event.message.channel.send(getBootStatus());
+    const sentMsg = await (<TextChannel>event.message.channel).send(getBootStatus());
     await djsCommonUtils.attachReactionsToMessage(
         sentMsg,
         [event.bankUser.getUserId()],

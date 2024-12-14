@@ -12,7 +12,7 @@ import { IOUTicket } from '../../../finance/IOUTicket';
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.getUserId());
     if (ious.length < 1) {
-        event.message.channel.send('*no redeemable IOUs found*');
+        (<TextChannel>event.message.channel).send('*no redeemable IOUs found*');
         return;
     }
     const sentIOUEmbed =
@@ -24,7 +24,7 @@ exports.run = async (event: MessageEventLocal) => {
     do {
         maxRetries--;
         if (maxRetries < 0) {
-            event.message.channel.send('*cancelled redeem request*');
+            (<TextChannel>event.message.channel).send('*cancelled redeem request*');
             return;
         }
         if (!iou) {
@@ -34,12 +34,12 @@ exports.run = async (event: MessageEventLocal) => {
             const iouIndexResponse = (await getUserResponse(event.message.channel, event.bankUser.getUserId()))
                 ?.content;
             if (!iouIndexResponse || iouIndexResponse.toLowerCase() === 'q') {
-                event.message.channel.send('*cancelled*');
+                (<TextChannel>event.message.channel).send('*cancelled*');
                 return;
             }
             const iouIndex = Math.floor(Number(iouIndexResponse)) - 1;
             if (!Number.isFinite(iouIndex) || !ious[iouIndex]) {
-                event.message.channel.send(formatErrorText('invalid IOU number'));
+                (<TextChannel>event.message.channel).send(formatErrorText('invalid IOU number'));
                 continue;
             }
             await iouVisualizer.getRedeemableIOUEmbed(ious, iouIndex).edit(sentIOUEmbed);
@@ -57,7 +57,7 @@ exports.run = async (event: MessageEventLocal) => {
         if (quantity === undefined) return;
     } while (!quantity || quantity < 1);
     if (!iou) {
-        event.message.channel.send(formatErrorText('could not find IOU'));
+        (<TextChannel>event.message.channel).send(formatErrorText('could not find IOU'));
         return;
     }
     await new EmbedBuilderLocal()
@@ -67,7 +67,7 @@ exports.run = async (event: MessageEventLocal) => {
 
     const reasonRsp = (await getUserResponse(event.message.channel, event.bankUser.getUserId()))?.content;
     if (!reasonRsp || reasonRsp.toLowerCase() === 'q') {
-        event.message.channel.send('*cancelled*');
+        (<TextChannel>event.message.channel).send('*cancelled*');
         return;
     }
     let redemptionComment = reasonRsp;
@@ -112,10 +112,10 @@ exports.run = async (event: MessageEventLocal) => {
                 Logger.errorLog(new Error(`could not find iou sender with the id ${iou.sender.id}`));
             }
         } else {
-            event.message.channel.send(formatErrorText('could not complete redemption'));
+            (<TextChannel>event.message.channel).send(formatErrorText('could not complete redemption'));
         }
     } else {
-        event.message.channel.send('*cancelled*');
+        (<TextChannel>event.message.channel).send('*cancelled*');
     }
 };
 

@@ -1,5 +1,5 @@
 import { bot, config, djsCommonUtils } from './constants/constants';
-import { Message, MessageReaction, ReactionCollector, TextChannel } from 'discord.js';
+import { Message, MessageManager, MessageReaction, ReactionCollector, TextChannel } from 'discord.js';
 import reactions from './constants/reactions';
 import { execSync } from 'child_process';
 import logger from './Logger';
@@ -201,11 +201,11 @@ class ProcessManager {
             const callback = (reaction: MessageReaction) => {
                 if (reaction.emoji.name === reactions.CHECK) {
                     hardwareTagMsg.edit(config.hardwareTag);
-                    statusMsg.channel.send(processNameChangedTxt);
+                    (<TextChannel>statusMsg.channel).send(processNameChangedTxt);
                     responseReceived = true;
                 } else if (reaction.emoji.name === reactions.X) {
                     this.setActive(false);
-                    statusMsg.channel.send(`process name will remain as ${hardwareTagMsg.content}`);
+                    (<TextChannel>statusMsg.channel).send(`process name will remain as ${hardwareTagMsg.content}`);
                     responseReceived = true;
                 }
                 if (collector) collector.stop();
@@ -214,7 +214,7 @@ class ProcessManager {
                 statusMsg.reactions.removeAll().catch((e) => logger.debugLog(e));
                 if (!responseReceived) {
                     await hardwareTagMsg.edit(config.hardwareTag);
-                    statusMsg.channel.send(processNameChangedTxt);
+                    await (<TextChannel>statusMsg.channel).send(processNameChangedTxt);
                 }
             };
             collector = await djsCommonUtils.attachReactionsToMessage(

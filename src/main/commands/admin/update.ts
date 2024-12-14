@@ -17,7 +17,7 @@ exports.run = async (event: MessageEventLocal) => {
                 }
             }
             if (bidsAreInProgress) {
-                await event.message.channel.send(
+                await (<TextChannel>event.message.channel).send(
                     `Bids are in progress. Use \`${event.prefix}update force\` to force an update`
                 );
                 return;

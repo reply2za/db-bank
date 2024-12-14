@@ -63,11 +63,11 @@ export abstract class Transfer {
             recipientDetails.recipientName
         );
         if (typeof bankUserOrErr === 'string') {
-            message.channel.send(bankUserOrErr);
+            (<TextChannel>message.channel).send(bankUserOrErr);
             return;
         }
         if (bankUserOrErr.getUserId() === message.author.id && !config.adminIDs.includes(`${message.author.id} `)) {
-            message.channel.send(`you cannot make a ${actionName} to yourself`);
+            (<TextChannel>message.channel).send(`you cannot make a ${actionName} to yourself`);
         }
         return bankUserOrErr;
     }
@@ -119,7 +119,7 @@ export abstract class Transfer {
         let newTransfer;
         if (comment === undefined) {
             const reactionCollector = await this.attachUndoReaction(embedMsg, async () => {
-                await this.channel.send('*resetting amount*');
+                await (<TextChannel>this.channel).send('*resetting amount*');
                 newTransfer = this.processTransfer();
                 if (this.commentMsg && this.commentMsg.deletable) await this.commentMsg.delete();
                 if (embedMsg.deletable) await embedMsg.delete();
@@ -139,7 +139,7 @@ export abstract class Transfer {
         await embedMsg.delete();
         embedMsg = await transferEmbed.send(this.channel);
         const reactionCollector = await this.attachUndoReaction(embedMsg, async () => {
-            await this.channel.send('*resetting comment*');
+            await (<TextChannel>this.channel).send('*resetting comment*');
             newTransfer = this.processTransfer(transferAmount);
             if (this.commentMsg && this.commentMsg.deletable) await this.commentMsg.delete();
             if (embedMsg.deletable) await embedMsg.delete();
@@ -159,7 +159,7 @@ export abstract class Transfer {
                         this.channel
                     );
                 } catch (e: any) {
-                    await this.channel.send(formatErrorText(e.message));
+                    await (<TextChannel>this.channel).send(formatErrorText(e.message));
                     await logger.debugLog(e);
                 }
                 await embedMsg.react(reactions.CHECK);
@@ -202,7 +202,7 @@ export abstract class Transfer {
             .setFooter('or `q` to quit')
             .send(this.channel);
         const response = await getUserResponse(this.channel, this.responder.getUserId());
-        if (!response) this.channel.send('*no response provided*');
+        if (!response) (<TextChannel>this.channel).send('*no response provided*');
         if (enterAmountMsg.deletable) await enterAmountMsg.delete();
         return response?.content;
     }
@@ -227,16 +227,18 @@ export abstract class Transfer {
     }
 
     protected async cancelResponse(reason = ''): Promise<void> {
-        await this.channel.send(`*cancelled ${this.transferType}${reason ? `: ${reason}` : ''}*`);
+        await (<TextChannel>this.channel).send(`*cancelled ${this.transferType}${reason ? `: ${reason}` : ''}*`);
     }
 
     protected async validateAmount(transferAmount: number, channel: MessageChannel): Promise<boolean> {
         if (!Number.isFinite(transferAmount)) {
-            await channel.send(formatErrorText('invalid input'));
+            await (<TextChannel>channel).send(formatErrorText('invalid input'));
             return false;
         }
         if (transferAmount < this.MINIMUM_TRANSFER_AMT) {
-            await channel.send(formatErrorText(`amount must be greater than or equal to ${this.MINIMUM_TRANSFER_AMT}`));
+            await (<TextChannel>channel).send(
+                formatErrorText(`amount must be greater than or equal to ${this.MINIMUM_TRANSFER_AMT}`)
+            );
             return false;
         }
         return true;
@@ -357,7 +359,7 @@ export abstract class Transfer {
                 }
                 eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
                 if (!newMsg) {
-                    message.channel.send('*no response provided*');
+                    (<TextChannel>message.channel).send('*no response provided*');
                     resolve(undefined);
                     return;
                 }
@@ -365,14 +367,14 @@ export abstract class Transfer {
                 if (!recipientID) {
                     if (newMsg.content) {
                         if (newMsg.content.toLowerCase() === 'q') {
-                            message.channel.send('*cancelled*');
+                            (<TextChannel>message.channel).send('*cancelled*');
                             resolve(undefined);
                             return;
                         } else {
                             name = newMsg.content;
                         }
                     } else {
-                        message.channel.send(`must specify user to ${actionName} to`);
+                        (<TextChannel>message.channel).send(`must specify user to ${actionName} to`);
                         resolve(undefined);
                         return;
                     }

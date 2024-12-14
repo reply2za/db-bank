@@ -28,7 +28,7 @@ export class CreditTransfer extends ACashTransfer {
     protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
         if (!(await super.validateAmount(transferAmount, channel))) return false;
         if (transferAmount > this.#MAX_CREDIT_AMT) {
-            this.channel.send(
+            (<TextChannel>this.channel).send(
                 `\`You can only credit a maximum of $${this.#MAX_CREDIT_AMT.toLocaleString()} at a time.\``
             );
             return false;

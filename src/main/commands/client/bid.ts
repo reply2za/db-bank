@@ -15,7 +15,7 @@ function getTvBidDescription(date: Date): string {
 }
 exports.run = async (event: MessageEventLocal) => {
     const isMaxBid: Boolean = event.data.get(EventDataNames.IS_MAX_BID) === 'true';
-    let bidChannelId: string; 
+    let bidChannelId: string;
     if (isMaxBid) {
         bidChannelId = config.TV_BID_CH;
     } else {
@@ -24,8 +24,8 @@ exports.run = async (event: MessageEventLocal) => {
     let bidEvent = bidManager.getBidEvent(bidChannelId);
     const currentDate = new Date();
     if (bidChannelId === config.TV_BID_CH) {
-        if (!isMaxBid && (currentDate.getHours() === 0 && currentDate.getMinutes() === 0)) {
-            event.message.channel.send('Bidding for the next day will start at 12:01am');
+        if (!isMaxBid && currentDate.getHours() === 0 && currentDate.getMinutes() === 0) {
+            (<TextChannel>event.message.channel).send('Bidding for the next day will start at 12:01am');
             return;
         }
         if (!bidEvent || (bidEvent && bidEvent.hasEnded())) {
@@ -36,7 +36,7 @@ exports.run = async (event: MessageEventLocal) => {
             bidEvent.setDailyBidConfig(DayOfTheWeek.Saturday, weekendBidAmounts);
             const addedBidEvent = bidManager.addBidEvent(bidChannelId, bidEvent);
             if (!addedBidEvent) {
-                event.message.channel.send('error creating new bid event');
+                (<TextChannel>event.message.channel).send('error creating new bid event');
                 return;
             }
             await bidEvent.startBidding();
@@ -45,12 +45,17 @@ exports.run = async (event: MessageEventLocal) => {
     if (bidEvent) {
         if (!event.args[0]) {
             const endDate = bidEvent.getEndDateTime();
-            if (bidEvent.getCurrentBidAmount() > 0 && bidEvent.getHighestBidder() && endDate && endDate.isBefore(currentDate)) {
-                event.message.channel.send(
+            if (
+                bidEvent.getCurrentBidAmount() > 0 &&
+                bidEvent.getHighestBidder() &&
+                endDate &&
+                endDate.isBefore(currentDate)
+            ) {
+                (<TextChannel>event.message.channel).send(
                     `Current bid: $${bidEvent.getCurrentBidAmount()} by ${bidEvent.getHighestBidder()?.getUsername()}`
                 );
             } else {
-                event.message.channel.send('*There are no bids as of yet*');
+                (<TextChannel>event.message.channel).send('*There are no bids as of yet*');
             }
             return;
         }
@@ -62,21 +67,21 @@ exports.run = async (event: MessageEventLocal) => {
             } else {
                 const highestBidderId = bidEvent.getHighestBidder()?.getUserId();
                 if (highestBidderId && highestBidderId !== event.bankUser.getUserId()) {
-                    event.bankUser.getDiscordUser().send("your max bid is less than the current bid!")
+                    event.bankUser.getDiscordUser().send('your max bid is less than the current bid!');
                 } else {
-                    event.bankUser.getDiscordUser().send("there was an error sending your max bid")
+                    event.bankUser.getDiscordUser().send('there was an error sending your max bid');
                 }
                 return;
             }
         } else {
             bid = Number(event.args[0].replace(/[$¢]/g, ''));
             if (isNaN(bid)) {
-                event.message.channel.send('Bid must be a number');
+                (<TextChannel>event.message.channel).send('Bid must be a number');
                 return;
             }
         }
         await bidEvent.addBid(event.bankUser, bid);
     } else {
-        event.message.channel.send('You can only bid in a designated bidding channel');
+        (<TextChannel>event.message.channel).send('You can only bid in a designated bidding channel');
     }
 };

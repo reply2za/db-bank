@@ -9,21 +9,21 @@ const SENT_MSG_TXT = 'updating...';
 
 exports.run = async (event: MessageEventLocal) => {
     if (!event.args[1]) {
-        await event.message.channel.send('*expected arguments author-id & num-to-delete*');
+        await (<TextChannel>event.message.channel).send('*expected arguments author-id & num-to-delete*');
         return;
     }
     const msg = await bankUserLookup.getUser(event.args[0])?.getDiscordUser()?.send(SENT_MSG_TXT);
     if (!msg) {
-        await event.message.channel.send('*could not find author*');
+        await (<TextChannel>event.message.channel).send('*could not find author*');
         return;
     }
     const numToDelete = parseInt(event.args[1]);
     if (!numToDelete || numToDelete > NUM_TO_FETCH) {
-        await event.message.channel.send('*invalid number*');
+        await (<TextChannel>event.message.channel).send('*invalid number*');
         return;
     }
     const numRemoved = await removeDBMessage(msg.channel.id, 1, true);
-    event.message.channel.send(`deleted ${numRemoved} additional messages`);
+    (<TextChannel>event.message.channel).send(`deleted ${numRemoved} additional messages`);
 };
 
 async function removeDBMessage(channelID: string, deleteNum = 1, onlyDB = true): Promise<number> {

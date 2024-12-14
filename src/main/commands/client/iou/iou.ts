@@ -2,14 +2,14 @@ import { EventDataNames, MessageEventLocal } from '../../../utils/types';
 import { bank } from '../../../finance/Bank';
 import reactions from '../../../utils/constants/reactions';
 import { commandHandler } from '../../../handlers/CommandHandler';
-import { MessageReaction } from 'discord.js';
+import { MessageReaction, TextChannel } from 'discord.js';
 import iouVisualizer from '../../../finance/visualizers/iouVisualizer';
 import { djsCommonUtils } from '../../../utils/constants/constants';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.getUserId());
     if (ious.length < 1) {
-        event.message.channel.send('*no redeemable IOUs found*');
+        (<TextChannel>event.message.channel).send('*no redeemable IOUs found*');
         return;
     }
     const sentIOUs = bank.getUserSentIOUs(event.bankUser.getUserId());

@@ -41,7 +41,7 @@ export class MonetaryTransfer extends ACashTransfer {
     protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
         if (!(await super.validateAmount(transferAmount, channel))) return false;
         if (this.sender.getBalance() < transferAmount) {
-            this.channel.send(formatErrorText('balance is too low'));
+            (<TextChannel>this.channel).send(formatErrorText('balance is too low'));
             return false;
         }
         return true;

@@ -19,7 +19,7 @@ exports.run = async (event: MessageEventLocal) => {
     if (event.args[0]) {
         if (event.args[0].toLowerCase() === 'default') isDefaultDateTime = true;
         if (event.args[0].toLowerCase() === 'q') {
-            await event.message.channel.send('*cancelled*');
+            await (<TextChannel>event.message.channel).send('*cancelled*');
             return;
         }
         if (event.args[0].includes(':')) {
@@ -37,7 +37,7 @@ exports.run = async (event: MessageEventLocal) => {
             .send(event.message.channel);
         const resp = (await getUserResponse(event.message.channel, event.message.author.id))?.content.split(' ');
         if (!resp) {
-            await event.message.channel.send('cancelled: You must specify a date and time');
+            await (<TextChannel>event.message.channel).send('cancelled: You must specify a date and time');
             return;
         }
         if (resp.length === 1) {
@@ -47,10 +47,10 @@ exports.run = async (event: MessageEventLocal) => {
             } else if (resp[0].toLowerCase() === 'default') {
                 isDefaultDateTime = true;
             } else if (resp[0].toLowerCase() === 'q') {
-                await event.message.channel.send('*cancelled*');
+                await (<TextChannel>event.message.channel).send('*cancelled*');
                 return;
             } else {
-                await event.message.channel.send('cancelled: You must specify a time');
+                await (<TextChannel>event.message.channel).send('cancelled: You must specify a time');
                 return;
             }
         } else {
@@ -63,7 +63,7 @@ exports.run = async (event: MessageEventLocal) => {
         .send(event.message.channel);
     const description = (await getUserResponse(event.message.channel, event.message.author.id))?.content;
     if (!description || description.toLowerCase() === 'q') {
-        await event.message.channel.send('cancelled: You must specify a description');
+        await (<TextChannel>event.message.channel).send('cancelled: You must specify a description');
         return;
     }
     let endDate;
@@ -71,7 +71,7 @@ exports.run = async (event: MessageEventLocal) => {
         endDate = BidEvent.defaultDateTime();
     } else {
         if (!day || !time) {
-            await event.message.channel.send(`You must specify a date (${day}) and time (${time})`);
+            await (<TextChannel>event.message.channel).send(`You must specify a date (${day}) and time (${time})`);
             return;
         }
         endDate = moment(day);
@@ -85,14 +85,14 @@ exports.run = async (event: MessageEventLocal) => {
         endDate = endDate.set({
             hour: parseInt(timeArr[0]),
             minute: parseInt(timeArr[1]),
-            second: parseInt(timeArr[2])
+            second: parseInt(timeArr[2]),
         });
         if (isNaN(endDate.valueOf())) {
-            await event.message.channel.send('Invalid date');
+            await (<TextChannel>event.message.channel).send('Invalid date');
             return;
         }
         if (endDate.isBefore(getCurrentMoment())) {
-            await event.message.channel.send('Date must be in the future');
+            await (<TextChannel>event.message.channel).send('Date must be in the future');
             return;
         }
     }
