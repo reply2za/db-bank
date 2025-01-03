@@ -10,5 +10,3 @@ const initiateTransferRequest = TransferFactory.get(IOUTransfer, (event, otherUs
 exports.run = async (event: MessageEventLocal) => {
     await initiateTransferRequest(event);
 };
-
-export default exports;

@@ -7,12 +7,11 @@ import { EventDataNames, MessageEventLocal } from '../../../utils/types';
 import Logger from '../../../utils/Logger';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 import { Colors, TextChannel } from 'discord.js';
-import { IOUTicket } from '../../../finance/IOUTicket';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.getUserId());
     if (ious.length < 1) {
-        (<TextChannel>event.message.channel).send('*no redeemable IOUs found*');
+        await (<TextChannel>event.message.channel).send('*no redeemable IOUs found*');
         return;
     }
     const sentIOUEmbed =
@@ -24,7 +23,7 @@ exports.run = async (event: MessageEventLocal) => {
     do {
         maxRetries--;
         if (maxRetries < 0) {
-            (<TextChannel>event.message.channel).send('*cancelled redeem request*');
+            await (<TextChannel>event.message.channel).send('*cancelled redeem request*');
             return;
         }
         if (!iou) {
@@ -109,13 +108,13 @@ exports.run = async (event: MessageEventLocal) => {
                         `----------------------------------------`
                 );
             } else {
-                Logger.errorLog(new Error(`could not find iou sender with the id ${iou.sender.id}`));
+                await Logger.errorLog(new Error(`could not find iou sender with the id ${iou.sender.id}`));
             }
         } else {
-            (<TextChannel>event.message.channel).send(formatErrorText('could not complete redemption'));
+            await (<TextChannel>event.message.channel).send(formatErrorText('could not complete redemption'));
         }
     } else {
-        (<TextChannel>event.message.channel).send('*cancelled*');
+        await (<TextChannel>event.message.channel).send('*cancelled*');
     }
 };
 

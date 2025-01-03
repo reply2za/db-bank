@@ -228,7 +228,15 @@ export class Bank {
         }
         for (let iou of parsedData.bank.ious) {
             this.#iOUList.push(
-                new IOUTicket(iou.id, iou.sender, iou.receiver, iou.date, iou.expirationDate, iou.comment, iou.quantity)
+                new IOUTicket(
+                    iou.id,
+                    iou.sender,
+                    iou.receiver,
+                    iou.date,
+                    iou.expDate ?? iou.expirationDate,
+                    iou.comment,
+                    iou.quantity
+                )
             );
         }
     }
