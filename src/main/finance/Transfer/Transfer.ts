@@ -137,7 +137,7 @@ export abstract class Transfer {
                 transferEmbed = this.getTransferEmbed(transferAmount, comment);
             }
         }
-        await embedMsg.delete();
+        embedMsg.deletable && (await embedMsg.delete());
         embedMsg = await transferEmbed.send(this.channel);
         const reactionCollector = await this.attachUndoReaction(embedMsg, async () => {
             await (<TextChannel>this.channel).send('*resetting comment*');
@@ -353,7 +353,7 @@ export abstract class Transfer {
                                         .catch((e) => logger.debugLog(e, 'initial_message_reactions_remove_error'));
                                     if (reason === 'reacted') {
                                         eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
-                                        initialTransferMsg.delete();
+                                        initialTransferMsg.deletable && initialTransferMsg.delete();
                                     }
                                 }
                             },
