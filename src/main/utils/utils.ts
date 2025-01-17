@@ -17,8 +17,6 @@ export async function getUserResponse(
             errors: ['time'],
         });
         return messages.first();
-    } catch {
-        // if the user doesn't respond in time
     } finally {
         processManager.removeUserResponseLock(userId, channel.id.toString());
     }
