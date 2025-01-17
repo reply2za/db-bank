@@ -17,6 +17,8 @@ export async function getUserResponse(
             errors: ['time'],
         });
         return messages.first();
+    } catch (e: any) {
+        /* Intentionally left blank */
     } finally {
         processManager.removeUserResponseLock(userId, channel.id.toString());
     }
