@@ -7,8 +7,9 @@ import { v4 as uuidv4 } from 'uuid';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 import { processManager } from '../../../utils/ProcessManager';
 import { djsCommonUtils } from '../../../utils/constants/constants';
+import path from 'node:path';
 
-const run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal) => {
     const balanceMsg = await visualizerCommon.showBalance(
         event.channel,
         event.bankUser,
@@ -74,6 +75,8 @@ function reactionCallback(event: MessageEventLocal) {
 }
 
 module.exports = {
-    data: new SlashCommandBuilder().setName('bank').setDescription('View balance'),
-    run,
+    data: new SlashCommandBuilder()
+        .setName(path.basename(__filename).split('.')[0])
+        .setDescription('View your bank balance'),
+    run: exports.run,
 };

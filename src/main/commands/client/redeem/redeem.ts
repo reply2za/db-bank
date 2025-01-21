@@ -7,8 +7,9 @@ import { EventDataNames, MessageEventLocal } from '../../../utils/types';
 import Logger from '../../../utils/Logger';
 import logger from '../../../utils/Logger';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
-import { Colors, TextChannel } from 'discord.js';
+import { Colors, SlashCommandBuilder, TextChannel } from 'discord.js';
 import { RedemptionType } from '../../../finance/types';
+import path from 'node:path';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.getUserId());
@@ -161,3 +162,10 @@ async function getIOURedeemQty(channel: TextChannel, qty: number, userId: string
     }
     return quantity;
 }
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName(path.basename(__filename).split('.')[0])
+        .setDescription('Redeem one or multiple IOUs'),
+    run: exports.run,
+};

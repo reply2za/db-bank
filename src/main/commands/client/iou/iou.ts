@@ -2,9 +2,10 @@ import { EventDataNames, MessageEventLocal } from '../../../utils/types';
 import { bank } from '../../../finance/Bank';
 import reactions from '../../../utils/constants/reactions';
 import { commandHandler } from '../../../handlers/CommandHandler';
-import { MessageReaction, TextChannel } from 'discord.js';
+import { MessageReaction, SlashCommandBuilder, TextChannel } from 'discord.js';
 import iouVisualizer from '../../../finance/visualizers/iouVisualizer';
 import { djsCommonUtils } from '../../../utils/constants/constants';
+import path from 'node:path';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.getUserId());
@@ -42,4 +43,11 @@ exports.run = async (event: MessageEventLocal) => {
         reactionsList,
         reactionCallback
     );
+};
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName(path.basename(__filename).split('.')[0])
+        .setDescription('View IOUs in your possession'),
+    run: exports.run,
 };

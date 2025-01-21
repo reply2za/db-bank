@@ -1,7 +1,8 @@
 import { MessageEventLocal } from '../../../utils/types';
-import { TextChannel } from 'discord.js';
+import { SlashCommandBuilder, TextChannel } from 'discord.js';
 import { IOUTransfer } from '../../../finance/Transfer/IOUTransfer';
 import { TransferFactory } from '../../../factories/TransferFactory';
+import path from 'node:path';
 
 const initiateTransferRequest = TransferFactory.get(IOUTransfer, (event, otherUser) => {
     return new IOUTransfer(<TextChannel>event.channel, event.bankUser, otherUser);
@@ -9,4 +10,11 @@ const initiateTransferRequest = TransferFactory.get(IOUTransfer, (event, otherUs
 
 exports.run = async (event: MessageEventLocal) => {
     await initiateTransferRequest(event);
+};
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName(path.basename(__filename).split('.')[0])
+        .setDescription('Send IOUs to a user'),
+    run: exports.run,
 };

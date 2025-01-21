@@ -1,5 +1,8 @@
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { MessageEventLocal } from '../../utils/types';
+import { SlashCommandBuilder } from 'discord.js';
+import path from 'node:path';
+import { bot, config } from '../../utils/constants/constants';
 
 exports.run = async (event: MessageEventLocal) => {
     await new EmbedBuilderLocal()
@@ -20,4 +23,11 @@ exports.run = async (event: MessageEventLocal) => {
         )
         .setFooter('commands are not case sensitive')
         .send(event.channel);
+};
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName(path.basename(__filename).split('.')[0])
+        .setDescription(`Displays the help list`),
+    run: exports.run,
 };
