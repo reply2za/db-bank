@@ -6,14 +6,21 @@ import { bank } from '../Bank';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import chargeTransferVisualizer from '../visualizers/transfers/chargeTransferVisualizer';
 import { MessageChannel } from '../../utils/types';
+import { ABankUser } from '../BankUser/ABankUser';
 
 export class ChargeTransfer extends ACashTransfer {
     constructor(channel: MessageChannel, sender: BankUserCopy, receiver: BankUserCopy) {
         super(channel, sender, receiver, TransferType.CHARGE, receiver);
     }
 
-    static getUserToTransferTo(message: Message, name: string, eventData: any): Promise<BankUserCopy | undefined> {
-        return super.getUserToTransferTo(message, name, eventData, 'charge');
+    static getUserToTransferTo(
+        bankUser: ABankUser,
+        channel: MessageChannel,
+        name: string,
+        message: Message,
+        eventData: any
+    ): Promise<BankUserCopy | undefined> {
+        return super.getUserToTransferTo(bankUser, channel, name, message, eventData, 'charge');
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {

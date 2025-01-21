@@ -1,5 +1,5 @@
 import { MessageEventLocal } from '../../../main/utils/types';
-import { Message } from 'discord.js';
+import { Channel, Message, TextBasedChannel } from 'discord.js';
 import { commandHandler } from '../../../main/handlers/CommandHandler';
 import { bank } from '../../../main/finance/Bank';
 import { bankUserLookup } from '../../../main/finance/BankUserLookup';
@@ -20,6 +20,7 @@ describe('monetary transfer', () => {
         prefix: '!',
         bankUser: s1.bankUserJoe,
         data: new Map(),
+        channel: <TextBasedChannel>(<unknown>s1.messageFromJoe.channel),
     };
 
     test('transfer no response ', async () => {
@@ -81,6 +82,7 @@ describe('monetary transfer', () => {
         ];
         const prevBalanceJoe = bank.findUser('Joe')[0].getBalance();
         const prevBalanceAnna = bank.findUser('Anna')[0].getBalance();
+        if (!eventTransferJoe.message) throw new Error('Invalid state');
         eventTransferJoe.message.content = '!transfer';
         eventTransferJoe.args = [];
         await commandHandler.execute(eventTransferJoe);
@@ -113,6 +115,7 @@ describe('monetary transfer', () => {
             prefix: '!',
             bankUser: s1.bankUserAnna,
             data: new Map(),
+            channel: <TextBasedChannel>(<unknown>s1.channel1),
         });
         expect(s1.channel1.receivedMessages.length).toBeGreaterThan(0);
         expect(s1.channel1.receivedMessages[s1.channel1.receivedMessages.length - 1]).toBe('sent $50.01 to Joe');

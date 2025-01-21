@@ -5,7 +5,7 @@ import { MonetaryTransfer } from '../../../finance/Transfer/MonetaryTransfer';
 import { TransferFactory } from '../../../factories/TransferFactory';
 
 const initiateTransferRequest = TransferFactory.get(MonetaryTransfer, (event, otherUser) => {
-    return new MonetaryTransfer(<TextChannel>event.message.channel, event.bankUser, otherUser);
+    return new MonetaryTransfer(<TextChannel>event.channel, event.bankUser, otherUser);
 });
 
 exports.run = async (event: MessageEventLocal) => {

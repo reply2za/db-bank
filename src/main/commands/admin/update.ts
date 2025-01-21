@@ -12,12 +12,12 @@ exports.run = async (event: MessageEventLocal) => {
             let bidsAreInProgress = false;
             for (const bidEvent of bidEvents) {
                 if (!bidEvent.hasEnded() && bidEvent.getHighestBidder()) {
-                    await bidEvent.getBidEmbed().send(event.message.channel);
+                    await bidEvent.getBidEmbed().send(event.channel);
                     bidsAreInProgress = true;
                 }
             }
             if (bidsAreInProgress) {
-                await (<TextChannel>event.message.channel).send(
+                await (<TextChannel>event.channel).send(
                     `Bids are in progress. Use \`${event.prefix}update force\` to force an update`
                 );
                 return;
@@ -30,10 +30,10 @@ exports.run = async (event: MessageEventLocal) => {
     const processId = event.args[0];
     if (processId) {
         if (processId === process.pid.toString() || processId === 'all') {
-            await update(<TextChannel>event.message.channel);
+            await update(<TextChannel>event.channel);
         }
     } else if (processManager.isActive() && !config.isDevMode) {
-        await update(<TextChannel>event.message.channel);
+        await update(<TextChannel>event.channel);
     }
 };
 

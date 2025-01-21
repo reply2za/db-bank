@@ -7,9 +7,9 @@ import { getCurrentMoment, getUserResponse } from '../../utils/utils';
 import moment from 'moment';
 
 exports.run = async (event: MessageEventLocal) => {
-    let bidEvent = bidManager.getBidEvent(event.message.channel.id);
+    let bidEvent = bidManager.getBidEvent(event.channel.id);
     if (bidEvent && !bidEvent.hasEnded()) {
-        const msg = await bidEvent.getBidEmbed().send(event.message.channel);
+        const msg = await bidEvent.getBidEmbed().send(event.channel);
         await msg.reply('There is already a bid in progress');
         return;
     }
@@ -19,7 +19,7 @@ exports.run = async (event: MessageEventLocal) => {
     if (event.args[0]) {
         if (event.args[0].toLowerCase() === 'default') isDefaultDateTime = true;
         if (event.args[0].toLowerCase() === 'q') {
-            await (<TextChannel>event.message.channel).send('*cancelled*');
+            await (<TextChannel>event.channel).send('*cancelled*');
             return;
         }
         if (event.args[0].includes(':')) {
@@ -34,10 +34,10 @@ exports.run = async (event: MessageEventLocal) => {
     } else {
         await new EmbedBuilderLocal()
             .setDescription("What is the date and time of the bid? (YYYYMMDD HH:MM:SS) or 'default' [q=cancel]")
-            .send(event.message.channel);
-        const resp = (await getUserResponse(event.message.channel, event.message.author.id))?.content.split(' ');
+            .send(event.channel);
+        const resp = (await getUserResponse(event.channel, event.bankUser.id))?.content.split(' ');
         if (!resp) {
-            await (<TextChannel>event.message.channel).send('cancelled: You must specify a date and time');
+            await (<TextChannel>event.channel).send('cancelled: You must specify a date and time');
             return;
         }
         if (resp.length === 1) {
@@ -47,10 +47,10 @@ exports.run = async (event: MessageEventLocal) => {
             } else if (resp[0].toLowerCase() === 'default') {
                 isDefaultDateTime = true;
             } else if (resp[0].toLowerCase() === 'q') {
-                await (<TextChannel>event.message.channel).send('*cancelled*');
+                await (<TextChannel>event.channel).send('*cancelled*');
                 return;
             } else {
-                await (<TextChannel>event.message.channel).send('cancelled: You must specify a time');
+                await (<TextChannel>event.channel).send('cancelled: You must specify a time');
                 return;
             }
         } else {
@@ -58,12 +58,10 @@ exports.run = async (event: MessageEventLocal) => {
             time = resp[1];
         }
     }
-    await new EmbedBuilderLocal()
-        .setDescription('What is the description of the bid? [q=cancel]')
-        .send(event.message.channel);
-    const description = (await getUserResponse(event.message.channel, event.message.author.id))?.content;
+    await new EmbedBuilderLocal().setDescription('What is the description of the bid? [q=cancel]').send(event.channel);
+    const description = (await getUserResponse(event.channel, event.bankUser.id))?.content;
     if (!description || description.toLowerCase() === 'q') {
-        await (<TextChannel>event.message.channel).send('cancelled: You must specify a description');
+        await (<TextChannel>event.channel).send('cancelled: You must specify a description');
         return;
     }
     let endDate;
@@ -71,7 +69,7 @@ exports.run = async (event: MessageEventLocal) => {
         endDate = BidEvent.defaultDateTime();
     } else {
         if (!day || !time) {
-            await (<TextChannel>event.message.channel).send(`You must specify a date (${day}) and time (${time})`);
+            await (<TextChannel>event.channel).send(`You must specify a date (${day}) and time (${time})`);
             return;
         }
         endDate = moment(day);
@@ -88,11 +86,11 @@ exports.run = async (event: MessageEventLocal) => {
             second: parseInt(timeArr[2]),
         });
         if (isNaN(endDate.valueOf())) {
-            await (<TextChannel>event.message.channel).send('Invalid date');
+            await (<TextChannel>event.channel).send('Invalid date');
             return;
         }
         if (endDate.isBefore(getCurrentMoment())) {
-            await (<TextChannel>event.message.channel).send('Date must be in the future');
+            await (<TextChannel>event.channel).send('Date must be in the future');
             return;
         }
     }
@@ -101,9 +99,9 @@ exports.run = async (event: MessageEventLocal) => {
         bidEvent.setDescription(description);
         bidEvent.setEndDateTime(endDate);
     } else {
-        bidEvent = new BidEvent(<TextChannel>event.message.channel, description);
+        bidEvent = new BidEvent(<TextChannel>event.channel, description);
         bidEvent.setEndDateTime(endDate);
-        bidManager.addBidEvent(event.message.channel.id, bidEvent);
+        bidManager.addBidEvent(event.channel.id, bidEvent);
     }
     await bidEvent.startBidding();
 };

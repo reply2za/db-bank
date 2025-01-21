@@ -36,5 +36,5 @@ exports.run = async (event: MessageEventLocal) => {
             iou.quantity > 1 ? ` (x${iou.quantity})` : ''
         }\nreason: ${iou.comment}\n`;
     }
-    await new EmbedBuilderLocal().setTitle('Accounts').setDescription(finalString).send(event.message.channel);
+    await new EmbedBuilderLocal().setTitle('Accounts').setDescription(finalString).send(event.channel);
 };

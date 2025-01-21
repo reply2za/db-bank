@@ -3,10 +3,10 @@ import { bidManager } from '../../finance/bid/BidManager';
 import { TextChannel } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
-    const bidEvent = bidManager.getBidEvent(event.message.channel.id);
+    const bidEvent = bidManager.getBidEvent(event.channel.id);
     if (bidEvent && !bidEvent.hasEnded()) {
         await bidEvent.cancelBidding();
     } else {
-        (<TextChannel>event.message.channel).send('There is no active bid in this channel');
+        (<TextChannel>event.channel).send('There is no active bid in this channel');
     }
 };

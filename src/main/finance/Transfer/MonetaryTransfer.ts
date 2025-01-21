@@ -7,14 +7,22 @@ import { TransferType } from '../types';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import cashTransferVisualizer from '../visualizers/transfers/cashTransferVisualizer';
 import { formatErrorText } from '../../utils/utils';
+import { ABankUser } from '../BankUser/ABankUser';
+import { MessageChannel } from '../../utils/types';
 
 export class MonetaryTransfer extends ACashTransfer {
     constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy) {
         super(channel, sender, receiver);
     }
 
-    static getUserToTransferTo(message: Message, name: string, eventData: any): Promise<BankUserCopy | undefined> {
-        return super.getUserToTransferTo(message, name, eventData, 'transfer money');
+    static getUserToTransferTo(
+        bankUser: ABankUser,
+        channel: MessageChannel,
+        name: string,
+        message: Message,
+        eventData: any
+    ): Promise<BankUserCopy | undefined> {
+        return super.getUserToTransferTo(bankUser, channel, name, message, eventData, 'transfer money');
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {

@@ -15,10 +15,16 @@ class TransferFactory {
     ): (event: MessageEventLocal) => Promise<void> {
         if (typeof classType !== 'function') throw new Error('Invalid class type');
         if (!classBuilder) throw new Error('Invalid class type');
-        if (classType.getUserToTransferTo.length != 3) throw new Error('invalid getUserToTransferTo method');
+        if (classType.getUserToTransferTo.length != 5) throw new Error('invalid getUserToTransferTo method');
         return async (event: MessageEventLocal) => {
             event.data.set(EventDataNames.AUTHOR_INTERACT_HISTORY, event.bankUser.getHistory());
-            const otherUser = await classType.getUserToTransferTo(event.message, event.args.join(' '), event.data);
+            const otherUser = await classType.getUserToTransferTo(
+                event.bankUser,
+                event.channel,
+                event.args.join(' '),
+                event.message,
+                event.data
+            );
             if (!otherUser) return;
             await classBuilder(event, otherUser).processTransfer();
             return;

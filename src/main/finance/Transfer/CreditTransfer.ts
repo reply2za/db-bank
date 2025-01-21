@@ -5,6 +5,8 @@ import { TransferType } from '../types';
 import { bank } from '../Bank';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import cashTransferVisualizer from '../visualizers/transfers/cashTransferVisualizer';
+import { ABankUser } from '../BankUser/ABankUser';
+import { MessageChannel } from '../../utils/types';
 
 export class CreditTransfer extends ACashTransfer {
     #MAX_CREDIT_AMT = 100_000_000;
@@ -12,8 +14,14 @@ export class CreditTransfer extends ACashTransfer {
         super(channel, sender, receiver, TransferType.CREDIT, sender);
     }
 
-    static getUserToTransferTo(message: Message, name: string, eventData: any): Promise<BankUserCopy | undefined> {
-        return super.getUserToTransferTo(message, name, eventData, 'credit');
+    static getUserToTransferTo(
+        bankUser: ABankUser,
+        channel: MessageChannel,
+        name: string,
+        message: Message,
+        eventData: any
+    ): Promise<BankUserCopy | undefined> {
+        return super.getUserToTransferTo(bankUser, channel, name, message, eventData, 'credit');
     }
 
     protected async approvedTransactionAction(transferAmount: number, comment: string) {

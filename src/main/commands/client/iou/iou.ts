@@ -9,7 +9,7 @@ import { djsCommonUtils } from '../../../utils/constants/constants';
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.getUserId());
     if (ious.length < 1) {
-        (<TextChannel>event.message.channel).send('*no redeemable IOUs found*');
+        (<TextChannel>event.channel).send('*no redeemable IOUs found*');
         return;
     }
     const sentIOUs = bank.getUserSentIOUs(event.bankUser.getUserId());
@@ -20,7 +20,7 @@ exports.run = async (event: MessageEventLocal) => {
     const redeemableIOUMsg = await iouVisualizer
         .getRedeemableIOUEmbed(ious)
         .setFooter(`redeem IOUs ${sentIOUs.length ? '| view sent IOUs' : ''}`)
-        .send(event.message.channel);
+        .send(event.channel);
     let processingRedeemCmd = false;
     const reactionCallback = async (reaction: MessageReaction) => {
         switch (reaction.emoji.name) {

@@ -1,5 +1,5 @@
 import { MessageEventLocal } from '../../../main/utils/types';
-import { Message } from 'discord.js';
+import { Channel, Message, TextBasedChannel } from 'discord.js';
 import { Setup1 } from '../classes/Setup';
 import { commandHandler } from '../../../main/handlers/CommandHandler';
 
@@ -11,6 +11,7 @@ const calculateEvent: MessageEventLocal = {
     prefix: '!',
     bankUser: s1.bankUserJoe,
     data: new Map(),
+    channel: <TextBasedChannel>(<unknown>s1.messageFromJoe.channel),
 };
 
 const formatTotalResult = (total: number) => {

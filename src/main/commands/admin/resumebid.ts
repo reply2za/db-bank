@@ -4,23 +4,23 @@ import Logger from '../../utils/Logger';
 import { TextChannel } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
-    const bidEvent = bidManager.getBidEvent(event.message.channel.id);
+    const bidEvent = bidManager.getBidEvent(event.channel.id);
     if (bidEvent && !bidEvent.hasEnded()) {
-        const message = await bidEvent.getBidEmbed().send(event.message.channel);
+        const message = await bidEvent.getBidEmbed().send(event.channel);
         await message.reply('There is already a bid in progress');
         return;
     }
-    const wasSuccessful = await bidManager.resumeBidEvent(event.message.channel.id);
+    const wasSuccessful = await bidManager.resumeBidEvent(event.channel.id);
     if (wasSuccessful) {
-        const bidEvent = bidManager.getBidEvent(event.message.channel.id);
+        const bidEvent = bidManager.getBidEvent(event.channel.id);
         if (!bidEvent) {
-            (<TextChannel>event.message.channel).send('Bid resumed');
+            (<TextChannel>event.channel).send('Bid resumed');
             await Logger.errorLog('Bid resumed but no bid found');
             return;
         }
-        const message = await bidEvent.getBidEmbed().send(event.message.channel);
+        const message = await bidEvent.getBidEmbed().send(event.channel);
         await message.reply('Bid resumed');
     } else {
-        await (<TextChannel>event.message.channel).send('No bid found');
+        await (<TextChannel>event.channel).send('No bid found');
     }
 };

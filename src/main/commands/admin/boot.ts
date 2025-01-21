@@ -24,7 +24,7 @@ function getBootStatus() {
 }
 
 async function displayStatus(event: MessageEventLocal) {
-    const sentMsg = await (<TextChannel>event.message.channel).send(getBootStatus());
+    const sentMsg = await (<TextChannel>event.channel).send(getBootStatus());
     await djsCommonUtils.attachReactionsToMessage(
         sentMsg,
         [event.bankUser.getUserId()],

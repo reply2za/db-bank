@@ -1,5 +1,5 @@
 import { MessageEventLocal } from '../../../main/utils/types';
-import { Message } from 'discord.js';
+import { Channel, Message, TextBasedChannel } from 'discord.js';
 import { bank } from '../../../main/finance/Bank';
 import { bankUserLookup } from '../../../main/finance/BankUserLookup';
 import { MockMessage } from '../classes/MockMessage';
@@ -20,6 +20,7 @@ describe('monetary charge', () => {
         prefix: '!',
         bankUser: s1.bankUserJoe,
         data: new Map(),
+        channel: <TextBasedChannel>(<unknown>s1.messageFromJoe.channel),
     };
 
     test('charge no response ', async () => {
@@ -84,6 +85,7 @@ describe('monetary charge', () => {
             prefix: '!',
             bankUser: s1.bankUserAnna,
             data: new Map(),
+            channel: <TextBasedChannel>(<unknown>s1.messageFromAnna.channel),
         });
         expect(s1.channel1.receivedMessages.length).toBeGreaterThan(0);
         expect(s1.channel1.receivedMessages[s1.channel1.receivedMessages.length - 1]).toContain('charged Joe $50.01');

@@ -4,7 +4,7 @@ import { TextChannel } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
     console.log('shutting down...');
-    await (<TextChannel>event.message.channel).send('shutting down...');
+    await (<TextChannel>event.channel).send('shutting down...');
     try {
         execSync('pm2 delete db-bank');
     } catch (e) {}

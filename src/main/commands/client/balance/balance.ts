@@ -2,15 +2,15 @@ import { bank } from '../../../finance/Bank';
 import { EventDataNames, MessageEventLocal } from '../../../utils/types';
 import reactions from '../../../utils/constants/reactions';
 import { commandHandler } from '../../../handlers/CommandHandler';
-import { Message, MessageReaction } from 'discord.js';
+import { Message, MessageReaction, SlashCommandBuilder } from 'discord.js';
 import { v4 as uuidv4 } from 'uuid';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 import { processManager } from '../../../utils/ProcessManager';
 import { djsCommonUtils } from '../../../utils/constants/constants';
 
-exports.run = async (event: MessageEventLocal) => {
+const run = async (event: MessageEventLocal) => {
     const balanceMsg = await visualizerCommon.showBalance(
-        event.message.channel,
+        event.channel,
         event.bankUser,
         bank.getUserIOUs(event.bankUser.getUserId())
     );
@@ -49,7 +49,7 @@ function reactionCallback(event: MessageEventLocal) {
         if (transferMsg) {
             const activeTransferReq = event.data.get(EventDataNames.REACTION_TSFR_REQ);
             if (activeTransferReq?.cmdName !== cmdName) {
-                processManager.removeUserResponseLock(event.bankUser.getUserId(), event.message.channel.id);
+                processManager.removeUserResponseLock(event.bankUser.getUserId(), event.channel.id);
                 transferMsg.deletable && (await transferMsg.delete());
                 event.data.delete(EventDataNames.INITIAL_TRANSFER_MSG);
                 event.data.delete(EventDataNames.REACTION_TSFR_REQ);
@@ -72,3 +72,8 @@ function reactionCallback(event: MessageEventLocal) {
         }
     };
 }
+
+module.exports = {
+    data: new SlashCommandBuilder().setName('bank').setDescription('View balance'),
+    run,
+};

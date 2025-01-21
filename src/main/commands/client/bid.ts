@@ -19,13 +19,13 @@ exports.run = async (event: MessageEventLocal) => {
     if (isMaxBid) {
         bidChannelId = config.TV_BID_CH;
     } else {
-        bidChannelId = event.message.channel.id;
+        bidChannelId = event.channel.id;
     }
     let bidEvent = bidManager.getBidEvent(bidChannelId);
     const currentDate = new Date();
     if (bidChannelId === config.TV_BID_CH) {
         if (!isMaxBid && currentDate.getHours() === 0 && currentDate.getMinutes() === 0) {
-            (<TextChannel>event.message.channel).send('Bidding for the next day will start at 12:01am');
+            (<TextChannel>event.channel).send('Bidding for the next day will start at 12:01am');
             return;
         }
         if (!bidEvent || (bidEvent && bidEvent.hasEnded())) {
@@ -36,7 +36,7 @@ exports.run = async (event: MessageEventLocal) => {
             bidEvent.setDailyBidConfig(DayOfTheWeek.Saturday, weekendBidAmounts);
             const addedBidEvent = bidManager.addBidEvent(bidChannelId, bidEvent);
             if (!addedBidEvent) {
-                (<TextChannel>event.message.channel).send('error creating new bid event');
+                (<TextChannel>event.channel).send('error creating new bid event');
                 return;
             }
             await bidEvent.startBidding();
@@ -51,11 +51,11 @@ exports.run = async (event: MessageEventLocal) => {
                 endDate &&
                 endDate.isBefore(currentDate)
             ) {
-                (<TextChannel>event.message.channel).send(
+                (<TextChannel>event.channel).send(
                     `Current bid: $${bidEvent.getCurrentBidAmount()} by ${bidEvent.getHighestBidder()?.getUsername()}`
                 );
             } else {
-                (<TextChannel>event.message.channel).send('*There are no bids as of yet*');
+                (<TextChannel>event.channel).send('*There are no bids as of yet*');
             }
             return;
         }
@@ -76,12 +76,12 @@ exports.run = async (event: MessageEventLocal) => {
         } else {
             bid = Number(event.args[0].replace(/[$¢]/g, ''));
             if (isNaN(bid)) {
-                (<TextChannel>event.message.channel).send('Bid must be a number');
+                (<TextChannel>event.channel).send('Bid must be a number');
                 return;
             }
         }
         await bidEvent.addBid(event.bankUser, bid);
     } else {
-        (<TextChannel>event.message.channel).send('You can only bid in a designated bidding channel');
+        (<TextChannel>event.channel).send('You can only bid in a designated bidding channel');
     }
 };

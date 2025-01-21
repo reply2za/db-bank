@@ -1,10 +1,11 @@
 import { BankUserCopy } from '../finance/BankUser/BankUserCopy';
 import { MessageEventCore } from '@hoursofza/djs-common';
-import { Message, TextChannel, DMChannel, NewsChannel, PartialDMChannel, TextBasedChannel } from 'discord.js';
+import { Message, TextChannel, DMChannel, NewsChannel, PartialDMChannel, TextBasedChannel, Channel } from 'discord.js';
 
 export type MessageEventLocal = MessageEventCore<EventDataNames> & {
     // the bank author initiating the event
     bankUser: BankUserCopy;
+    channel: TextBasedChannel;
 };
 
 export enum EventDataNames {

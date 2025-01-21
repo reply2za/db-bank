@@ -6,8 +6,8 @@ import { TextChannel } from 'discord.js';
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserSentIOUs(event.bankUser.getUserId());
     if (ious.length < 1) {
-        (<TextChannel>event.message.channel).send('*no sent IOUs found*');
+        (<TextChannel>event.channel).send('*no sent IOUs found*');
         return;
     }
-    await iouVisualizer.getSentIOUEmbed(ious).send(event.message.channel);
+    await iouVisualizer.getSentIOUEmbed(ious).send(event.channel);
 };

@@ -5,6 +5,7 @@ import { bot, config } from './utils/constants/constants';
 import { bank } from './finance/Bank';
 import { localStorage } from './storage/LocalStorage';
 import { commandHandler } from './handlers/CommandHandler';
+import slashCommandHandler from './handlers/SlashCommandHandler';
 import { eventHandler } from './handlers/EventHandler';
 import logger from './utils/Logger';
 import { processManager } from './utils/ProcessManager';
@@ -37,6 +38,7 @@ async function main() {
     }
     commandHandler.loadAllCommands();
     eventHandler.loadAllEvents((eventName, listener) => bot.on(eventName, listener));
+    await slashCommandHandler();
     console.log(`prefix: ${config.prefix}`);
     const processNameMsg = await processManager.getLastProcessName();
     if (processNameMsg?.content === config.hardwareTag) {

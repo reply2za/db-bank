@@ -1,4 +1,13 @@
-import { Collection, Colors, Message, MessageReaction, ReactionCollector, TextChannel } from 'discord.js';
+import {
+    Channel,
+    Collection,
+    Colors,
+    Message,
+    MessageReaction,
+    ReactionCollector,
+    TextBasedChannel,
+    TextChannel,
+} from 'discord.js';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { formatErrorText, getUserResponse } from '../../utils/utils';
 import { roundNumberTwoDecimals } from '../../utils/numberUtils';
@@ -12,6 +21,8 @@ import { bankUserLookup } from '../BankUserLookup';
 import logger from '../../utils/Logger';
 import Logger from '../../utils/Logger';
 import { processManager } from '../../utils/ProcessManager';
+import { ABankUser } from '../BankUser/ABankUser';
+import { bank } from '../Bank';
 
 const MAX_RETRY_COUNT = 3;
 const USER_SELECT_REACTIONS = [reactions.ONE, reactions.TWO];
@@ -44,6 +55,8 @@ export abstract class Transfer {
 
     /**
      * Searches the message for a mention. If there is none then searches the name. If there is no name then prompts the author.
+     * @param bankUser The bank user
+     * @param channel The channel
      * @param message The author's message.
      * @param name Optional - A name of an author to search for.
      * @param actionName Optional - The name of the action that is being attempted.
@@ -51,24 +64,26 @@ export abstract class Transfer {
      * @returns The BankUser to transfer to or undefined if the request failed or was cancelled.
      */
     static async getUserToTransferTo(
-        message: Message,
+        bankUser: ABankUser,
+        channel: MessageChannel,
         name = '',
+        message?: Message,
         eventData = new Map<EventDataNames, any>(),
         actionName = 'transfer'
     ): Promise<BankUserCopy | undefined> {
         let recipientDetails;
-        recipientDetails = await Transfer.promptForRecipient(message, name, actionName, eventData);
+        recipientDetails = await Transfer.promptForRecipient(channel, bankUser, name, actionName, message, eventData);
         if (!recipientDetails) return;
         const bankUserOrErr = await Transfer.resolveBankUser(
             recipientDetails.recipientID,
             recipientDetails.recipientName
         );
         if (typeof bankUserOrErr === 'string') {
-            (<TextChannel>message.channel).send(bankUserOrErr);
+            (<TextChannel>channel).send(bankUserOrErr);
             return;
         }
-        if (bankUserOrErr.getUserId() === message.author.id && !config.adminIDs.includes(`${message.author.id} `)) {
-            (<TextChannel>message.channel).send(`you cannot make a ${actionName} to yourself`);
+        if (bankUserOrErr.getUserId() === bankUser.getUserId() && !config.adminIDs.includes(`${bankUser.id} `)) {
+            (<TextChannel>channel).send(`you cannot make a ${actionName} to yourself`);
         }
         return bankUserOrErr;
     }
@@ -280,13 +295,15 @@ export abstract class Transfer {
     ): Promise<void>;
 
     private static async promptForRecipient(
-        message: Message,
+        channel: TextBasedChannel,
+        bankUser: ABankUser,
         name = '',
         actionName = 'transfer',
+        message?: Message,
         eventData = new Map<EventDataNames, any>()
     ): Promise<{ recipientID?: string; recipientName?: string } | undefined> {
         return new Promise(async (resolve, reject) => {
-            let recipientID = message.mentions?.users.first()?.id;
+            let recipientID = message?.mentions?.users.first()?.id;
             if (!name && !recipientID) {
                 let historyList: string[] | undefined = eventData.get(EventDataNames.AUTHOR_INTERACT_HISTORY);
                 let historyMsg = this.printUserHistory(historyList);
@@ -296,7 +313,7 @@ export abstract class Transfer {
                             historyList?.length ? '(or select a reaction)' : ''
                         } to ${actionName} *['q' = cancel]*`
                     )
-                    .send(message.channel);
+                    .send(channel);
 
                 eventData.set(EventDataNames.INITIAL_TRANSFER_MSG, initialTransferMsg);
                 const reactList = [];
@@ -313,7 +330,7 @@ export abstract class Transfer {
                     djsCommonUtils
                         .attachReactionsToMessage(
                             initialTransferMsg,
-                            [message.author.id],
+                            [bankUser.getUserId()],
                             reactList,
                             (react) => {
                                 if (!historyList) return;
@@ -321,27 +338,18 @@ export abstract class Transfer {
                                     return;
                                 if (react.emoji.name === reactions.ONE) {
                                     resolve({ recipientID: historyList[historyList.length - 1] });
-                                    processManager.removeUserResponseLock(
-                                        message.author.id,
-                                        message.channel.id.toString()
-                                    );
+                                    processManager.removeUserResponseLock(bankUser.getUserId(), channel.id.toString());
                                     if (collector) collector.stop('reacted');
                                     return;
                                 } else if (react.emoji.name === reactions.TWO && historyList.length > 1) {
                                     if (collector) collector.stop('reacted');
                                     resolve({ recipientID: historyList[historyList.length - 2] });
-                                    processManager.removeUserResponseLock(
-                                        message.author.id,
-                                        message.channel.id.toString()
-                                    );
+                                    processManager.removeUserResponseLock(bankUser.getUserId(), channel.id.toString());
                                     return;
                                 } else if (react.emoji.name === reactions.X) {
-                                    (<TextChannel>message.channel).send('*cancelled*');
+                                    (<TextChannel>channel).send('*cancelled*');
                                     resolve(undefined);
-                                    processManager.removeUserResponseLock(
-                                        message.author.id,
-                                        message.channel.id.toString()
-                                    );
+                                    processManager.removeUserResponseLock(bankUser.getUserId(), channel.id.toString());
                                     if (collector) collector.stop('user cancelled');
                                     return;
                                 }
@@ -366,7 +374,7 @@ export abstract class Transfer {
                         })
                         .catch((e) => Logger.debugLog(e));
                 }
-                const newMsg = await getUserResponse(message.channel, message.author.id);
+                const newMsg = await getUserResponse(channel, bankUser.getUserId());
                 collector?.stop();
                 isStopped = true;
                 // determines if abandoned, meaning that the same transfer is no longer active
@@ -376,7 +384,7 @@ export abstract class Transfer {
                 }
                 eventData.delete(EventDataNames.INITIAL_TRANSFER_MSG);
                 if (!newMsg) {
-                    (<TextChannel>message.channel).send('*no response provided*');
+                    (<TextChannel>channel).send('*no response provided*');
                     resolve(undefined);
                     return;
                 }
@@ -384,14 +392,14 @@ export abstract class Transfer {
                 if (!recipientID) {
                     if (newMsg.content) {
                         if (newMsg.content.toLowerCase() === 'q') {
-                            (<TextChannel>message.channel).send('*cancelled*');
+                            (<TextChannel>channel).send('*cancelled*');
                             resolve(undefined);
                             return;
                         } else {
                             name = newMsg.content;
                         }
                     } else {
-                        (<TextChannel>message.channel).send(`must specify user to ${actionName} to`);
+                        (<TextChannel>channel).send(`must specify user to ${actionName} to`);
                         resolve(undefined);
                         return;
                     }

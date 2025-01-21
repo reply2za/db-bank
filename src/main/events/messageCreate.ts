@@ -41,6 +41,7 @@ module.exports = async (message: Message) => {
         prefix: config.prefix,
         bankUser,
         data: new Map(),
+        channel: message.channel,
     };
     commandResponse.command.run(event).catch((e) => Logger.errorLog(e));
 };

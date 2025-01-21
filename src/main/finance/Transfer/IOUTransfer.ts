@@ -7,6 +7,8 @@ import { bank } from '../Bank';
 import visualizerCommon from '../visualizers/visualizerCommon';
 import { formatErrorText } from '../../utils/utils';
 import { config } from '../../utils/constants/constants';
+import { ABankUser } from '../BankUser/ABankUser';
+import { MessageChannel } from '../../utils/types';
 
 export class IOUTransfer extends Transfer {
     MINIMUM_TRANSFER_AMT = 1;
@@ -14,8 +16,14 @@ export class IOUTransfer extends Transfer {
         super(channel, sender, receiver);
     }
 
-    static getUserToTransferTo(message: Message, name: string, eventData: any): Promise<BankUserCopy | undefined> {
-        return super.getUserToTransferTo(message, name, eventData, 'transfer IOUs');
+    static getUserToTransferTo(
+        bankUser: ABankUser,
+        channel: MessageChannel,
+        name: string,
+        message: Message,
+        eventData: any
+    ): Promise<BankUserCopy | undefined> {
+        return super.getUserToTransferTo(bankUser, channel, name, message, eventData, 'transfer IOUs');
     }
 
     getTransferEmbed(amount: number, comment: string): EmbedBuilderLocal {

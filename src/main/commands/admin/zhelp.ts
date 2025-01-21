@@ -23,5 +23,5 @@ exports.run = async (event: MessageEventLocal) => {
 \`processdata previous\` - view the previous ${config.dataFile} contents
 `
         )
-        .send(event.message.channel);
+        .send(event.channel);
 };

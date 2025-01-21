@@ -4,7 +4,7 @@ import { IOUTransfer } from '../../../finance/Transfer/IOUTransfer';
 import { TransferFactory } from '../../../factories/TransferFactory';
 
 const initiateTransferRequest = TransferFactory.get(IOUTransfer, (event, otherUser) => {
-    return new IOUTransfer(<TextChannel>event.message.channel, event.bankUser, otherUser);
+    return new IOUTransfer(<TextChannel>event.channel, event.bankUser, otherUser);
 });
 
 exports.run = async (event: MessageEventLocal) => {

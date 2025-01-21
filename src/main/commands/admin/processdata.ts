@@ -5,14 +5,21 @@ import { localStorage } from '../../storage/LocalStorage';
 import { Message, TextChannel } from 'discord.js';
 import fs from 'fs';
 import axios from 'axios';
+import logger from '../../utils/Logger';
 let previousData: string;
 exports.run = async (event: MessageEventLocal) => {
     if (event.args.length) {
         if (event.args[0].toLowerCase() === 'previous') {
             if (previousData) {
-                (<TextChannel>event.message.channel).send(previousData);
+                (<TextChannel>event.channel).send(previousData);
             }
         }
+        return;
+    }
+    if (!event.message) {
+        const error = '[FATAL] Message object not found.';
+        await (<TextChannel>event.channel).send(error);
+        await logger.errorLog(error);
         return;
     }
     if (event.message.attachments) {
@@ -24,9 +31,9 @@ exports.run = async (event: MessageEventLocal) => {
         const data = localStorage.retrieveLocalData();
         await localStorage.saveData(data);
         await bank.deserializeAndLoadData(data, bot.users);
-        (<TextChannel>event.message.channel).send('*contents changed*');
+        (<TextChannel>event.channel).send('*contents changed*');
     } else {
-        (<TextChannel>event.message.channel).send('*there was an issue processing the data*');
+        (<TextChannel>event.channel).send('*there was an issue processing the data*');
     }
 };
 

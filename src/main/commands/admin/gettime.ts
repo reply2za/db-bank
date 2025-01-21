@@ -8,7 +8,7 @@ exports.run = async (event: MessageEventLocal) => {
         if (err) resp += `error: ${stdout}\n`;
         if (stdout) resp += `stdout: ${stdout}\n`;
         if (stderr) resp += `stderr: ${stderr}\n`;
-        await (<TextChannel>event.message.channel).send(resp);
+        await (<TextChannel>event.channel).send(resp);
         process.disconnect();
     });
 };

@@ -19,5 +19,5 @@ exports.run = async (event: MessageEventLocal) => {
 **redeem** - redeem an IOU`
         )
         .setFooter('commands are not case sensitive')
-        .send(event.message.channel);
+        .send(event.channel);
 };

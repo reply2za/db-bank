@@ -1,5 +1,5 @@
 import { MessageEventLocal } from '../../../main/utils/types';
-import { FetchChannelOptions, Message, TextChannel } from 'discord.js';
+import { Channel, FetchChannelOptions, Message, TextBasedChannel, TextChannel } from 'discord.js';
 import { commandHandler } from '../../../main/handlers/CommandHandler';
 import { BidSetup1, Setup1 } from '../classes/Setup';
 import { bidManager } from '../../../main/finance/bid/BidManager';
@@ -8,7 +8,6 @@ import { bot, config } from '../../../main/utils/constants/constants';
 const s1 = new Setup1('transfer anna', 'transfer joe');
 const bidS1 = new BidSetup1('bid', 'bid');
 
-
 describe('bid events', () => {
     let spy: any;
     afterAll(async () => {
@@ -16,27 +15,25 @@ describe('bid events', () => {
         await bidS1.reset();
     });
 
-
-
-    beforeAll(()=> {
+    beforeAll(() => {
         const aId = bot.channels.fetch('1065729072287715329');
-        spy = jest.spyOn(bot.channels, 'fetch').mockImplementation((id: string, options?: FetchChannelOptions | undefined)=> {
-            return new Promise(async (res,rej)=>{
-                if (id === config.TV_BID_CH) {
-                    res(<TextChannel><unknown>bidS1.channel1)
-                }
-                else {
-                    if (id == '1065729072287715329') res(await aId);
-                    else console.log('need: ' + id);
-                }
+        spy = jest
+            .spyOn(bot.channels, 'fetch')
+            .mockImplementation((id: string, options?: FetchChannelOptions | undefined) => {
+                return new Promise(async (res, rej) => {
+                    if (id === config.TV_BID_CH) {
+                        res(<TextChannel>(<unknown>bidS1.channel1));
+                    } else {
+                        if (id == '1065729072287715329') res(await aId);
+                        else console.log('need: ' + id);
+                    }
+                });
             });
-        });
     });
 
-    afterAll(()=> {
+    afterAll(() => {
         jest.restoreAllMocks();
-    })
-
+    });
 
     test('bid in an invalid channel ', async () => {
         const invalidChannelBidJoe: MessageEventLocal = {
@@ -46,6 +43,7 @@ describe('bid events', () => {
             prefix: '!',
             bankUser: s1.bankUserJoe,
             data: new Map(),
+            channel: <TextBasedChannel>(<unknown>s1.messageFromJoe.channel),
         };
         await commandHandler.execute(invalidChannelBidJoe);
         const channel1Length = s1.channel1.receivedMessages.length;
@@ -61,6 +59,7 @@ describe('bid events', () => {
             prefix: '!',
             bankUser: bidS1.bankUserA,
             data: new Map(),
+            channel: <TextBasedChannel>(<unknown>bidS1.messageFromUserA.channel),
         };
         await commandHandler.execute(validChannelBidJoe);
         const channel1Length = bidS1.channel1.receivedMessages.length;
@@ -75,6 +74,7 @@ describe('bid events', () => {
             prefix: '!',
             bankUser: bidS1.bankUserA,
             data: new Map(),
+            channel: <TextBasedChannel>(<unknown>bidS1.messageFromUserA.channel),
         };
         await commandHandler.execute(validChannelBidJoe);
         const channel1Length = bidS1.channel1.receivedMessages.length;
@@ -88,5 +88,4 @@ describe('bid events', () => {
         if (!bidEvent) return;
         expect(spy).toHaveBeenCalled();
     });
-
 });

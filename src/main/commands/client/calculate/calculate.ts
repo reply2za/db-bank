@@ -9,21 +9,21 @@ exports.run = async (event: MessageEventLocal) => {
     if (!totalTxt) {
         await new EmbedBuilderLocal()
             .setDescription('enter the numbers to sum up:\n*ex: `10 + 2.21 - 5`*')
-            .send(event.message.channel);
-        const response = await getUserResponse(event.message.channel, event.message.author.id);
+            .send(event.channel);
+        const response = await getUserResponse(event.channel, event.bankUser.id);
         if (response && response.content) {
             totalTxt = response.content;
         } else {
-            (<TextChannel>event.message.channel).send('*cancelled calc command*');
+            (<TextChannel>event.channel).send('*cancelled calc command*');
             return;
         }
     }
     totalTxt = calculateTotal(totalTxt);
     const total = Number(totalTxt);
     if (!Number.isFinite(total)) {
-        (<TextChannel>event.message.channel).send(formatErrorText('invalid expression'));
+        (<TextChannel>event.channel).send(formatErrorText('invalid expression'));
         return;
     }
-    (<TextChannel>event.message.channel).send(`total: \`${totalTxt}\``);
+    (<TextChannel>event.channel).send(`total: \`${totalTxt}\``);
     return total;
 };

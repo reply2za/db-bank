@@ -25,19 +25,26 @@ export abstract class ABankUser {
         return this.userId;
     }
 
+    get id() {
+        return this.userId;
+    }
+
     getMaxBid(startDate: moment.Moment): number {
-        if (this.maxBidAmount > 0 && this.maxBidDate && 
-            startDate.toISOString().split("T")[0] === this.getMaxBidDate().toISOString().split("T")[0]) {
+        if (
+            this.maxBidAmount > 0 &&
+            this.maxBidDate &&
+            startDate.toISOString().split('T')[0] === this.getMaxBidDate().toISOString().split('T')[0]
+        ) {
             return this.maxBidAmount;
         } else {
             this.maxBidAmount = -1;
-            this.maxBidDate = "";
+            this.maxBidDate = '';
             return this.maxBidAmount;
-        };
+        }
     }
 
     setMaxBid(amount: number) {
-        if (amount && !isNaN(amount) && amount > 0){
+        if (amount && !isNaN(amount) && amount > 0) {
             this.maxBidDate = getCurrentMoment().toISOString();
             this.maxBidAmount = amount;
         }

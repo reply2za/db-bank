@@ -4,7 +4,7 @@ import { TextChannel } from 'discord.js';
 
 exports.run = async (event: MessageEventLocal) => {
     console.log('restarting...');
-    await (<TextChannel>event.message.channel).send('restarting (may only shut down)...');
+    await (<TextChannel>event.channel).send('restarting (may only shut down)...');
     try {
         execSync('pm2 restart db-bank');
     } catch (e) {}
