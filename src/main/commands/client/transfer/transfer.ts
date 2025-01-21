@@ -20,6 +20,6 @@ exports.run = async (event: MessageEventLocal) => {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName(path.basename(__filename).split('.')[0])
-        .setDescription('Transfer money to a user'),
+        .setDescription('Transfer cash to a user'),
     run: exports.run,
 };
