@@ -32,9 +32,9 @@ exports.run = async (event: MessageEventLocal) => {
     };
     finalString += '\n---IOUs---\n';
     for (let iou of bank.getAllIOUs()) {
-        finalString += `**from ${await getName(iou.sender.id)} to ${await getName(iou.receiver.id)}**${
+        finalString += `**${await getName(iou.sender.id)} to ${await getName(iou.receiver.id)}**${
             iou.quantity > 1 ? ` (x${iou.quantity})` : ''
-        }\nreason: ${iou.comment}\n`;
+        } [${iou.expirationDate}]\nreason: ${iou.comment}\n`;
     }
     await new EmbedBuilderLocal().setTitle('Accounts').setDescription(finalString).send(event.channel);
 };

@@ -47,7 +47,7 @@ export class Bank {
             };
         }
         const date = new Date();
-        const expirationDate = IOUTicket.setExpirationDate(new Date());
+        const expirationDate = IOUTicket.setExpirationDate(quantity);
         const iou = new IOUTicket(
             null,
             { id: sender.getUserId(), name: sender.getUsername() },
