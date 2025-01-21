@@ -5,4 +5,4 @@ node_modules
 localData.txt
 .idea
 local
-
+resources/testData.txt
