@@ -41,7 +41,8 @@ export const config = Object.freeze({
     token: TOKEN,
     // IDs are followed by a space (testId: 799524729173442620)
     adminIDs: Object.freeze(adminIDs),
-    transactionLogChID: isDevMode ? '1081761590292009041' : '1062859204177698958',
+    transactionLogChID: isDevMode ? ['1081761590292009041'] : ['1062859204177698958'],
+    simpleTransactionLogChID: isDevMode ? ['1331047866025906186'] : ['1331047720059928646', '1331048172079808523'],
     infoLogChID: isDevMode ? '1081761590292009041' : '1070859598627610746',
     errorLogChID: '1064628593772220488',
     processLog: '1091525626281857045',

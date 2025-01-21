@@ -305,6 +305,7 @@ export class Bank {
                 .concat(`${this.#printUserBalances(sender, receiver)}\n`)
                 .concat(`----------------------------------------\n`);
             await logger.transactionLog(logItem);
+            await logger.simpleTransactionLog(sender, receiver, transferType, transferAmount, comment);
         } else {
             await visualizerCommon
                 .getErrorEmbed(`${transferType} failed: ${transferResponse.failReason || 'unknown reason'}`)

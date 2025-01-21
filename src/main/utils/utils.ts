@@ -1,7 +1,7 @@
 import { GuildTextBasedChannel, If, Message, TextBasedChannel, TextChannel } from 'discord.js';
 import { config } from './constants/constants';
 import { processManager } from './ProcessManager';
-import { TransferType } from '../finance/types';
+import { RedemptionType, TransferRedemptionType, TransferType } from '../finance/types';
 import moment from 'moment';
 
 export async function getUserResponse(
@@ -33,11 +33,11 @@ export function formatErrorText(text: string): string {
 }
 
 /**
- * Given a transfer type, returns a function that formats a number into an amount with the correct unit.
+ * Given a transfer or redemption type, returns a function that formats a number into an amount with the correct unit.
  * @param transferType The transfer type to format the amount for.
  */
-export function unitFormatFactory(transferType: TransferType): (amount: number) => string {
-    if (transferType === TransferType.TRANSFER_IOU) {
+export function unitFormatFactory(transferType: TransferRedemptionType): (amount: number) => string {
+    if (transferType === TransferType.TRANSFER_IOU || transferType === RedemptionType.REDEEM_IOU) {
         return (amount) => `${amount} IOU${amount === 1 ? '' : 's'}`;
     } else {
         return (amount) => `$${amount.toLocaleString()}`;

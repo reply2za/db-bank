@@ -1,12 +1,14 @@
 import { bank } from '../../../finance/Bank';
 import iouVisualizer from '../../../finance/visualizers/iouVisualizer';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
-import { formatErrorText, getUserResponse } from '../../../utils/utils';
+import { formatErrorText, getUserResponse, unitFormatFactory } from '../../../utils/utils';
 import { bot } from '../../../utils/constants/constants';
 import { EventDataNames, MessageEventLocal } from '../../../utils/types';
 import Logger from '../../../utils/Logger';
+import logger from '../../../utils/Logger';
 import visualizerCommon from '../../../finance/visualizers/visualizerCommon';
 import { Colors, TextChannel } from 'discord.js';
+import { RedemptionType } from '../../../finance/types';
 
 exports.run = async (event: MessageEventLocal) => {
     const ious = bank.getUserIOUs(event.bankUser.getUserId());
@@ -56,8 +58,7 @@ exports.run = async (event: MessageEventLocal) => {
         if (quantity === undefined) return;
     } while (!quantity || quantity < 1);
     if (!iou) {
-        (<TextChannel>event.message.channel).send(formatErrorText('could not find IOU'));
-        return;
+        return void (await (<TextChannel>event.message.channel).send(formatErrorText('could not find IOU')));
     }
     await new EmbedBuilderLocal()
         .setColor(Colors.Orange)
@@ -66,17 +67,15 @@ exports.run = async (event: MessageEventLocal) => {
 
     const reasonRsp = (await getUserResponse(event.message.channel, event.bankUser.getUserId()))?.content;
     if (!reasonRsp || reasonRsp.toLowerCase() === 'q') {
-        (<TextChannel>event.message.channel).send('*cancelled*');
-        return;
+        return void (await (<TextChannel>event.message.channel).send('*cancelled*'));
     }
     let redemptionComment = reasonRsp;
     if (reasonRsp.toLowerCase() === 'b') {
         redemptionComment = '';
     }
-    // whether to append an s to text based on the IOU quantity
-    const appendS = quantity > 1 ? 's' : '';
+    const amountTxt = unitFormatFactory(RedemptionType.REDEEM_IOU)(quantity);
     await visualizerCommon
-        .getConfirmationEmbed(`redemption of ${quantity} IOU${appendS}`)
+        .getConfirmationEmbed(`redemption of ${amountTxt}`)
         .addFields(
             { name: 'to', value: `${iou.sender.name}`, inline: true },
             { name: 'comment', value: redemptionComment || '*(empty)*', inline: true }
@@ -98,15 +97,33 @@ exports.run = async (event: MessageEventLocal) => {
                 await iouSender.send({
                     embeds: [iouRedeemedNotifEmbed.build()],
                 });
-                const senderName = bank.getUserCopy(iou.sender.id)?.getDBName() || iou.sender.name;
-                const receiverName = bank.getUserCopy(iou.receiver.id)?.getDBName() || iou.receiver.name;
+                const sender = bank.getUserCopy(iou.sender.id);
+                const receiver = bank.getUserCopy(iou.receiver.id);
+                const senderName = sender?.getDBName() || iou.sender.name;
+                const receiverName = receiver?.getDBName() || iou.receiver.name;
                 await Logger.transactionLog(
                     `[iou redemption] (${iou.sender.id} -> ${iou.receiver.id})\n` +
-                        `${receiverName} redeemed ${quantity} IOU${appendS} from ${senderName} \n` +
+                        `${receiverName} redeemed ${amountTxt} from ${senderName} \n` +
                         `IOU reason: ${iou.comment || 'N/A'}\n` +
                         `Redemption reason: ${redemptionComment || 'N/A'}\n` +
                         `----------------------------------------`
                 );
+                if (sender && receiver) {
+                    await logger.simpleTransactionLog(
+                        sender,
+                        receiver,
+                        RedemptionType.REDEEM_IOU,
+                        quantity,
+                        redemptionComment,
+                        `IOU reason: ${iou.comment}`
+                    );
+                } else {
+                    await logger.errorLog(
+                        `One or more users is undefined. sender: ${sender?.getDBName()}, receiver: ${
+                            receiver?.getDBName
+                        }`
+                    );
+                }
             } else {
                 await Logger.errorLog(new Error(`could not find iou sender with the id ${iou.sender.id}`));
             }

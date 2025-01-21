@@ -1,6 +1,9 @@
 import { bot, config } from './constants/constants';
 import { Message, TextChannel } from 'discord.js';
-import { ILogger } from '@hoursofza/djs-common';
+import { EmbedBuilderLocal, ILogger } from '@hoursofza/djs-common';
+import { ABankUser } from '../finance/BankUser/ABankUser';
+import { TransferRedemptionType } from '../finance/types';
+import { unitFormatFactory } from './utils';
 
 class Logger implements ILogger {
     async errorLog(error: Error | string, additionalInfo = '[ERROR]') {
@@ -17,7 +20,32 @@ class Logger implements ILogger {
     }
 
     async transactionLog(info: string) {
-        (<TextChannel>await bot.channels.fetch(config.transactionLogChID))?.send(info);
+        for (const chId of config.transactionLogChID) {
+            (<TextChannel>await bot.channels.fetch(chId))?.send(info);
+        }
+    }
+
+    async simpleTransactionLog(
+        sender: ABankUser,
+        receiver: ABankUser,
+        transferType: TransferRedemptionType,
+        amount: number,
+        comment: string,
+        additionalText?: string
+    ) {
+        const unitFormatter = unitFormatFactory(transferType);
+        const embed = new EmbedBuilderLocal()
+            .setTitle(`[${transferType.toString()}] (${sender.getUsername()} -> ${receiver.getUsername()})\n`)
+            .setDescription(
+                `amount: ${unitFormatter(amount)}\ncomment: ${comment}${additionalText ? `\n${additionalText}` : ''}`
+            )
+            .setFooter(
+                `[${sender.getDBName()} -> ${receiver.getDBName()}] ${sender.getUserId()},${receiver.getUserId()}`
+            );
+        for (const chId of config.simpleTransactionLogChID) {
+            const channel = <TextChannel>await bot.channels.fetch(chId);
+            await embed.send(channel);
+        }
     }
 
     /**
