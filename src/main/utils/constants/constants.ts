@@ -56,6 +56,7 @@ export const config = Object.freeze({
     NO_AMT_SELECTED_TXT: '*no amount selected*',
     TV_BID_CH: isDevMode ? '1091548846775095336' : '1177097674495905842',
     BOT_ID: '1062574908451856574',
+    slashCommandGuild: isDevMode ? '827425831365640242' : '1062862759143948411',
 });
 
 export const djsCommonUtils = new Utils(config.BOT_ID);

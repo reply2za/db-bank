@@ -3,13 +3,13 @@
     "users": [
       {
         "userId": "12341",
-        "name": "Josephine",
+        "name": "Joe",
         "balance": 2324,
         "history": []
       },
       {
         "userId": "313132",
-        "name": "Kevin",
+        "name": "Anna",
         "balance": 131,
         "history": []
       }

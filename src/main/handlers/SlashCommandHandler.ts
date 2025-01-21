@@ -38,7 +38,7 @@ export default async function run() {
         console.log(`Reloading ${commands.length} application (/) commands.`);
 
         // The put method is used to fully refresh all commands in the guild with the current set
-        const data: any = await rest.put(Routes.applicationGuildCommands(config.BOT_ID, '827425831365640242'), {
+        const data: any = await rest.put(Routes.applicationGuildCommands(config.BOT_ID, config.slashCommandGuild), {
             body: commands,
         });
 
