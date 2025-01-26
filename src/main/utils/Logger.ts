@@ -13,6 +13,7 @@ class Logger implements ILogger {
         if (channel) {
             return (<TextChannel>channel)?.send(`${additionalInfo} ${body}`);
         }
+        return;
     }
 
     async infoLog(info: string) {

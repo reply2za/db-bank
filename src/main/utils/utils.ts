@@ -19,6 +19,7 @@ export async function getUserResponse(
         return messages.first();
     } catch (e: any) {
         /* Intentionally left blank */
+        return;
     } finally {
         processManager.removeUserResponseLock(userId, channel.id.toString());
     }

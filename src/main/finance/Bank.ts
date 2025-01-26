@@ -162,6 +162,7 @@ export class Bank {
         } else {
             console.log(`[error] no user found with id: ${id}`);
         }
+        return;
     }
 
     /**
@@ -311,6 +312,7 @@ export class Bank {
                 .getErrorEmbed(`${transferType} failed: ${transferResponse.failReason || 'unknown reason'}`)
                 .send(channel);
         }
+        return senderAndReceiverStatus;
     }
 
     #printUserBalances(sender: OriginalBankUser, receiver: OriginalBankUser): string {
