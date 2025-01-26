@@ -15,7 +15,7 @@ export class MonetaryTransfer extends ACashTransfer {
         super(channel, sender, receiver);
     }
 
-    static getUserToTransferTo(
+    static override getUserToTransferTo(
         bankUser: ABankUser,
         channel: MessageChannel,
         name: string,
@@ -46,10 +46,10 @@ export class MonetaryTransfer extends ACashTransfer {
         return cashTransferVisualizer.getCashTransferEmbed(this.sender, this.receiver, amount, comment);
     }
 
-    protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
+    protected override async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
         if (!(await super.validateAmount(transferAmount, channel))) return false;
         if (this.sender.getBalance() < transferAmount) {
-            (<TextChannel>this.channel).send(formatErrorText('balance is too low'));
+            await (<TextChannel>this.channel).send(formatErrorText('balance is too low'));
             return false;
         }
         return true;

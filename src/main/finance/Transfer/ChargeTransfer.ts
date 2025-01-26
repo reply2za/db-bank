@@ -13,7 +13,7 @@ export class ChargeTransfer extends ACashTransfer {
         super(channel, sender, receiver, TransferType.CHARGE, receiver);
     }
 
-    static getUserToTransferTo(
+    static override getUserToTransferTo(
         bankUser: ABankUser,
         channel: MessageChannel,
         name: string,
@@ -38,11 +38,11 @@ export class ChargeTransfer extends ACashTransfer {
         return chargeTransferVisualizer.getChargeTransferEmbed(this.sender, this.receiver, amount, comment);
     }
 
-    protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
+    protected override async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
         return await super.validateAmount(transferAmount, channel);
     }
 
-    protected async postSuccessfulTransferAction(
+    protected override async postSuccessfulTransferAction(
         sender: BankUserCopy,
         receiver: BankUserCopy,
         transferAmount: number,

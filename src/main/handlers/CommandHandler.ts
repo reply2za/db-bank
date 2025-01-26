@@ -15,7 +15,7 @@ class CommandHandlerLocal extends CommandHandler<EventDataNames> {
         super(isAdmin, `./${config.sourceDirPath}/commands`, '../commands');
     }
 
-    getCommand(statement: string, userID: string): CommandResponse<EventDataNames> {
+    override getCommand(statement: string, userID: string): CommandResponse<EventDataNames> {
         if (!processManager.isActive() && !MULTI_PROCESS_CMDS.includes(statement))
             return { command: undefined, isAdminCommand: false };
         return super.getCommand(statement, userID);

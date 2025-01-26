@@ -7,7 +7,7 @@ export class ApprovedChargeTransfer extends ChargeTransfer {
         super(channel, sender, receiver);
     }
 
-    protected async getFinalConfirmation(): Promise<boolean> {
+    protected override async getFinalConfirmation(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(true);

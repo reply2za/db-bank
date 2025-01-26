@@ -14,7 +14,7 @@ export class CreditTransfer extends ACashTransfer {
         super(channel, sender, receiver, TransferType.CREDIT, sender);
     }
 
-    static getUserToTransferTo(
+    static override getUserToTransferTo(
         bankUser: ABankUser,
         channel: MessageChannel,
         name: string,
@@ -33,7 +33,7 @@ export class CreditTransfer extends ACashTransfer {
         return cashTransferVisualizer.getCreditTransferEmbed(this.receiver, amount, comment);
     }
 
-    protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
+    protected override async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
         if (!(await super.validateAmount(transferAmount, channel))) return false;
         if (transferAmount > this.#MAX_CREDIT_AMT) {
             (<TextChannel>this.channel).send(

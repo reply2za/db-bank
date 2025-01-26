@@ -11,12 +11,12 @@ import { ABankUser } from '../BankUser/ABankUser';
 import { MessageChannel } from '../../utils/types';
 
 export class IOUTransfer extends Transfer {
-    MINIMUM_TRANSFER_AMT = 1;
+    override MINIMUM_TRANSFER_AMT = 1;
     constructor(channel: TextChannel, sender: BankUserCopy, receiver: BankUserCopy) {
         super(channel, sender, receiver);
     }
 
-    static getUserToTransferTo(
+    static override getUserToTransferTo(
         bankUser: ABankUser,
         channel: MessageChannel,
         name: string,
@@ -50,7 +50,7 @@ export class IOUTransfer extends Transfer {
         return false;
     }
 
-    protected async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
+    protected override async validateAmount(transferAmount: number, channel: TextChannel): Promise<boolean> {
         return (
             (await super.validateAmount(transferAmount, channel)) &&
             (() => {

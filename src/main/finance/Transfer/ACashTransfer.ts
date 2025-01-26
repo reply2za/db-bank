@@ -10,7 +10,7 @@ import cashTransferVisualizer from '../visualizers/transfers/cashTransferVisuali
  * Any type of transfer that is done in cash.
  */
 export abstract class ACashTransfer extends Transfer {
-    protected async promptForAmount(): Promise<string | undefined> {
+    protected override async promptForAmount(): Promise<string | undefined> {
         let amt = await super.promptForAmount();
         if (amt) {
             if (amt.charAt(0) === '$') amt = amt.replace('$', '');
@@ -22,7 +22,7 @@ export abstract class ACashTransfer extends Transfer {
         return amt;
     }
 
-    protected async getComment(): Promise<string | undefined> {
+    protected override async getComment(): Promise<string | undefined> {
         await new EmbedBuilderLocal()
             .setDescription("type a short comment/description ['b' = blank, 'q' = cancel]")
             .setColor(Colors.Orange)
