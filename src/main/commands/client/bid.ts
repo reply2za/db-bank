@@ -5,6 +5,7 @@ import { bot, config } from '../../utils/constants/constants';
 import { bidManager } from '../../finance/bid/BidManager';
 import { DayOfTheWeek } from '../../utils/enums';
 import { getCurrentMoment } from '../../utils/utils';
+import { commandHandler } from '../../handlers/CommandHandler';
 
 function getNextDay(date: Date): string {
     return `${date.getMonth() + 1}/${date.getDate() + 1}/${date.getFullYear()}`;
@@ -29,6 +30,8 @@ exports.run = async (event: MessageEventLocal) => {
             return;
         }
         if (!bidEvent || (bidEvent && bidEvent.hasEnded())) {
+            event.data.set(EventDataNames.IS_SILENT, true);
+            await commandHandler.execute({ ...event, statement: 'updatetime' });
             const bidChannel = await bot.channels.fetch(bidChannelId);
             bidEvent = new BidEvent(<TextChannel>bidChannel, getTvBidDescription(currentDate));
             const weekendBidAmounts = { minBidAmount: 0.5, minBidIncrement: 0.5 };

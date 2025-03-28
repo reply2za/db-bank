@@ -1,6 +1,6 @@
 import { BankUserCopy } from '../finance/BankUser/BankUserCopy';
 import { MessageEventCore } from '@hoursofza/djs-common';
-import { Message, TextChannel, DMChannel, NewsChannel, PartialDMChannel, TextBasedChannel, Channel } from 'discord.js';
+import { TextBasedChannel } from 'discord.js';
 
 export type MessageEventLocal = MessageEventCore<EventDataNames> & {
     // the bank author initiating the event
@@ -40,6 +40,10 @@ export enum EventDataNames {
      * value is either 'true', 'false', or undefined
      */
     IS_MAX_BID,
+    /**
+     * {boolean} - Whether to print the command responses to the event's text channel.
+     */
+    IS_SILENT,
 }
 
 export type MessageChannel = TextBasedChannel;
