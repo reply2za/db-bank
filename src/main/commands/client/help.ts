@@ -2,9 +2,8 @@ import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { MessageEventLocal } from '../../utils/types';
 import { SlashCommandBuilder } from 'discord.js';
 import path from 'node:path';
-import { bot, config } from '../../utils/constants/constants';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     await new EmbedBuilderLocal()
         .setTitle('Help List')
         .setDescription(

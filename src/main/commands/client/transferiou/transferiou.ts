@@ -8,7 +8,7 @@ const initiateTransferRequest = TransferFactory.get(IOUTransfer, (event, otherUs
     return new IOUTransfer(<TextChannel>event.channel, event.bankUser, otherUser);
 });
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     await initiateTransferRequest(event);
 };
 

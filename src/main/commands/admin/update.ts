@@ -5,7 +5,7 @@ import { config } from '../../utils/constants/constants';
 import { TextChannel } from 'discord.js';
 import { bidManager } from '../../finance/bid/BidManager';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     const bidEvents = bidManager.getAllActiveBidEvents();
     if (processManager.isActive()) {
         if (event.args[0] !== 'force') {

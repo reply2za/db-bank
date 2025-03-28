@@ -7,6 +7,6 @@ const initiateTransferRequest = TransferFactory.get(CreditTransfer, (event, othe
     return new CreditTransfer(<TextChannel>event.channel, event.bankUser, otherUser);
 });
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     await initiateTransferRequest(event);
 };

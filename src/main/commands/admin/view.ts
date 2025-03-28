@@ -3,7 +3,7 @@ import { MessageEventLocal } from '../../utils/types';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { bot } from '../../utils/constants/constants';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     let finalString = '';
     bank.getAllUsers().forEach((user) => {
         if (user.getBalance() !== 0) {

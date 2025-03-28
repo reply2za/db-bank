@@ -7,7 +7,7 @@ import { bankUserLookup } from '../../finance/BankUserLookup';
 const NUM_TO_FETCH = 30;
 const SENT_MSG_TXT = 'updating...';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     if (!event.args[1]) {
         await (<TextChannel>event.channel).send('*expected arguments author-id & num-to-delete*');
         return;

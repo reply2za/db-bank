@@ -1,4 +1,4 @@
-import { bot, config } from '../utils/constants/constants';
+import { config } from '../utils/constants/constants';
 import { ChatInputCommandInteraction, Interaction } from 'discord.js';
 import { MessageEventLocal } from '../utils/types';
 import Logger from '../utils/Logger';

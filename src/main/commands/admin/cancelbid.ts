@@ -2,7 +2,7 @@ import { MessageEventLocal } from '../../utils/types';
 import { bidManager } from '../../finance/bid/BidManager';
 import { TextChannel } from 'discord.js';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     const bidEvent = bidManager.getBidEvent(event.channel.id);
     if (bidEvent && !bidEvent.hasEnded()) {
         await bidEvent.cancelBidding();

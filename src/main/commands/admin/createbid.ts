@@ -6,7 +6,7 @@ import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { getCurrentMoment, getUserResponse } from '../../utils/utils';
 import moment from 'moment';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     let bidEvent = bidManager.getBidEvent(event.channel.id);
     if (bidEvent && !bidEvent.hasEnded()) {
         const msg = await bidEvent.getBidEmbed().send(event.channel);

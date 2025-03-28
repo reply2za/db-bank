@@ -1,5 +1,5 @@
 import { bot, config, djsCommonUtils } from './constants/constants';
-import { Message, MessageManager, MessageReaction, ReactionCollector, TextChannel } from 'discord.js';
+import { Message, MessageReaction, ReactionCollector, TextChannel } from 'discord.js';
 import reactions from './constants/reactions';
 import { execSync } from 'child_process';
 import logger from './Logger';

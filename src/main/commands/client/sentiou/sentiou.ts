@@ -4,7 +4,7 @@ import iouVisualizer from '../../../finance/visualizers/iouVisualizer';
 import { SlashCommandBuilder, TextChannel } from 'discord.js';
 import path from 'node:path';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     const ious = bank.getUserSentIOUs(event.bankUser.getUserId());
     if (ious.length < 1) {
         (<TextChannel>event.channel).send('*no sent IOUs found*');

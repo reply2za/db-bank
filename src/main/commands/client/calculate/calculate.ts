@@ -4,7 +4,7 @@ import { formatErrorText, getUserResponse } from '../../../utils/utils';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { TextChannel } from 'discord.js';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     let totalTxt = event.args.join(' ');
     if (!totalTxt) {
         await new EmbedBuilderLocal()
@@ -25,5 +25,4 @@ exports.run = async (event: MessageEventLocal) => {
         return;
     }
     (<TextChannel>event.channel).send(`total: \`${totalTxt}\``);
-    return total;
 };

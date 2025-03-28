@@ -7,7 +7,7 @@ import iouVisualizer from '../../../finance/visualizers/iouVisualizer';
 import { djsCommonUtils } from '../../../utils/constants/constants';
 import path from 'node:path';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     const ious = bank.getUserIOUs(event.bankUser.getUserId());
     if (ious.length < 1) {
         (<TextChannel>event.channel).send('*no redeemable IOUs found*');

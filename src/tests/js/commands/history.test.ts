@@ -1,5 +1,5 @@
 import { MessageEventLocal } from '../../../main/utils/types';
-import { Channel, Message, TextBasedChannel } from 'discord.js';
+import { Message, TextBasedChannel } from 'discord.js';
 import { Setup1 } from '../classes/Setup';
 
 import { Transfer } from '../../../main/finance/Transfer/Transfer';

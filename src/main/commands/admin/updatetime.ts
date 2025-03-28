@@ -2,7 +2,7 @@ import { EventDataNames, MessageEventLocal } from '../../utils/types';
 import { exec } from 'child_process';
 import { TextChannel } from 'discord.js';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     const printToChannel = !event.data.get(EventDataNames.IS_SILENT);
     if (printToChannel) await (<TextChannel>event.channel).send('updating time...');
     exec(

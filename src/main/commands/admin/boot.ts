@@ -5,7 +5,7 @@ import { config, djsCommonUtils } from '../../utils/constants/constants';
 import reactions from '../../utils/constants/reactions';
 import { MessageReaction, TextChannel, User } from 'discord.js';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     if (!event.args[0]) {
         displayStatus(event).catch((err) => Logger.debugLog(err));
     } else if (event.args[1] && matchesHardwareTagOrPID(event.args[1])) {

@@ -11,7 +11,7 @@ import { Colors, SlashCommandBuilder, TextChannel } from 'discord.js';
 import { RedemptionType } from '../../../finance/types';
 import path from 'node:path';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     const ious = bank.getUserIOUs(event.bankUser.getUserId());
     if (ious.length < 1) {
         await (<TextChannel>event.channel).send('*no redeemable IOUs found*');

@@ -2,7 +2,7 @@ import { MessageEventLocal } from '../../utils/types';
 import { exec } from 'child_process';
 import { TextChannel } from 'discord.js';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     const process = exec('date', async (err, stdout, stderr) => {
         let resp = '';
         if (err) resp += `error: ${stdout}\n`;

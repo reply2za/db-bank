@@ -9,7 +9,7 @@ const initiateTransferRequest = TransferFactory.get(MonetaryTransfer, (event, ot
     return new MonetaryTransfer(<TextChannel>event.channel, event.bankUser, otherUser);
 });
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     if (event.args[0]?.toLowerCase() === 'iou') {
         await commandHandler.execute({ ...event, statement: 'transferiou', args: event.args.slice(1) });
     } else {

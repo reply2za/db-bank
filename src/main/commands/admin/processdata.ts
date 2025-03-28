@@ -7,7 +7,7 @@ import fs from 'fs';
 import axios from 'axios';
 import logger from '../../utils/Logger';
 let previousData: string;
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     if (event.args.length) {
         if (event.args[0].toLowerCase() === 'previous') {
             if (previousData) {

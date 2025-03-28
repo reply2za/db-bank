@@ -1,13 +1,4 @@
-import {
-    Channel,
-    Collection,
-    Colors,
-    Message,
-    MessageReaction,
-    ReactionCollector,
-    TextBasedChannel,
-    TextChannel,
-} from 'discord.js';
+import { Colors, Message, ReactionCollector, TextBasedChannel, TextChannel } from 'discord.js';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { formatErrorText, getUserResponse } from '../../utils/utils';
 import { roundNumberTwoDecimals } from '../../utils/numberUtils';
@@ -22,7 +13,6 @@ import logger from '../../utils/Logger';
 import Logger from '../../utils/Logger';
 import { processManager } from '../../utils/ProcessManager';
 import { ABankUser } from '../BankUser/ABankUser';
-import { bank } from '../Bank';
 
 const MAX_RETRY_COUNT = 3;
 const USER_SELECT_REACTIONS = [reactions.ONE, reactions.TWO];

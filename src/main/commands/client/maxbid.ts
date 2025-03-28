@@ -4,7 +4,7 @@ import { EventDataNames, MessageEventLocal } from '../../utils/types';
 import { getCurrentMoment } from '../../utils/utils';
 import { TextChannel } from 'discord.js';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     if (event.args.length < 1) {
         const bidAmt = event.bankUser.getMaxBid(getCurrentMoment());
         if (bidAmt <= 0) {

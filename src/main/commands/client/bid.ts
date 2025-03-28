@@ -14,7 +14,7 @@ function getNextDay(date: Date): string {
 function getTvBidDescription(date: Date): string {
     return `VIP TV access for ${getNextDay(date)}`;
 }
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     const isMaxBid: Boolean = event.data.get(EventDataNames.IS_MAX_BID) === 'true';
     let bidChannelId: string;
     if (isMaxBid) {

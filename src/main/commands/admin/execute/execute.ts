@@ -2,7 +2,7 @@ import { MessageEventLocal } from '../../../utils/types';
 import child_process from 'child_process';
 import { TextChannel } from 'discord.js';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     if (event.args.length < 1) {
         (<TextChannel>event.channel).send('*no arguments provided*');
     } else {

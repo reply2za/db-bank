@@ -1,5 +1,5 @@
 import { MessageEventLocal } from '../../../main/utils/types';
-import { Channel, FetchChannelOptions, Message, TextBasedChannel, TextChannel } from 'discord.js';
+import { FetchChannelOptions, Message, TextBasedChannel, TextChannel } from 'discord.js';
 import { commandHandler } from '../../../main/handlers/CommandHandler';
 import { BidSetup1, Setup1 } from '../classes/Setup';
 import { bidManager } from '../../../main/finance/bid/BidManager';

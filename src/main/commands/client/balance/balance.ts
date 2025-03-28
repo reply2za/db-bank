@@ -9,7 +9,7 @@ import { processManager } from '../../../utils/ProcessManager';
 import { djsCommonUtils } from '../../../utils/constants/constants';
 import path from 'node:path';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     const balanceMsg = await visualizerCommon.showBalance(
         event.channel,
         event.bankUser,

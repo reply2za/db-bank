@@ -2,7 +2,7 @@ import { MessageEventLocal } from '../../utils/types';
 import { EmbedBuilderLocal } from '@hoursofza/djs-common';
 import { config } from '../../utils/constants/constants';
 
-exports.run = async (event: MessageEventLocal) => {
+exports.run = async (event: MessageEventLocal): Promise<void> => {
     await new EmbedBuilderLocal()
         .setTitle('Dev Help List')
         .setDescription(
