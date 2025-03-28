@@ -5,7 +5,7 @@ import { TextChannel } from 'discord.js';
 exports.run = async (event: MessageEventLocal): Promise<void> => {
     const printToChannel = !event.data.get(EventDataNames.IS_SILENT);
     if (printToChannel) await (<TextChannel>event.channel).send('updating time...');
-    exec(
+    const process = exec(
         'sudo date -s "$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date: | cut -d\' \' -f5-8)Z"',
         async (err, stdout, stderr) => {
             let resp = '';
