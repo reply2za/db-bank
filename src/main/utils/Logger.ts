@@ -34,6 +34,7 @@ class Logger implements ILogger {
         comment: string,
         additionalText?: string
     ) {
+        console.log('a');
         const unitFormatter = unitFormatFactory(transferType);
         const embed = new EmbedBuilderLocal()
             .setTitle(`[${transferType.toString()}] (${sender.getUsername()} -> ${receiver.getUsername()})\n`)
@@ -42,7 +43,8 @@ class Logger implements ILogger {
             )
             .setFooter(
                 `[${sender.getDBName()} -> ${receiver.getDBName()}] ${sender.getUserId()},${receiver.getUserId()}`
-            );
+            )
+            .setThumbnail(sender.getDiscordUser().displayAvatarURL());
         for (const chId of config.simpleTransactionLogChID) {
             const channel = <TextChannel>await bot.channels.fetch(chId);
             await embed.send(channel);
