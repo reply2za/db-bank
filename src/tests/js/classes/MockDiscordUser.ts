@@ -20,4 +20,6 @@ export class MockDiscordUser {
     async fetch() {
         return this;
     }
+
+    displayAvatarURL() {}
 }
