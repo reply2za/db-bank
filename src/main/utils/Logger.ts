@@ -34,10 +34,9 @@ class Logger implements ILogger {
         comment: string,
         additionalText?: string
     ) {
-        console.log('a');
         const unitFormatter = unitFormatFactory(transferType);
         const embed = new EmbedBuilderLocal()
-            .setTitle(`[${transferType.toString()}] (${sender.getUsername()} -> ${receiver.getUsername()})\n`)
+            .setTitle(`[${transferType.toString()}] ${sender.getUsername()} -> ${receiver.getUsername()}\n`)
             .setDescription(
                 `amount: ${unitFormatter(amount)}\ncomment: ${comment}${additionalText ? `\n${additionalText}` : ''}`
             )

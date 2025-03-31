@@ -98,16 +98,17 @@ exports.run = async (event: MessageEventLocal): Promise<void> => {
                 const senderName = sender?.getDBName() || iou.sender.name;
                 const receiverName = receiver?.getDBName() || iou.receiver.name;
                 await Logger.transactionLog(
-                    `[iou redemption] (${iou.sender.id} -> ${iou.receiver.id})\n` +
+                    `[iou redemption] (${iou.receiver.id} -> ${iou.sender.id})\n` +
                         `${receiverName} redeemed ${amountTxt} from ${senderName} \n` +
                         `IOU reason: ${iou.comment || 'N/A'}\n` +
                         `Redemption reason: ${redemptionComment || 'N/A'}\n` +
                         `----------------------------------------`
                 );
                 if (sender && receiver) {
+                    // receiver becomes the sender as this is an IOU redemption
                     await logger.simpleTransactionLog(
-                        sender,
                         receiver,
+                        sender,
                         RedemptionType.REDEEM_IOU,
                         quantity,
                         redemptionComment,
