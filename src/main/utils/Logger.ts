@@ -34,20 +34,27 @@ class Logger implements ILogger {
         comment: string,
         additionalText?: string
     ) {
+        const truncatedIdLength = 7;
         const unitFormatter = unitFormatFactory(transferType);
-        const embed = new EmbedBuilderLocal()
+        const footerText = `[${sender.getDBName()} -> ${receiver.getDBName()}] [${this.truncateDisplayEnding(sender.getUserId(), truncatedIdLength)},${this.truncateDisplayEnding(receiver.getUserId(), truncatedIdLength)}]`;
+        let embed = new EmbedBuilderLocal()
             .setTitle(`[${transferType.toString()}] ${sender.getUsername()} -> ${receiver.getUsername()}\n`)
             .setDescription(
                 `amount: ${unitFormatter(amount)}\ncomment: ${comment}${additionalText ? `\n${additionalText}` : ''}`
             )
-            .setFooter(
-                `[${sender.getDBName()} -> ${receiver.getDBName()}] ${sender.getUserId()},${receiver.getUserId()}`
-            )
-            .setThumbnail(sender.getDiscordUser().displayAvatarURL());
+            .setFooter({
+                iconURL: sender.getDiscordUser().displayAvatarURL(),
+                text: footerText,
+            })
+            .setThumbnail(receiver.getDiscordUser().displayAvatarURL());
         for (const chId of config.simpleTransactionLogChID) {
             const channel = <TextChannel>await bot.channels.fetch(chId);
             await embed.send(channel);
         }
+    }
+
+    truncateDisplayEnding(str: string, count: number) {
+        return str.substring(str.length - count);
     }
 
     /**
