@@ -2,7 +2,8 @@
 
 echo "[NOTICE] Ensure localData.txt is up to date"
 echo "building js..."
-npm run build:prod
+npm install;
+npm run build:prod;
 
 echo "running pm2 script..."
 NAME=${1:-db-bank}
