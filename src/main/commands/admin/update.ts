@@ -38,6 +38,6 @@ exports.run = async (event: MessageEventLocal): Promise<void> => {
 };
 
 async function update(channel: TextChannel) {
-    await channel.send('updating... (notice: prod process starts in a sidelined state)');
+    await channel.send('updating... (notice: prod process may start in a sidelined state)');
     execSync('git stash && git pull && npm run prod');
 }
