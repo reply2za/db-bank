@@ -38,7 +38,7 @@ class Logger implements ILogger {
         const unitFormatter = unitFormatFactory(transferType);
         const footerText = `[${sender.getDBName()} -> ${receiver.getDBName()}] [${this.truncateDisplayEnding(sender.getUserId(), truncatedIdLength)},${this.truncateDisplayEnding(receiver.getUserId(), truncatedIdLength)}]`;
         let embed = new EmbedBuilderLocal()
-            .setTitle(`${transferType.toString()}: ${sender.getUsername()} > ${receiver.getUsername()}\n`)
+            .setTitle(`${transferType.toString()}: ${sender.getUsername()} -> ${receiver.getUsername()}\n`)
             .setDescription(
                 `amount: ${unitFormatter(amount)}\ncomment: ${comment}${additionalText ? `\n${additionalText}` : ''}`
             )
