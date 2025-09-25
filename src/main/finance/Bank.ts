@@ -166,7 +166,7 @@ export class Bank {
     }
 
     /**
-     * Gets all the active IOU tickets given to a author.
+     * Gets all the active IOU tickets given to an author.
      * @param id The author id
      */
     getUserIOUs(id: string): IOUTicket[] {

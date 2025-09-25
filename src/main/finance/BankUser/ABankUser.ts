@@ -12,6 +12,7 @@ export abstract class ABankUser {
     private static readonly MAX_HISTORY_LENGTH = 2;
     private maxBidDate: string;
     private maxBidAmount: number = -1;
+    private isExcommunicado: boolean = false;
 
     public constructor(discordUser: User, name: string, balance: Balance, history: string[] = []) {
         this.userId = discordUser.id;
@@ -83,6 +84,7 @@ export abstract class ABankUser {
             name: this.name,
             balance: this.balance.value,
             history: this.history,
+            excommunicado: this.isExcommunicado,
         };
     }
 

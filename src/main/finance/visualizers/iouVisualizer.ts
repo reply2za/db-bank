@@ -36,13 +36,18 @@ export default {
     },
     /**
      * Shows sent IOUs.
-     * @param ious A list of IOUs that were sent by a author.
+     * @param ious A list of IOUs that were sent by an author.
      */
     getSentIOUEmbed(ious: IOUTicket[]) {
         let descriptionText = '';
         let i = 1;
         let total = 0;
         for (const singleIOU of ious) {
+            let now = Date.now();
+            let expDate = Date.parse(singleIOU.expirationDate);
+            if (!Number.isNaN(expDate)) {
+                if (expDate >= now) continue;
+            }
             total += singleIOU.quantity;
             descriptionText += getIOUDescription(
                 i,
