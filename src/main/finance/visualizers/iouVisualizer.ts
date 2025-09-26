@@ -45,9 +45,7 @@ export default {
         for (const singleIOU of ious) {
             let now = Date.now();
             let expDate = Date.parse(singleIOU.expirationDate);
-            if (!Number.isNaN(expDate)) {
-                if (expDate >= now) continue;
-            }
+            if (expDate && expDate < now) continue;
             total += singleIOU.quantity;
             descriptionText += getIOUDescription(
                 i,
