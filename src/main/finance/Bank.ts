@@ -170,9 +170,9 @@ export class Bank {
      * @param id The author id
      */
     getUserIOUs(id: string): IOUTicket[] {
-        let iouArr = this.#iOUList.filter((value: IOUTicket) => value.receiver.id === id);
-        let now = Date.now();
-        return iouArr.filter((iou) => {
+        const receiverIOUs = this.#iOUList.filter((t: IOUTicket) => t.receiver.id === id);
+        const now = Date.now();
+        return receiverIOUs.filter((iou) => {
             let expDate = Date.parse(iou.expirationDate);
             if (Number.isNaN(expDate)) return true;
             return expDate >= now;
@@ -227,17 +227,19 @@ export class Bank {
                 console.log('could not load author data\n', e);
             }
         }
+
         for (let iou of parsedData.bank.ious) {
+            const iouExpirationDate = iou.expDate ?? iou.expirationDate;
+            const expDate = Date.parse(iouExpirationDate);
+            if (Number.isFinite(expDate)) {
+                if (expDate > Date.now()) {
+                    // skip the expired IOUs
+                    continue;
+                }
+            }
+
             this.#iOUList.push(
-                new IOUTicket(
-                    iou.id,
-                    iou.sender,
-                    iou.receiver,
-                    iou.date,
-                    iou.expDate ?? iou.expirationDate,
-                    iou.comment,
-                    iou.quantity
-                )
+                new IOUTicket(iou.id, iou.sender, iou.receiver, iou.date, iouExpirationDate, iou.comment, iou.quantity)
             );
         }
     }
