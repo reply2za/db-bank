@@ -6,3 +6,4 @@ localData.txt
 .idea
 local
 src/tests/resources/testData.txt
+.tsbuildinfo
