@@ -232,7 +232,7 @@ export class Bank {
             const iouExpirationDate = iou.expDate ?? iou.expirationDate;
             const expDate = Date.parse(iouExpirationDate);
             if (Number.isFinite(expDate)) {
-                if (expDate > Date.now()) {
+                if (expDate < Date.now()) {
                     // skip the expired IOUs
                     continue;
                 }
